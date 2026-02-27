@@ -1,4 +1,4 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
+import { Request, Response } from 'express';
 import { createClient } from '@supabase/supabase-js';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
@@ -20,7 +20,7 @@ const generateSessionToken = (): string => {
   return crypto.randomBytes(48).toString('hex');
 };
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req: Request, res: Response) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');

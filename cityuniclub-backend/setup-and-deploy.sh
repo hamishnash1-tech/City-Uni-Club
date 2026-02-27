@@ -16,7 +16,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-BACKEND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/cityuniclub-backend"
+BACKEND_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$BACKEND_DIR"
 
 echo -e "${BLUE}Step 1: Install Dependencies${NC}"
