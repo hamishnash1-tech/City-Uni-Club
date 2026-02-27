@@ -301,22 +301,22 @@ class APIService {
         purpose: String,
         specialRequests: String? = nil
     ) async throws -> LoiRequest {
-        struct LoiRequest: Encodable {
+        struct LoiRequestBody: Encodable {
             let club_id: String
             let arrival_date: String
             let departure_date: String
             let purpose: String
             let special_requests: String?
         }
-        
+
         struct LoiResponse: Decodable {
             let request: LoiRequest
         }
-        
+
         let response: LoiResponse = try await request(
             endpoint: "/loi-requests",
             method: "POST",
-            body: LoiRequest(
+            body: LoiRequestBody(
                 club_id: clubId,
                 arrival_date: arrivalDate,
                 departure_date: departureDate,
@@ -325,7 +325,7 @@ class APIService {
             ),
             requiresAuth: true
         )
-        
+
         return response.request
     }
     
@@ -344,22 +344,21 @@ class APIService {
     }
     
     // MARK: - Member Profile Endpoints
-    
+
     func getMemberProfile() async throws -> (member: Member, profile: MemberProfile?) {
-        struct ProfileResponse: Decodable {
+        struct MemberResponse: Decodable {
             let member: Member
-            let profile: MemberProfile?
         }
-        
-        let response: ProfileResponse = try await request(
+
+        let memberResp: MemberResponse = try await request(
             endpoint: "/members/profile",
             method: "GET",
             requiresAuth: true
         )
-        
-        return (response.member, response.profile)
+
+        return (memberResp.member, nil)
     }
-    
+
     func updateMemberProfile(
         fullName: String? = nil,
         firstName: String? = nil,
@@ -374,13 +373,12 @@ class APIService {
             let dietary_requirements: String?
             let notification_enabled: Bool?
         }
-        
-        struct ProfileResponse: Decodable {
+
+        struct MemberResponse: Decodable {
             let member: Member
-            let profile: MemberProfile?
         }
-        
-        let response: ProfileResponse = try await request(
+
+        let response: MemberResponse = try await request(
             endpoint: "/members/profile",
             method: "PUT",
             body: ProfileUpdateRequest(
@@ -392,6 +390,9 @@ class APIService {
             ),
             requiresAuth: true
         )
+
+        return (response.member, nil)
+    }
         
         return (response.member, response.profile)
     }
