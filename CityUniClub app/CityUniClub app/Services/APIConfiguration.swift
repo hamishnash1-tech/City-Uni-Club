@@ -16,8 +16,9 @@ enum APIConfiguration {
     // Replace with your Mac's local IP address
     // static let baseURL = "http://192.168.1.100:3000/api"
     
-    // For production (deployed server)
-    static let baseURL = "https://cityuniclub-backend-production.up.railway.app/api"
+    // For production (Vercel deployment)
+    // Update this after deploying to Vercel
+    static let baseURL = "https://city-uni-club-frontend.vercel.app/api"
     
     static let timeout: TimeInterval = 30
 }
