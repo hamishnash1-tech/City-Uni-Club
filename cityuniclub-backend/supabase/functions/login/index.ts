@@ -1,7 +1,7 @@
 // Follow Deno runtime
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import bcrypt from 'https://deno.land/x/bcrypt@0.5.0/mod.ts'
+import { compare } from "https://deno.land/x/bcrypt@0.4.1/mod.ts"
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -45,7 +45,7 @@ serve(async (req: Request) => {
     }
 
     // Verify password
-    const isValid = await bcrypt.compare(password, member.password_hash)
+    const isValid = await compare(password, member.password_hash)
     if (!isValid) {
       throw new Error('Invalid email or password')
     }
