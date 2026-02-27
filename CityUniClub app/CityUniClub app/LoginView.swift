@@ -8,6 +8,9 @@ struct LoginView: View {
     @State private var errorMessage = ""
     @State private var isLoading = false
     @State private var isLoggedIn = false
+    @State private var isCheckingAuth = true
+    
+    private let apiService = APIService.shared
     
     var body: some View {
         ZStack {
@@ -189,7 +192,19 @@ struct LoginView: View {
         }
         // ✅ .fullScreenCover goes HERE - attached to the root ZStack
         .fullScreenCover(isPresented: $isLoggedIn) {
-            MainAppView()
+            MainTabView()
+        }
+        .onAppear {
+            checkExistingAuth()
+        }
+    }
+    
+    // MARK: - Auth Check
+    private func checkExistingAuth() {
+        guard !isCheckingAuth else { return }
+        
+        if apiService.isAuthenticated {
+            isLoggedIn = true
         }
     }
     
@@ -198,23 +213,27 @@ struct LoginView: View {
         isLoading = true
         showError = false
         
-        // Simulate API call to club database
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            // Validate credentials (replace with actual API call)
-            if isValidCredentials() {
-                isLoggedIn = true
-            } else {
-                errorMessage = "Invalid membership email or password"
-                showError = true
+        Task {
+            do {
+                _ = try await apiService.login(email: email, password: password)
+                await MainActor.run {
+                    isLoading = false
+                    isLoggedIn = true
+                }
+            } catch let error as APIError {
+                await MainActor.run {
+                    isLoading = false
+                    errorMessage = error.errorDescription ?? "Login failed"
+                    showError = true
+                }
+            } catch {
+                await MainActor.run {
+                    isLoading = false
+                    errorMessage = "Invalid membership email or password"
+                    showError = true
+                }
             }
-            isLoading = false
         }
-    }
-    
-    // MARK: - Validation
-    private func isValidCredentials() -> Bool {
-        // Replace with actual database validation
-        return !email.isEmpty && !password.isEmpty && email.contains("@")
     }
 }
 

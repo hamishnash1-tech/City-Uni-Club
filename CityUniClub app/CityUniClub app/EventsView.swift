@@ -1,39 +1,30 @@
 import SwiftUI
 
 struct EventsView: View {
-    // Using ClubEvent instead of Event to avoid conflict
-    let events: [ClubEvent] = [
-        ClubEvent(title: "Sri Lankan Lunch and Dinner", dateString: "Wednesday 25 February", type: .lunchDinner),
-        ClubEvent(title: "Younger Member's Dinner", dateString: "Thursday 26 February", type: .dinner),
-        ClubEvent(title: "New Member, Candidates Meeting", dateString: "TBA", type: .meeting),
-        ClubEvent(title: "St Patrick's Day Lunch", dateString: "Tuesday 17 March", type: .lunch),
-        ClubEvent(title: "Younger Members Dinner", dateString: "Thursday 26 March", type: .dinner),
-        ClubEvent(title: "4 Course French Tasting Menu with Paired Wines", dateString: "March (TBA)", type: .special),
-        ClubEvent(title: "Sea Food Lunch", dateString: "April (tba)", type: .lunch),
-        ClubEvent(title: "Literary Lunch", dateString: "Friday 17 April", type: .lunch),
-        ClubEvent(title: "St George's Day Lunch", dateString: "Thursday 23 April", type: .lunch),
-        ClubEvent(title: "Younger Members Dinner", dateString: "Thursday 30 April", type: .dinner),
-        ClubEvent(title: "Royal Ascot Tent", dateString: "Wednesday 17 June", type: .special)
-    ]
-    
-    @State private var selectedEvent: ClubEvent?
+    @State private var events: [Event] = []
+    @State private var isLoading = true
+    @State private var showError = false
+    @State private var selectedEvent: Event?
     @State private var showBookingSheet = false
     @State private var selectedMeal: MealOption?
     @State private var guestCount = 1
     @State private var specialRequests = ""
     @State private var showConfirmation = false
+    @State private var isBooking = false
     
+    private let apiService = APIService.shared
+
     enum MealOption: String, CaseIterable, Identifiable {
         case lunch = "Lunch (12:30 PM)"
         case dinner = "Dinner (7:00 PM)"
-        
+
         var id: String { self.rawValue }
     }
     
     var body: some View {
         ZStack {
             Color.oxfordBlue.ignoresSafeArea()
-            
+
             VStack(spacing: 0) {
                 // Header
                 Text("Club Events")
@@ -41,24 +32,52 @@ struct EventsView: View {
                     .foregroundColor(.white)
                     .padding(.top, 50)
                     .padding(.bottom, 20)
-                
-                ScrollView {
-                    LazyVStack(spacing: 16) {
-                        ForEach(events) { event in
-                            EventCard(
-                                event: event,
-                                onBook: {
-                                    selectedEvent = event
-                                    selectedMeal = nil
-                                    guestCount = 1
-                                    specialRequests = ""
-                                    showBookingSheet = true
-                                }
-                            )
+
+                if isLoading {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .scaleEffect(1.5)
+                } else if showError {
+                    VStack(spacing: 16) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.system(size: 48))
+                            .foregroundColor(.white.opacity(0.7))
+                        Text("Failed to load events")
+                            .foregroundColor(.white)
+                        Button("Retry") {
+                            loadEvents()
                         }
+                        .padding()
+                        .background(Color.cambridgeBlue)
+                        .cornerRadius(10)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 30)
+                } else if events.isEmpty {
+                    VStack(spacing: 16) {
+                        Image(systemName: "calendar.badge.exclamationmark")
+                            .font(.system(size: 48))
+                            .foregroundColor(.white.opacity(0.7))
+                        Text("No upcoming events")
+                            .foregroundColor(.white)
+                    }
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(events) { event in
+                                EventCard(
+                                    event: event,
+                                    onBook: {
+                                        selectedEvent = event
+                                        selectedMeal = nil
+                                        guestCount = 1
+                                        specialRequests = ""
+                                        showBookingSheet = true
+                                    }
+                                )
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 30)
+                    }
                 }
             }
         }
@@ -71,11 +90,64 @@ struct EventsView: View {
             Button("OK", role: .cancel) { }
         } message: {
             if let event = selectedEvent {
-                if event.type == .lunchDinner, let meal = selectedMeal {
+                if event.eventType == "lunch_dinner", let meal = selectedMeal {
                     Text("You have booked \(guestCount) ticket\(guestCount > 1 ? "s" : "") for \(meal.rawValue) at \(event.title)")
                 } else {
                     Text("You have booked \(guestCount) ticket\(guestCount > 1 ? "s" : "") for \(event.title)")
                 }
+            }
+        }
+        .onAppear {
+            loadEvents()
+        }
+    }
+    
+    private func loadEvents() {
+        isLoading = true
+        showError = false
+        
+        Task {
+            do {
+                let loadedEvents = try await apiService.getEvents(upcoming: true)
+                await MainActor.run {
+                    self.events = loadedEvents
+                    self.isLoading = false
+                }
+            } catch {
+                await MainActor.run {
+                    self.showError = true
+                    self.isLoading = false
+                }
+            }
+        }
+    }
+    
+    private func confirmBooking() async {
+        guard let event = selectedEvent else { return }
+        
+        isBooking = true
+        
+        do {
+            let mealOption: String? = selectedMeal?.rawValue == "Lunch (12:30 PM)" ? "lunch" : 
+                                       selectedMeal?.rawValue == "Dinner (7:00 PM)" ? "dinner" : nil
+            
+            _ = try await apiService.bookEvent(
+                eventId: event.id,
+                mealOption: mealOption,
+                guestCount: guestCount,
+                specialRequests: specialRequests.isEmpty ? nil : specialRequests
+            )
+            
+            await MainActor.run {
+                isBooking = false
+                showBookingSheet = false
+                showConfirmation = true
+            }
+        } catch {
+            await MainActor.run {
+                isBooking = false
+                showBookingSheet = false
+                showError = true
             }
         }
     }
@@ -113,12 +185,12 @@ struct EventsView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 24) {
                         // Meal Selection for Lunch/Dinner Events
-                        if event.type == .lunchDinner {
+                        if event.eventType == "lunch_dinner" {
                             VStack(alignment: .leading, spacing: 12) {
                                 Text("Select Sitting")
                                     .font(.system(size: 16, weight: .semibold))
                                     .foregroundColor(.oxfordBlue)
-                                
+
                                 HStack(spacing: 16) {
                                     ForEach(MealOption.allCases) { meal in
                                         mealSelectionButton(meal)
@@ -233,28 +305,32 @@ struct EventsView: View {
                     }
                     
                     Button(action: {
-                        // Validate meal selection for lunch/dinner events
-                        if event.type == .lunchDinner && selectedMeal == nil {
-                            // Show error - but for now just return
-                            return
+                        Task {
+                            await confirmBooking()
                         }
-                        showBookingSheet = false
-                        showConfirmation = true
                     }) {
-                        Text("Confirm Booking")
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(
-                                        (event.type == .lunchDinner && selectedMeal == nil) ?
-                                        Color.gray : Color.oxfordBlue
-                                    )
-                            )
+                        HStack {
+                            if isBooking {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .scaleEffect(0.8)
+                            } else {
+                                Text("Confirm Booking")
+                                    .font(.system(size: 16, weight: .semibold))
+                            }
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(
+                                    (event.eventType == "lunch_dinner" && selectedMeal == nil) || isBooking ?
+                                    Color.gray : Color.oxfordBlue
+                                )
+                        )
                     }
-                    .disabled(event.type == .lunchDinner && selectedMeal == nil)
+                    .disabled((event.eventType == "lunch_dinner" && selectedMeal == nil) || isBooking)
                 }
                 .padding(.horizontal, 24)
                 .padding(.bottom, 30)
@@ -401,7 +477,7 @@ struct EventCard: View {
                 }
                 
                 // Show time options indicator for lunch/dinner events
-                if event.type == .lunchDinner {
+                if event.eventType == "lunch_dinner" {
                     HStack(spacing: 12) {
                         Label("Lunch 12:30", systemImage: "sun.max.fill")
                             .font(.system(size: 12))
