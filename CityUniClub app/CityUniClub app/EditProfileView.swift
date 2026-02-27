@@ -97,6 +97,7 @@ struct EditProfileView: View {
                                     .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
                             )
                     )
+                    .accentColor(.white)
             }
             
             VStack(alignment: .leading, spacing: 12) {
@@ -116,6 +117,7 @@ struct EditProfileView: View {
                                     .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
                             )
                     )
+                    .accentColor(.white)
             }
             
             VStack(alignment: .leading, spacing: 12) {
@@ -137,6 +139,7 @@ struct EditProfileView: View {
                                     .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
                             )
                     )
+                    .accentColor(.white)
             }
             
             VStack(alignment: .leading, spacing: 12) {
@@ -157,6 +160,7 @@ struct EditProfileView: View {
                                     .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
                             )
                     )
+                    .accentColor(.white)
             }
         }
         .padding()

@@ -97,9 +97,26 @@ struct MembershipProfileView: View {
                     Text("Member Until")
                         .font(.system(size: 9, weight: .regular))
                         .foregroundColor(.secondaryText)
-                    Text(member?.memberUntil ?? "TBD")
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(.oxfordBlue)
+                    if let memberUntil = member?.memberUntil {
+                        // Format: "March 2026"
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "yyyy-MM-dd"
+                        if let date = dateFormatter.date(from: memberUntil) {
+                            let outputFormatter = DateFormatter()
+                            outputFormatter.dateFormat = "MMMM yyyy"
+                            Text(outputFormatter.string(from: date))
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.oxfordBlue)
+                        } else {
+                            Text(memberUntil)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(.oxfordBlue)
+                        }
+                    } else {
+                        Text("TBD")
+                            .font(.system(size: 12, weight: .semibold))
+                            .foregroundColor(.oxfordBlue)
+                    }
                 }
 
                 Spacer()
