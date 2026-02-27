@@ -15,13 +15,11 @@ The iOS app now connects **directly to Supabase** - no backend server needed!
 
 ## Setup Steps
 
-### 1. Get Your Supabase Anon Key
+### ✅ Supabase Already Configured!
 
-1. Go to: [Supabase Dashboard](https://supabase.com/dashboard/project/myfoyoyjtkqthjjvabmn/settings/api)
-2. Copy the **`anon` / `public`** key (NOT service_role)
-3. It starts with `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`
+Your Supabase credentials are already set up in the app. Just follow these steps:
 
-### 2. Add Supabase Swift Package
+### 1. Add Supabase Swift Package
 
 In Xcode:
 1. Open your CityUniClub project
@@ -30,34 +28,7 @@ In Xcode:
 4. Click **Add Package**
 5. Select your target: **CityUniClub app**
 
-### 3. Configure SupabaseManager
-
-Open: `CityUniClub app/CityUniClub app/Services/SupabaseManager.swift`
-
-Find this line (around line 24):
-```swift
-let supabaseKey = "YOUR_ANON_KEY_HERE"
-```
-
-Replace with your actual anon key:
-```swift
-let supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.your-actual-anon-key-here"
-```
-
-### 4. Update LoginView
-
-The LoginView is already set up to use SupabaseManager. Just make sure it's imported:
-
-```swift
-import SwiftUI
-
-struct LoginView: View {
-    @StateObject private var supabase = SupabaseManager.shared
-    // ... rest of the code
-}
-```
-
-### 5. Build & Run!
+### 2. Build & Run!
 
 Your app is now connected directly to Supabase! ✅
 

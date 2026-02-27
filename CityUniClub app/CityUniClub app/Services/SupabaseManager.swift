@@ -27,17 +27,10 @@ class SupabaseManager: ObservableObject {
     
     init() {
         // Initialize Supabase client
-        // Replace with your actual Supabase URL and anon key
         let supabaseURL = "https://myfoyoyjtkqthjjvabmn.supabase.co"
-        let supabaseKey = "YOUR_ANON_KEY_HERE" // Get this from Supabase Dashboard → Settings → API
+        let supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Zm95b3lqdGtxdGhqanZhYm1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDI5NDAsImV4cCI6MjA4Nzc3ODk0MH0._OhoEKRYAZ0C7oon9e_WSj7p47pJlWQmqBgx2CtBtdg"
         
-        // Only initialize if keys are configured
-        if supabaseKey != "YOUR_ANON_KEY_HERE" {
-            self.supabase = SupabaseClient(supabaseURL: supabaseURL, supabaseKey: supabaseKey)
-        } else {
-            self.supabase = nil
-            print("⚠️ Supabase not configured - add your anon key in SupabaseManager.swift")
-        }
+        self.supabase = SupabaseClient(supabaseURL: supabaseURL, supabaseKey: supabaseKey)
     }
     
     // MARK: - Authentication
