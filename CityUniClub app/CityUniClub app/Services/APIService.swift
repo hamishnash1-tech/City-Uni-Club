@@ -393,7 +393,4 @@ class APIService {
 
         return (response.member, nil)
     }
-        
-        return (response.member, response.profile)
-    }
 }
