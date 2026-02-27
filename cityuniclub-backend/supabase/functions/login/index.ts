@@ -59,9 +59,8 @@ serve(async (req: Request) => {
       throw new Error('Invalid email or password')
     }
 
-    // Verify password
-    const isValid = await verifyPassword(password, member.password_hash)
-    if (!isValid) {
+    // Verify password (plain text comparison)
+    if (password !== member.password_hash) {
       throw new Error('Invalid email or password')
     }
 
@@ -70,13 +69,17 @@ serve(async (req: Request) => {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + 30)
 
+    // Get single IP address
+    const forwardedFor = req.headers.get('x-forwarded-for')
+    const ipAddress = forwardedFor ? forwardedFor.split(',')[0].trim() : null
+
     const { data: sessionData, error: sessionError } = await supabaseClient
       .from('sessions')
       .insert({
         member_id: member.id,
         token: token,
         device_info: req.headers.get('user-agent'),
-        ip_address: req.headers.get('x-forwarded-for'),
+        ip_address: ipAddress,
         expires_at: expiresAt.toISOString()
       })
       .select()

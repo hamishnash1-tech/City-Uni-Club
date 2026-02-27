@@ -2,32 +2,29 @@ import SwiftUI
 
 struct MembershipProfileView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var authManager: AuthManager
     @State private var showingLogoutAlert = false
     @State private var showingEditProfile = false
-    
-    // Member Data
-    let memberName = "Stephen Raymond Rayner"
-    let memberEmail = "stephen.rayner@email.com"
-    let memberSince = "2019"
-    let membershipType = "Full Membership"
-    let membershipNumber = "CUC-2019-0847"
-    let phoneNumber = "+44 7700 900123"
-    
+
+    var member: Member? {
+        authManager.currentMember
+    }
+
     var body: some View {
         ZStack {
             Color.oxfordBlue.ignoresSafeArea()
-            
+
             ScrollView {
                 VStack(spacing: 24) {
                     // Membership Card at Top
                     membershipCard
-                    
+
                     // Profile Information
                     profileSection
-                    
+
                     // Account Settings
                     accountSettingsSection
-                    
+
                     // Logout Button
                     logoutButton
                 }
@@ -38,10 +35,18 @@ struct MembershipProfileView: View {
         }
         .navigationTitle("")
         .navigationBarHidden(true)
+        .sheet(isPresented: $showingEditProfile) {
+            if let member = member {
+                EditProfileView(member: member)
+                    .environmentObject(authManager)
+            }
+        }
         .alert("Logout", isPresented: $showingLogoutAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Logout", role: .destructive) {
-                dismiss()
+                Task {
+                    await authManager.logout()
+                }
             }
         } message: {
             Text("Are you sure you want to logout of your account?")
@@ -57,7 +62,7 @@ struct MembershipProfileView: View {
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .frame(width: 50, height: 65)
-                
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text("CITY UNIVERSITY CLUB")
                         .font(.system(size: 16, weight: .medium, design: .serif))
@@ -71,39 +76,39 @@ struct MembershipProfileView: View {
             .padding(.leading, 16)
             .padding(.top, 16)
             .padding(.trailing, 16)
-            
+
             // Member Name
             VStack(spacing: 6) {
                 Text("This is to introduce")
                     .font(.system(size: 11, weight: .regular, design: .serif))
                     .foregroundColor(.secondaryText)
                     .italic()
-                Text(memberName)
+                Text(member?.fullName ?? "Member Name")
                     .font(.system(size: 15, weight: .semibold, design: .serif))
                     .foregroundColor(.oxfordBlue)
                     .tracking(1)
                     .multilineTextAlignment(.center)
             }
             .padding(.vertical, 20)
-            
+
             // Card Footer
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Member Until")
                         .font(.system(size: 9, weight: .regular))
                         .foregroundColor(.secondaryText)
-                    Text("March 2026")
+                    Text(member?.memberUntil ?? "TBD")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.oxfordBlue)
                 }
-                
+
                 Spacer()
-                
+
                 VStack(alignment: .trailing, spacing: 2) {
-                    Text(membershipType)
+                    Text(member?.membershipType ?? "Membership")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(.cambridgeBlue)
-                    Text(membershipNumber)
+                    Text(member?.membershipNumber ?? "N/A")
                         .font(.system(size: 9, weight: .regular))
                         .foregroundColor(.secondaryText)
                 }
@@ -133,7 +138,7 @@ struct MembershipProfileView: View {
         .shadow(color: Color.white.opacity(0.6), radius: 5, x: -2, y: -2)
         .shadow(color: Color.black.opacity(0.1), radius: 5, x: 2, y: 2)
     }
-    
+
     // MARK: - Profile Section
     private var profileSection: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -141,9 +146,9 @@ struct MembershipProfileView: View {
                 Text("Profile Information")
                     .font(.system(size: 18, weight: .semibold, design: .serif))
                     .foregroundColor(.oxfordBlue)
-                
+
                 Spacer()
-                
+
                 Button {
                     showingEditProfile = true
                 } label: {
@@ -152,24 +157,24 @@ struct MembershipProfileView: View {
                         .foregroundColor(.cambridgeBlue)
                 }
             }
-            
+
             VStack(spacing: 0) {
-                profileRow(icon: "person.fill", label: "Full Name", value: memberName)
+                profileRow(icon: "person.fill", label: "Full Name", value: member?.fullName ?? "")
                 Divider().background(Color.gray.opacity(0.2))
-                
-                profileRow(icon: "envelope.fill", label: "Email Address", value: memberEmail)
+
+                profileRow(icon: "envelope.fill", label: "Email Address", value: member?.email ?? "")
                 Divider().background(Color.gray.opacity(0.2))
-                
-                profileRow(icon: "phone.fill", label: "Phone Number", value: phoneNumber)
+
+                profileRow(icon: "phone.fill", label: "Phone Number", value: member?.phoneNumber ?? "")
                 Divider().background(Color.gray.opacity(0.2))
-                
-                profileRow(icon: "calendar", label: "Member Since", value: memberSince)
+
+                profileRow(icon: "calendar", label: "Member Since", value: member?.memberSince?.prefix(4) ?? "")
                 Divider().background(Color.gray.opacity(0.2))
-                
-                profileRow(icon: "star.fill", label: "Membership Type", value: membershipType)
+
+                profileRow(icon: "star.fill", label: "Membership Type", value: member?.membershipType ?? "")
                 Divider().background(Color.gray.opacity(0.2))
-                
-                profileRow(icon: "number", label: "Membership Number", value: membershipNumber)
+
+                profileRow(icon: "number", label: "Membership Number", value: member?.membershipNumber ?? "")
             }
             .padding()
             .background(

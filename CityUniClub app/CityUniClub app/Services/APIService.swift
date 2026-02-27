@@ -440,4 +440,23 @@ class APIService {
 
         return (response.member, nil)
     }
+    
+    func updateMemberEmail(email: String) async throws -> Member {
+        struct UpdateRequest: Encodable {
+            let email: String
+        }
+        
+        struct MemberResponse: Decodable {
+            let member: Member
+        }
+        
+        let response: MemberResponse = try await request(
+            endpoint: "/members/profile",
+            method: "PUT",
+            body: UpdateRequest(email: email),
+            requiresAuth: true
+        )
+        
+        return response.member
+    }
 }
