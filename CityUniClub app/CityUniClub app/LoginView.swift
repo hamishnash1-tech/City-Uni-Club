@@ -1,17 +1,15 @@
 import SwiftUI
 
 struct LoginView: View {
+    @EnvironmentObject var authManager: AuthManager
+    
     @State private var email = ""
     @State private var password = ""
     @State private var showPassword = false
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var isLoading = false
-    @State private var isLoggedIn = false
-    @State private var isCheckingAuth = true
-    
-    private let apiService = APIService.shared
-    
+
     var body: some View {
         ZStack {
             // Oxford Blue Background
@@ -190,21 +188,8 @@ struct LoginView: View {
                     .padding(.bottom, 20)
             }
         }
-        // ✅ .fullScreenCover goes HERE - attached to the root ZStack
-        .fullScreenCover(isPresented: $isLoggedIn) {
+        .fullScreenCover(isPresented: $authManager.isAuthenticated) {
             MainTabView()
-        }
-        .onAppear {
-            checkExistingAuth()
-        }
-    }
-    
-    // MARK: - Auth Check
-    private func checkExistingAuth() {
-        guard !isCheckingAuth else { return }
-        
-        if apiService.isAuthenticated {
-            isLoggedIn = true
         }
     }
     
@@ -215,11 +200,7 @@ struct LoginView: View {
         
         Task {
             do {
-                _ = try await apiService.login(email: email, password: password)
-                await MainActor.run {
-                    isLoading = false
-                    isLoggedIn = true
-                }
+                try await authManager.login(email: email, password: password)
             } catch let error as APIError {
                 await MainActor.run {
                     isLoading = false

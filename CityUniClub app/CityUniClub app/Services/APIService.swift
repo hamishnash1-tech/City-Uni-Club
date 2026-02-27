@@ -93,7 +93,7 @@ class APIService {
         }
         
         let response: AuthResponse = try await request(
-            endpoint: "/auth/login",
+            endpoint: "/login",
             method: "POST",
             body: LoginRequest(email: email, password: password),
             requiresAuth: false
@@ -107,12 +107,27 @@ class APIService {
         guard isAuthenticated else { return }
         
         try await request(
-            endpoint: "/auth/logout",
+            endpoint: "/logout",
             method: "POST",
             requiresAuth: true
         )
         
         clearAuthToken()
+    }
+    
+    func validateToken(_ token: String) async throws -> Bool {
+        let url = URL(string: "\(APIConfiguration.baseURL)/auth/validate")!
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            return false
+        }
+        
+        return httpResponse.statusCode == 200
     }
     
     func getCurrentMember() async throws -> Member {
@@ -121,7 +136,7 @@ class APIService {
         }
         
         let response: MemberResponse = try await request(
-            endpoint: "/auth/me",
+            endpoint: "/me",
             method: "GET",
             requiresAuth: true
         )
@@ -137,7 +152,7 @@ class APIService {
         }
         
         let response: EventsResponse = try await request(
-            endpoint: "/events?upcoming=true",
+            endpoint: "/events",
             method: "GET",
             requiresAuth: false
         )
@@ -147,6 +162,7 @@ class APIService {
     
     func bookEvent(eventId: String, mealOption: String? = nil, guestCount: Int, specialRequests: String? = nil) async throws -> EventBooking {
         struct BookingRequest: Encodable {
+            let event_id: String
             let meal_option: String?
             let guest_count: Int
             let special_requests: String?
@@ -157,9 +173,10 @@ class APIService {
         }
         
         let response: BookingResponse = try await request(
-            endpoint: "/events/\(eventId)/book",
+            endpoint: "/events/book",
             method: "POST",
             body: BookingRequest(
+                event_id: eventId,
                 meal_option: mealOption,
                 guest_count: guestCount,
                 special_requests: specialRequests
@@ -263,7 +280,7 @@ class APIService {
             let clubs: [ReciprocalClub]
         }
         
-        var endpoint = "/reciprocal/clubs"
+        var endpoint = "/clubs"
         if let region = region, region != "All" {
             endpoint += "?region=\(region)"
         }
@@ -271,7 +288,7 @@ class APIService {
         let response: ClubsResponse = try await request(
             endpoint: endpoint,
             method: "GET",
-            requiresAuth: true
+            requiresAuth: false
         )
         
         return response.clubs
@@ -297,7 +314,7 @@ class APIService {
         }
         
         let response: LoiResponse = try await request(
-            endpoint: "/reciprocal/loi-requests",
+            endpoint: "/loi-requests",
             method: "POST",
             body: LoiRequest(
                 club_id: clubId,

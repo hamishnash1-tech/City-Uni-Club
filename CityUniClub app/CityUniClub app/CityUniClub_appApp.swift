@@ -9,9 +9,18 @@ import SwiftUI
 
 @main
 struct CityUniClub_appApp: App {
+    @StateObject private var authManager = AuthManager.shared
+    
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            Group {
+                if authManager.isAuthenticated {
+                    MainTabView()
+                } else {
+                    LoginView()
+                }
+            }
+            .environmentObject(authManager)
         }
     }
 }
