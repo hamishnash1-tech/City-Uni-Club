@@ -426,23 +426,23 @@ enum EventType {
 
 // MARK: - Event Card Component
 struct EventCard: View {
-    let event: ClubEvent
+    let event: Event
     let onBook: () -> Void
-    
+
     @State private var isHovered = false
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Top accent bar with event type
             HStack {
-                Image(systemName: event.type.icon)
+                Image(systemName: eventTypeIcon)
                     .foregroundColor(.white)
                     .font(.system(size: 14))
                 Text(eventTypeString)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.white)
                 Spacer()
-                if event.isTBA {
+                if event.isTba {
                     Text("TBA")
                         .font(.system(size: 10, weight: .bold))
                         .padding(.horizontal, 8)
@@ -454,8 +454,8 @@ struct EventCard: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
-            .background(event.type.color)
-            
+            .background(eventTypeColor)
+
             // Main content
             VStack(alignment: .leading, spacing: 12) {
                 Text(event.title)
@@ -463,19 +463,19 @@ struct EventCard: View {
                     .foregroundColor(.oxfordBlue)
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.top, 8)
-                
+
                 HStack(spacing: 8) {
                     Image(systemName: "calendar")
                         .font(.system(size: 14))
                         .foregroundColor(.cambridgeBlue)
-                    
-                    Text(event.displayDateTime)
+
+                    Text(event.displayDate)
                         .font(.system(size: 15, weight: .medium))
                         .foregroundColor(.secondaryText)
-                    
+
                     Spacer()
                 }
-                
+
                 // Show time options indicator for lunch/dinner events
                 if event.eventType == "lunch_dinner" {
                     HStack(spacing: 12) {
@@ -488,10 +488,10 @@ struct EventCard: View {
                     }
                     .padding(.top, 4)
                 }
-                
+
                 Divider()
                     .background(Color.gray.opacity(0.2))
-                
+
                 // Book Tickets Button
                 Button(action: onBook) {
                     HStack {
@@ -525,12 +525,35 @@ struct EventCard: View {
     }
     
     private var eventTypeString: String {
-        switch event.type {
-        case .lunch: return "LUNCH"
-        case .dinner: return "DINNER"
-        case .lunchDinner: return "LUNCH & DINNER"
-        case .meeting: return "MEETING"
-        case .special: return "SPECIAL EVENT"
+        switch event.eventType {
+        case "lunch": return "LUNCH"
+        case "dinner": return "DINNER"
+        case "lunch_dinner": return "LUNCH & DINNER"
+        case "meeting": return "MEETING"
+        case "special": return "SPECIAL EVENT"
+        default: return "EVENT"
+        }
+    }
+    
+    private var eventTypeIcon: String {
+        switch event.eventType {
+        case "lunch": return "sun.max.fill"
+        case "dinner": return "moon.stars.fill"
+        case "lunch_dinner": return "sun.and.horizon.fill"
+        case "meeting": return "person.2.fill"
+        case "special": return "star.fill"
+        default: return "calendar"
+        }
+    }
+    
+    private var eventTypeColor: Color {
+        switch event.eventType {
+        case "lunch": return .orange
+        case "dinner": return .indigo
+        case "lunch_dinner": return .cambridgeBlue
+        case "meeting": return .clubGold
+        case "special": return .pink
+        default: return .gray
         }
     }
 }
