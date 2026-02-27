@@ -116,17 +116,7 @@ struct MembershipProfileView: View {
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.oxfordBlue)
                 }
-
                 Spacer()
-
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text(member?.membershipType ?? "Membership")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.cambridgeBlue)
-                    Text(member?.membershipNumber ?? "N/A")
-                        .font(.system(size: 9, weight: .regular))
-                        .foregroundColor(.secondaryText)
-                }
             }
             .padding(.leading, 16)
             .padding(.trailing, 16)
@@ -184,12 +174,6 @@ struct MembershipProfileView: View {
                 Divider().background(Color.gray.opacity(0.2))
 
                 profileRow(icon: "calendar", label: "Member Since", value: String(member?.memberSince?.prefix(4) ?? ""))
-                Divider().background(Color.gray.opacity(0.2))
-
-                profileRow(icon: "star.fill", label: "Membership Type", value: member?.membershipType ?? "")
-                Divider().background(Color.gray.opacity(0.2))
-
-                profileRow(icon: "number", label: "Membership Number", value: member?.membershipNumber ?? "")
             }
             .padding()
             .background(

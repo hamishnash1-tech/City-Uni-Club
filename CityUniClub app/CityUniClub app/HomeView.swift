@@ -113,17 +113,7 @@ struct HomeView: View {
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(.oxfordBlue)
                 }
-
                 Spacer()
-
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text(member?.membershipType ?? "Membership")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(.cambridgeBlue)
-                    Text(member?.membershipNumber ?? "N/A")
-                        .font(.system(size: 10, weight: .regular))
-                        .foregroundColor(.secondaryText)
-                }
             }
             .padding(.leading, 20)
             .padding(.trailing, 20)
