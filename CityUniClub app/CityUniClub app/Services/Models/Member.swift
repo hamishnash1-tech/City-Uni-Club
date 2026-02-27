@@ -33,18 +33,16 @@ struct Member: Codable, Identifiable {
     }
 }
 
-struct MemberProfile: Codable {
+struct MemberProfile {
     let id: String
     let memberId: String
     let dietaryRequirements: String?
-    let preferences: [String: Any]?
     let notificationEnabled: Bool
     
     enum CodingKeys: String, CodingKey {
         case id
         case memberId = "member_id"
         case dietaryRequirements = "dietary_requirements"
-        case preferences
         case notificationEnabled = "notification_enabled"
     }
 }
