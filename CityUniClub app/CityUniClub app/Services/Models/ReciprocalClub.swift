@@ -17,7 +17,7 @@ struct ReciprocalClub: Codable, Identifiable, Hashable {
     let contactEmail: String?
     let contactPhone: String?
     let isActive: Bool
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case name
@@ -28,6 +28,19 @@ struct ReciprocalClub: Codable, Identifiable, Hashable {
         case contactEmail = "contact_email"
         case contactPhone = "contact_phone"
         case isActive = "is_active"
+    }
+    
+    // Helper initializer for hardcoded clubs in ReciprocalClubsView
+    init(name: String, location: String, region: String, country: String, note: String? = nil) {
+        self.id = UUID().uuidString
+        self.name = name
+        self.location = location
+        self.region = region
+        self.country = country
+        self.note = note
+        self.contactEmail = nil
+        self.contactPhone = nil
+        self.isActive = true
     }
 }
 
@@ -43,7 +56,7 @@ struct LoiRequest: Codable, Identifiable {
     let secretaryNotes: String?
     let requestedAt: String
     let club: ReciprocalClub?
-    
+
     enum CodingKeys: String, CodingKey {
         case id
         case memberId = "member_id"

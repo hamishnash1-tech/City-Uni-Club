@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct SplashView: View {
-    @EnvironmentObject var authManager: AuthManager
     @State private var showLogo = false
 
     var body: some View {

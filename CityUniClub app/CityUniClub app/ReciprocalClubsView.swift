@@ -338,23 +338,6 @@ struct ReciprocalClubsView: View {
     }
 }
 
-struct ReciprocalClub: Identifiable, Hashable {
-    let id = UUID()
-    let name: String
-    let location: String
-    let region: String
-    let country: String
-    let note: String?
-    
-    init(name: String, location: String, region: String, country: String, note: String? = nil) {
-        self.name = name
-        self.location = location
-        self.region = region
-        self.country = country
-        self.note = note
-    }
-}
-
 struct ReciprocalClubsView_Previews: PreviewProvider {
     static var previews: some View {
         ReciprocalClubsView()
