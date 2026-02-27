@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "deploy": "./deploy-vercel.sh",
+    "deploy:prod": "vercel --prod",
+    "deploy:preview": "vercel"
+  }
+}
