@@ -1,10 +1,15 @@
 import SwiftUI
 
 struct MoreView: View {
+    @EnvironmentObject var authManager: AuthManager
     @State private var showReciprocalClubs = false
     @State private var showClubNews = false
     @State private var showMembershipProfile = false
     
+    var member: Member? {
+        authManager.currentMember
+    }
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -133,26 +138,22 @@ struct MoreView: View {
             Text("MEMBERSHIP PROFILE")
                 .font(.system(size: 20, weight: .semibold, design: .serif))
                 .foregroundColor(.oxfordBlue)
-            
+
             HStack {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 8) {
                         Image(systemName: "person.circle.fill")
                             .font(.system(size: 20))
                             .foregroundColor(.cambridgeBlue)
-                        
-                        Text("Stephen Raymond Rayner")
+
+                        Text(member?.fullName ?? "[MEMBER'S NAME]")
                             .font(.system(size: 15, weight: .semibold))
                             .foregroundColor(.oxfordBlue)
                     }
-                    
-                    Text("Member since 2019 • Full Membership")
-                        .font(.system(size: 12))
-                        .foregroundColor(.secondaryText)
                 }
-                
+
                 Spacer()
-                
+
                 Image(systemName: "chevron.right")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.cambridgeBlue)

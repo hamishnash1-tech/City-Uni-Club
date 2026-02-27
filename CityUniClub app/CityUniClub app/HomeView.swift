@@ -96,7 +96,7 @@ struct HomeView: View {
                     .font(.system(size: 13, weight: .regular, design: .serif))
                     .foregroundColor(.secondaryText)
                     .italic()
-                Text(member?.fullName ?? "Member Name")
+                Text(member?.fullName ?? "[MEMBER'S NAME]")
                     .font(.system(size: 18, weight: .semibold, design: .serif))
                     .foregroundColor(.oxfordBlue)
                     .tracking(1.5)
