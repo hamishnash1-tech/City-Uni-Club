@@ -7,6 +7,21 @@ struct HomeView: View {
         authManager.currentMember
     }
     
+    var formattedMemberUntil: String {
+        guard let memberUntil = member?.memberUntil else {
+            return "TBD"
+        }
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        if let date = dateFormatter.date(from: memberUntil) {
+            let outputFormatter = DateFormatter()
+            outputFormatter.dateFormat = "MMMM yyyy"
+            return outputFormatter.string(from: date)
+        }
+        return memberUntil
+    }
+    
     var body: some View {
         ZStack {
             // Background Image
@@ -94,26 +109,9 @@ struct HomeView: View {
                     Text("Member Until")
                         .font(.system(size: 10, weight: .regular))
                         .foregroundColor(.secondaryText)
-                    if let memberUntil = member?.memberUntil {
-                        // Format: "March 2026"
-                        let dateFormatter = DateFormatter()
-                        dateFormatter.dateFormat = "yyyy-MM-dd"
-                        if let date = dateFormatter.date(from: memberUntil) {
-                            let outputFormatter = DateFormatter()
-                            outputFormatter.dateFormat = "MMMM yyyy"
-                            Text(outputFormatter.string(from: date))
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(.oxfordBlue)
-                        } else {
-                            Text(memberUntil)
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(.oxfordBlue)
-                        }
-                    } else {
-                        Text("TBD")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundColor(.oxfordBlue)
-                    }
+                    Text(formattedMemberUntil)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.oxfordBlue)
                 }
 
                 Spacer()
