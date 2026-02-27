@@ -105,13 +105,14 @@ class APIService {
     
     func logout() async throws {
         guard isAuthenticated else { return }
-        
-        try await request(
+
+        _ = try await request(
             endpoint: "/logout",
             method: "POST",
+            body: [String: String](),
             requiresAuth: true
         )
-        
+
         clearAuthToken()
     }
     
@@ -188,9 +189,10 @@ class APIService {
     }
     
     func cancelBooking(bookingId: String) async throws {
-        try await request(
+        _ = try await request(
             endpoint: "/events/bookings/\(bookingId)/cancel",
             method: "PUT",
+            body: [String: String](),
             requiresAuth: true
         )
     }
@@ -250,9 +252,10 @@ class APIService {
     }
     
     func cancelReservation(reservationId: String) async throws {
-        try await request(
+        _ = try await request(
             endpoint: "/dining/reservations/\(reservationId)",
             method: "DELETE",
+            body: [String: String](),
             requiresAuth: true
         )
     }
