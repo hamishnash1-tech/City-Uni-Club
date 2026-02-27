@@ -14,7 +14,7 @@ struct LoginView: View {
         ZStack {
             // Oxford Blue Background
             Color.oxfordBlue.ignoresSafeArea()
-            
+
             VStack(spacing: 0) {
                 // Top Section - Logo & Welcome
                 VStack(spacing: 16) {
@@ -23,18 +23,18 @@ struct LoginView: View {
                         .resizable()
                         .aspectRatio(contentMode: .fit)
                         .frame(width: 100, height: 100)
-                    
+
                     Text("Welcome")
                         .font(.system(size: 28, weight: .light))
                         .foregroundColor(.white)
-                    
+
                     Text("City University Club")
                         .font(.system(size: 16, weight: .medium, design: .serif))
                         .foregroundColor(.cambridgeBlue)
                 }
                 .padding(.top, 80)
                 .padding(.bottom, 50)
-                
+
                 // Login Form
                 VStack(spacing: 20) {
                     // Email Field
@@ -42,12 +42,12 @@ struct LoginView: View {
                         Text("Membership Email")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.cambridgeBlue)
-                        
+
                         HStack {
                             Image(systemName: "envelope.fill")
                                 .foregroundColor(.secondaryText)
                                 .font(.system(size: 16))
-                            
+
                             TextField("email@example.com", text: $email)
                                 .font(.system(size: 16))
                                 .foregroundColor(.white)
@@ -65,18 +65,18 @@ struct LoginView: View {
                                 )
                         )
                     }
-                    
+
                     // Password Field
                     VStack(alignment: .leading, spacing: 8) {
                         Text("Password")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.cambridgeBlue)
-                        
+
                         HStack {
                             Image(systemName: "lock.fill")
                                 .foregroundColor(.secondaryText)
                                 .font(.system(size: 16))
-                            
+
                             if showPassword {
                                 TextField("Password", text: $password)
                                     .font(.system(size: 16))
@@ -86,7 +86,7 @@ struct LoginView: View {
                                     .font(.system(size: 16))
                                     .foregroundColor(.white)
                             }
-                            
+
                             Button {
                                 showPassword.toggle()
                             } label: {
@@ -105,7 +105,7 @@ struct LoginView: View {
                                 )
                         )
                     }
-                    
+
                     // Error Message
                     if showError {
                         HStack {
@@ -118,7 +118,7 @@ struct LoginView: View {
                         .padding(.horizontal, 4)
                         .transition(.opacity)
                     }
-                    
+
                     // Login Button
                     Button {
                         handleLogin()
@@ -155,7 +155,7 @@ struct LoginView: View {
                     }
                     .disabled(isLoading || email.isEmpty || password.isEmpty)
                     .opacity(isLoading || email.isEmpty || password.isEmpty ? 0.6 : 1)
-                    
+
                     // Forgot Password
                     Button {
                         // Handle forgot password
@@ -166,21 +166,21 @@ struct LoginView: View {
                             .underline()
                     }
                     .padding(.top, 8)
-                    
+
                     // Help Text
                     Text("Contact the secretary for login assistance")
                         .font(.system(size: 11))
                         .foregroundColor(.secondaryText)
                         .padding(.top, 20)
-                    
+
                     Text("secretary@cityuniversityclub.co.uk")
                         .font(.system(size: 11))
                         .foregroundColor(.cambridgeBlue)
                 }
                 .padding(.horizontal, 30)
-                
+
                 Spacer()
-                
+
                 // Footer
                 Text("© 2026 City University Club")
                     .font(.system(size: 10))
@@ -188,8 +188,8 @@ struct LoginView: View {
                     .padding(.bottom, 20)
             }
         }
-        .fullScreenCover(isPresented: $authManager.isAuthenticated) {
-            MainTabView()
+        .onChange(of: authManager.isAuthenticated) { newValue in
+            // Auth state changed, view will update automatically via App root
         }
     }
     
