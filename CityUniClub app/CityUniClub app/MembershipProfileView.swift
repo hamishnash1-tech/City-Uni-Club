@@ -12,7 +12,7 @@ struct MembershipProfileView: View {
     
     var formattedMemberUntil: String {
         guard let memberUntil = member?.memberUntil else {
-            return "TBD"
+            return "March 2026"
         }
         
         let dateFormatter = DateFormatter()
@@ -171,9 +171,6 @@ struct MembershipProfileView: View {
                 Divider().background(Color.gray.opacity(0.2))
 
                 profileRow(icon: "phone.fill", label: "Phone Number", value: member?.phoneNumber ?? "")
-                Divider().background(Color.gray.opacity(0.2))
-
-                profileRow(icon: "calendar", label: "Member Since", value: String(member?.memberSince?.prefix(4) ?? ""))
             }
             .padding()
             .background(

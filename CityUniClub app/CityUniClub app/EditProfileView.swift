@@ -83,84 +83,84 @@ struct EditProfileView: View {
             VStack(alignment: .leading, spacing: 12) {
                 Text("Full Name")
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.cambridgeBlue)
+                    .foregroundColor(.oxfordBlue)
                 
                 TextField("Full Name", text: $fullName)
                     .font(.system(size: 16))
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white.opacity(0.1))
+                            .fill(Color.white)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
                             )
                     )
-                    .accentColor(.white)
+                    .accentColor(.oxfordBlue)
             }
             
             VStack(alignment: .leading, spacing: 12) {
                 Text("First Name")
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.cambridgeBlue)
+                    .foregroundColor(.oxfordBlue)
                 
                 TextField("First Name", text: $firstName)
                     .font(.system(size: 16))
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white.opacity(0.1))
+                            .fill(Color.white)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
                             )
                     )
-                    .accentColor(.white)
+                    .accentColor(.oxfordBlue)
             }
             
             VStack(alignment: .leading, spacing: 12) {
                 Text("Email Address")
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.cambridgeBlue)
+                    .foregroundColor(.oxfordBlue)
                 
                 TextField("Email", text: $email)
                     .font(.system(size: 16))
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .keyboardType(.emailAddress)
                     .autocapitalization(.none)
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white.opacity(0.1))
+                            .fill(Color.white)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
                             )
                     )
-                    .accentColor(.white)
+                    .accentColor(.oxfordBlue)
             }
             
             VStack(alignment: .leading, spacing: 12) {
                 Text("Phone Number")
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundColor(.cambridgeBlue)
+                    .foregroundColor(.oxfordBlue)
                 
                 TextField("Phone Number", text: $phoneNumber)
                     .font(.system(size: 16))
-                    .foregroundColor(.white)
+                    .foregroundColor(.black)
                     .keyboardType(.phonePad)
                     .padding()
                     .background(
                         RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.white.opacity(0.1))
+                            .fill(Color.white)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12)
                                     .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
                             )
                     )
-                    .accentColor(.white)
+                    .accentColor(.oxfordBlue)
             }
         }
         .padding()

@@ -9,7 +9,7 @@ struct HomeView: View {
     
     var formattedMemberUntil: String {
         guard let memberUntil = member?.memberUntil else {
-            return "TBD"
+            return "March 2026"
         }
         
         let dateFormatter = DateFormatter()
