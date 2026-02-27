@@ -34,7 +34,7 @@ class APIService {
     }
     
     // MARK: - Generic Request Methods
-    
+
     private func request<T: Decodable>(
         endpoint: String,
         method: String = "GET",
@@ -44,25 +44,25 @@ class APIService {
         guard var url = URL(string: "\(APIConfiguration.baseURL)\(endpoint)") else {
             throw APIError.invalidURL
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
+
         if requiresAuth, let token = authToken {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         }
-        
+
         if let body = body {
             request.httpBody = try JSONEncoder().encode(body)
         }
-        
+
         let (data, response) = try await URLSession.shared.data(for: request)
-        
+
         guard let httpResponse = response as? HTTPURLResponse else {
             throw APIError.noData
         }
-        
+
         switch httpResponse.statusCode {
         case 200...299:
             break
@@ -76,11 +76,55 @@ class APIService {
         default:
             throw APIError.httpError(statusCode: httpResponse.statusCode, message: "Request failed")
         }
-        
+
         do {
             return try JSONDecoder().decode(T.self, from: data)
         } catch {
             throw APIError.decodingError
+        }
+    }
+    
+    // Request with no return value
+    private func requestVoid(
+        endpoint: String,
+        method: String = "GET",
+        body: Encodable? = nil,
+        requiresAuth: Bool = false
+    ) async throws {
+        guard var url = URL(string: "\(APIConfiguration.baseURL)\(endpoint)") else {
+            throw APIError.invalidURL
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = method
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        if requiresAuth, let token = authToken {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+
+        if let body = body {
+            request.httpBody = try JSONEncoder().encode(body)
+        }
+
+        let (_, response) = try await URLSession.shared.data(for: request)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.noData
+        }
+
+        switch httpResponse.statusCode {
+        case 200...299:
+            break
+        case 401:
+            clearAuthToken()
+            throw APIError.unauthorized
+        case 404:
+            throw APIError.httpError(statusCode: httpResponse.statusCode, message: "Not found")
+        case 500...599:
+            throw APIError.serverError
+        default:
+            throw APIError.httpError(statusCode: httpResponse.statusCode, message: "Request failed")
         }
     }
     
@@ -106,7 +150,7 @@ class APIService {
     func logout() async throws {
         guard isAuthenticated else { return }
 
-        _ = try await request(
+        try await requestVoid(
             endpoint: "/logout",
             method: "POST",
             body: [String: String](),
@@ -189,7 +233,7 @@ class APIService {
     }
     
     func cancelBooking(bookingId: String) async throws {
-        _ = try await request(
+        try await requestVoid(
             endpoint: "/events/bookings/\(bookingId)/cancel",
             method: "PUT",
             body: [String: String](),
@@ -252,7 +296,7 @@ class APIService {
     }
     
     func cancelReservation(reservationId: String) async throws {
-        _ = try await request(
+        try await requestVoid(
             endpoint: "/dining/reservations/\(reservationId)",
             method: "DELETE",
             body: [String: String](),
