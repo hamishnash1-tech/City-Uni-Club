@@ -14,24 +14,30 @@ class AuthManager: ObservableObject {
     @Published var isAuthenticated = false
     @Published var currentMember: Member?
     @Published var isLoading = true
+    @Published var hasCheckedAuth = false
     
     private let apiService = APIService.shared
     private let authTokenKey = "authToken"
     private let memberKey = "currentMember"
     
     init() {
-        // Check for existing session on init
-        checkExistingSession()
+        // Don't check auth in init - do it in a separate method
+        // This ensures the view renders first
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.checkExistingSession()
+        }
     }
     
     // MARK: - Session Management
     
     func checkExistingSession() {
-        isLoading = true
-        
         // Check if we have a saved token
         guard let token = UserDefaults.standard.string(forKey: authTokenKey) else {
-            isLoading = false
+            // No token, show login
+            DispatchQueue.main.async {
+                self.isLoading = false
+                self.hasCheckedAuth = true
+            }
             return
         }
         
@@ -71,6 +77,14 @@ class AuthManager: ObservableObject {
                     self.currentMember = member
                     self.isAuthenticated = true
                     self.isLoading = false
+                    self.hasCheckedAuth = true
+                }
+            } else {
+                // No member data, fetch it
+                await MainActor.run {
+                    self.isAuthenticated = true
+                    self.isLoading = false
+                    self.hasCheckedAuth = true
                 }
             }
         } else {
@@ -127,6 +141,7 @@ class AuthManager: ObservableObject {
             self.currentMember = nil
             self.isAuthenticated = false
             self.isLoading = false
+            self.hasCheckedAuth = true
         }
     }
     

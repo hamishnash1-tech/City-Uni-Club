@@ -14,7 +14,10 @@ struct CityUniClub_appApp: App {
     var body: some Scene {
         WindowGroup {
             Group {
-                if authManager.isAuthenticated {
+                if authManager.isLoading {
+                    // Show splash screen while checking auth
+                    SplashView()
+                } else if authManager.isAuthenticated {
                     MainTabView()
                 } else {
                     LoginView()
