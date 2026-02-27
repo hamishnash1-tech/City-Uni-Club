@@ -48,7 +48,7 @@ fi
 echo "🔐 Checking Vercel login..."
 vercel whoami 2>/dev/null || {
     echo -e "${YELLOW}Not logged in to Vercel. Opening browser for login...${NC}"
-    vercel login --browser
+    vercel login
 }
 echo -e "${GREEN}✓ Logged in to Vercel${NC}"
 echo ""

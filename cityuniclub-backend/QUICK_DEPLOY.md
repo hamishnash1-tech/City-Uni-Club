@@ -32,8 +32,8 @@ cd cityuniclub-backend
 # Install Vercel CLI
 npm install -g vercel
 
-# Login (opens browser - new flow!)
-vercel login --browser
+# Login (automatically opens browser)
+vercel login
 
 # Deploy
 vercel --prod
