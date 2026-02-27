@@ -168,7 +168,7 @@ struct MembershipProfileView: View {
                 profileRow(icon: "phone.fill", label: "Phone Number", value: member?.phoneNumber ?? "")
                 Divider().background(Color.gray.opacity(0.2))
 
-                profileRow(icon: "calendar", label: "Member Since", value: member?.memberSince?.prefix(4) ?? "")
+                profileRow(icon: "calendar", label: "Member Since", value: String(member?.memberSince?.prefix(4) ?? ""))
                 Divider().background(Color.gray.opacity(0.2))
 
                 profileRow(icon: "star.fill", label: "Membership Type", value: member?.membershipType ?? "")
