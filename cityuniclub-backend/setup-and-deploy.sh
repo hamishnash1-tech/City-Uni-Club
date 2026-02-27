@@ -33,7 +33,8 @@ echo ""
 
 echo -e "${BLUE}Step 3: Login to Vercel${NC}"
 echo "----------------------------------------"
-vercel login
+echo "Opening browser for Vercel login..."
+vercel login --browser
 echo -e "${GREEN}✓ Logged in${NC}"
 echo ""
 
