@@ -41,7 +41,7 @@ class APIService {
         body: Encodable? = nil,
         requiresAuth: Bool = false
     ) async throws -> T {
-        guard var url = URL(string: "\(APIConfiguration.baseURL)\(endpoint)") else {
+        guard let url = URL(string: "\(APIConfiguration.baseURL)\(endpoint)") else {
             throw APIError.invalidURL
         }
 
@@ -57,7 +57,7 @@ class APIService {
             request.httpBody = try JSONEncoder().encode(body)
         }
 
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (_, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw APIError.noData
@@ -91,7 +91,7 @@ class APIService {
         body: Encodable? = nil,
         requiresAuth: Bool = false
     ) async throws {
-        guard var url = URL(string: "\(APIConfiguration.baseURL)\(endpoint)") else {
+        guard let url = URL(string: "\(APIConfiguration.baseURL)\(endpoint)") else {
             throw APIError.invalidURL
         }
 
@@ -166,7 +166,7 @@ class APIService {
         request.httpMethod = "POST"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         
-        let (data, response) = try await URLSession.shared.data(for: request)
+        let (_, response) = try await URLSession.shared.data(for: request)
         
         guard let httpResponse = response as? HTTPURLResponse else {
             return false
