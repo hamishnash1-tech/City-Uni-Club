@@ -32,25 +32,37 @@ struct MoreView: View {
                         }
                         
                         // RECIPROCAL CLUBS - Button to Page
-                        Button {
-                            showReciprocalClubs = true
-                        } label: {
-                            reciprocalClubsButton
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("RECIPROCAL CLUBS")
+                                .font(.system(size: 16, weight: .semibold, design: .serif))
+                                .foregroundColor(.oxfordBlue)
+                            
+                            Button {
+                                showReciprocalClubs = true
+                            } label: {
+                                reciprocalClubsButton
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .navigationDestination(isPresented: $showReciprocalClubs) {
+                                ReciprocalClubsView()
+                            }
                         }
-                        .buttonStyle(PlainButtonStyle())
-                        .navigationDestination(isPresented: $showReciprocalClubs) {
-                            ReciprocalClubsView()
-                        }
-                        
+
                         // CLUB NEWS - Button to Page
-                        Button {
-                            showClubNews = true
-                        } label: {
-                            clubNewsButton
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .navigationDestination(isPresented: $showClubNews) {
-                            ClubNewsView()
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("NEWS")
+                                .font(.system(size: 16, weight: .semibold, design: .serif))
+                                .foregroundColor(.oxfordBlue)
+                            
+                            Button {
+                                showClubNews = true
+                            } label: {
+                                clubNewsButton
+                            }
+                            .buttonStyle(PlainButtonStyle())
+                            .navigationDestination(isPresented: $showClubNews) {
+                                ClubNewsView()
+                            }
                         }
                     }
                     .padding(.horizontal, 20)
