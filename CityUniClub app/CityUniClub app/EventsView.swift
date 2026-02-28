@@ -105,12 +105,25 @@ struct EventsView: View {
     private func loadEvents() {
         isLoading = true
         showError = false
-        
+
         Task {
             do {
                 let loadedEvents = try await apiService.getEvents(upcoming: true)
+                
+                // Filter out past events
+                let today = Date()
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                
+                let upcomingEvents = loadedEvents.filter { event in
+                    if let eventDate = dateFormatter.date(from: event.eventDate) {
+                        return eventDate >= today
+                    }
+                    return false
+                }
+                
                 await MainActor.run {
-                    self.events = loadedEvents
+                    self.events = upcomingEvents
                     self.isLoading = false
                 }
             } catch {
