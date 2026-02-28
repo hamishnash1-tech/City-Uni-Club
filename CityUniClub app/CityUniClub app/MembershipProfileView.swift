@@ -5,6 +5,7 @@ struct MembershipProfileView: View {
     @EnvironmentObject var authManager: AuthManager
     @State private var showingLogoutAlert = false
     @State private var showingEditProfile = false
+    @State private var showingChangePassword = false
 
     var member: Member? {
         authManager.currentMember
@@ -55,6 +56,10 @@ struct MembershipProfileView: View {
                 EditProfileView(member: member)
                     .environmentObject(authManager)
             }
+        }
+        .sheet(isPresented: $showingChangePassword) {
+            ChangePasswordView()
+                .environmentObject(authManager)
         }
         .alert("Logout", isPresented: $showingLogoutAlert) {
             Button("Cancel", role: .cancel) {}
@@ -197,15 +202,19 @@ struct MembershipProfileView: View {
                 .foregroundColor(.oxfordBlue)
             
             VStack(spacing: 0) {
-                settingsRow(icon: "lock.fill", label: "Change Password", value: "••••••••")
+                Button {
+                    showingChangePassword = true
+                } label: {
+                    settingsRow(icon: "lock.fill", label: "Change Password", value: "")
+                }
                 Divider().background(Color.gray.opacity(0.2))
-                
+
                 settingsRow(icon: "bell.fill", label: "Notifications", value: "Enabled")
                 Divider().background(Color.gray.opacity(0.2))
-                
+
                 settingsRow(icon: "doc.text.fill", label: "Terms & Conditions", value: "")
                 Divider().background(Color.gray.opacity(0.2))
-                
+
                 settingsRow(icon: "shield.fill", label: "Privacy Policy", value: "")
             }
             .padding()

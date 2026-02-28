@@ -459,4 +459,42 @@ class APIService {
         
         return response.member
     }
+    
+    func changePassword(currentPassword: String, newPassword: String) async throws {
+        struct ChangePasswordRequest: Encodable {
+            let current_password: String
+            let new_password: String
+        }
+        
+        struct ChangePasswordResponse: Decodable {
+            let message: String
+        }
+        
+        let _: ChangePasswordResponse = try await request(
+            endpoint: "/auth/change-password",
+            method: "POST",
+            body: ChangePasswordRequest(
+                current_password: currentPassword,
+                new_password: newPassword
+            ),
+            requiresAuth: true
+        )
+    }
+    
+    func requestPasswordReset(email: String) async throws {
+        struct ForgotPasswordRequest: Encodable {
+            let email: String
+        }
+        
+        struct ForgotPasswordResponse: Decodable {
+            let message: String
+        }
+        
+        let _: ForgotPasswordResponse = try await request(
+            endpoint: "/auth/forgot-password",
+            method: "POST",
+            body: ForgotPasswordRequest(email: email),
+            requiresAuth: false
+        )
+    }
 }
