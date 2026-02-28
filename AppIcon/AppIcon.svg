@@ -1,0 +1,29 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cambridge Blue Background -->
+  <rect width="1024" height="1024" fill="#A3C9D8" rx="224" ry="224"/>
+  
+  <!-- Outer Circle -->
+  <circle cx="512" cy="512" r="400" fill="none" stroke="#003366" stroke-width="12"/>
+  
+  <!-- Inner Circle -->
+  <circle cx="512" cy="512" r="380" fill="none" stroke="#003366" stroke-width="2"/>
+  
+  <!-- C Letter (Left) -->
+  <g transform="translate(280, 512)">
+    <path d="M 0,-180 C -100,-180 -180,-100 -180,0 C -180,100 -100,180 0,180" fill="none" stroke="#003366" stroke-width="45" stroke-linecap="round"/>
+  </g>
+  
+  <!-- U Letter (Center) -->
+  <g transform="translate(512, 512)">
+    <path d="M -150,-180 L -150,50 C -150,150 -100,200 0,200 C 100,200 150,150 150,50 L 150,-180" fill="none" stroke="#003366" stroke-width="45" stroke-linecap="round"/>
+  </g>
+  
+  <!-- C Letter (Right) -->
+  <g transform="translate(744, 512)">
+    <path d="M 0,-180 C 100,-180 180,-100 180,0 C 180,100 100,180 0,180" fill="none" stroke="#003366" stroke-width="45" stroke-linecap="round"/>
+  </g>
+  
+  <!-- Decorative Dots -->
+  <circle cx="512" cy="280" r="15" fill="#003366"/>
+  <circle cx="512" cy="744" r="15" fill="#003366"/>
+</svg>
