@@ -129,6 +129,7 @@ struct ChangePasswordView: View {
                         TextField("Enter current password", text: $currentPassword)
                             .font(.system(size: 16))
                             .foregroundColor(.black)
+                            .autocapitalization(.none)
                     } else {
                         SecureField("Enter current password", text: $currentPassword)
                             .font(.system(size: 16))
@@ -172,6 +173,7 @@ struct ChangePasswordView: View {
                         TextField("Enter new password", text: $newPassword)
                             .font(.system(size: 16))
                             .foregroundColor(.black)
+                            .autocapitalization(.none)
                     } else {
                         SecureField("Enter new password", text: $newPassword)
                             .font(.system(size: 16))
@@ -215,6 +217,7 @@ struct ChangePasswordView: View {
                         TextField("Confirm new password", text: $confirmPassword)
                             .font(.system(size: 16))
                             .foregroundColor(.black)
+                            .autocapitalization(.none)
                     } else {
                         SecureField("Confirm new password", text: $confirmPassword)
                             .font(.system(size: 16))

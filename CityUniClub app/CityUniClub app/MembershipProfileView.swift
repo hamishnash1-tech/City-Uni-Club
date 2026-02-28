@@ -289,19 +289,19 @@ struct MembershipProfileView: View {
                 .font(.system(size: 16))
                 .foregroundColor(.oxfordBlue)
                 .frame(width: 24)
-            
+
             Text(label)
                 .font(.system(size: 14, weight: .medium))
                 .foregroundColor(.oxfordBlue)
-            
+
             Spacer()
-            
+
             if !value.isEmpty {
                 Text(value)
                     .font(.system(size: 13))
                     .foregroundColor(.secondaryText)
             }
-            
+
             Image(systemName: "chevron.right")
                 .font(.system(size: 12))
                 .foregroundColor(.secondaryText)
