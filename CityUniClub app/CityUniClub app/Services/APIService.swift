@@ -471,7 +471,7 @@ class APIService {
         }
         
         let _: ChangePasswordResponse = try await request(
-            endpoint: "/auth/change-password",
+            endpoint: "/change-password",
             method: "POST",
             body: ChangePasswordRequest(
                 current_password: currentPassword,
