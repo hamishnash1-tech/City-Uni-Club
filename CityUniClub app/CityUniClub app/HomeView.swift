@@ -114,6 +114,15 @@ struct HomeView: View {
                         .foregroundColor(.oxfordBlue)
                 }
                 Spacer()
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("Secretary")
+                        .font(.system(size: 9, weight: .regular))
+                        .foregroundColor(.secondaryText)
+                    Text("H. Senanayake")
+                        .font(.system(size: 11, weight: .regular, design: .serif))
+                        .foregroundColor(.oxfordBlue)
+                        .italic()
+                }
             }
             .padding(.leading, 20)
             .padding(.trailing, 20)

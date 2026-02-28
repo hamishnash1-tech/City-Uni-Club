@@ -117,6 +117,15 @@ struct MembershipProfileView: View {
                         .foregroundColor(.oxfordBlue)
                 }
                 Spacer()
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("Secretary")
+                        .font(.system(size: 8, weight: .regular))
+                        .foregroundColor(.secondaryText)
+                    Text("H. Senanayake")
+                        .font(.system(size: 10, weight: .regular, design: .serif))
+                        .foregroundColor(.oxfordBlue)
+                        .italic()
+                }
             }
             .padding(.leading, 16)
             .padding(.trailing, 16)
