@@ -190,67 +190,55 @@ struct MoreView: View {
     // MARK: - Reciprocal Clubs Button
     private var reciprocalClubsButton: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("RECIPROCAL CLUBS")
-                .font(.system(size: 20, weight: .semibold, design: .serif))
-                .foregroundColor(.oxfordBlue)
-            
-            VStack(alignment: .leading, spacing: 12) {
-                Text("We enjoy reciprocity with over 450 clubs worldwide")
-                    .font(.system(size: 14))
-                    .foregroundColor(.secondaryText)
-                
-                HStack {
-                    Text("Request Letter of Introduction")
-                        .font(.system(size: 15, weight: .semibold))
-                        .foregroundColor(.oxfordBlue)
-                    
-                    Spacer()
-                    
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .semibold))
-                        .foregroundColor(.cambridgeBlue)
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(Color.gray.opacity(0.05))
-                )
+            Text("We enjoy reciprocity with over 450 clubs worldwide")
+                .font(.system(size: 14))
+                .foregroundColor(.secondaryText)
+
+            HStack {
+                Text("Request Letter of Introduction")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(.oxfordBlue)
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.cambridgeBlue)
             }
             .padding()
+            .frame(maxWidth: .infinity)
             .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.cardWhite)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
-                    )
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(Color.gray.opacity(0.05))
             )
         }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.cardWhite)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
+                )
+        )
     }
     
     // MARK: - Club News Button
     private var clubNewsButton: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("CLUB NEWS")
-                .font(.system(size: 20, weight: .semibold, design: .serif))
-                .foregroundColor(.oxfordBlue)
-            
-            VStack(spacing: 12) {
-                newsItemPreview(title: "Dining Room open 23 February for Dinner", date: "February 2026")
-                newsItemPreview(title: "Free Gin Friday - every Friday at lunch", date: "Weekly")
-                newsItemPreview(title: "Sri Lankan Lunch - 25 February", date: "February 2026")
-            }
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.cardWhite)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
-                    )
-            )
+        VStack(spacing: 12) {
+            newsItemPreview(title: "Dining Room open 23 February for Dinner", date: "February 2026")
+            newsItemPreview(title: "Free Gin Friday - every Friday at lunch", date: "Weekly")
+            newsItemPreview(title: "Sri Lankan Lunch - 25 February", date: "February 2026")
         }
+        .padding()
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.cardWhite)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
+                )
+        )
     }
     
     private func newsItemPreview(title: String, date: String) -> some View {
