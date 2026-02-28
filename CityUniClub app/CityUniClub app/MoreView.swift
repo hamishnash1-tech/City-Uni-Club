@@ -32,38 +32,22 @@ struct MoreView: View {
                         }
 
                         // RECIPROCAL CLUBS - Button to Page
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("RECIPROCAL CLUBS")
-                                .font(.system(size: 16, weight: .semibold, design: .serif))
-                                .foregroundColor(.oxfordBlue)
-
-                            Button {
+                        reciprocalClubsButton
+                            .onTapGesture {
                                 showReciprocalClubs = true
-                            } label: {
-                                reciprocalClubsButton
                             }
-                            .buttonStyle(PlainButtonStyle())
                             .navigationDestination(isPresented: $showReciprocalClubs) {
                                 ReciprocalClubsView()
                             }
-                        }
 
                         // CLUB NEWS - Button to Page
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("NEWS")
-                                .font(.system(size: 16, weight: .semibold, design: .serif))
-                                .foregroundColor(.oxfordBlue)
-
-                            Button {
+                        clubNewsButton
+                            .onTapGesture {
                                 showClubNews = true
-                            } label: {
-                                clubNewsButton
                             }
-                            .buttonStyle(PlainButtonStyle())
                             .navigationDestination(isPresented: $showClubNews) {
                                 ClubNewsView()
                             }
-                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.top, 50)
@@ -190,27 +174,33 @@ struct MoreView: View {
     // MARK: - Reciprocal Clubs Button
     private var reciprocalClubsButton: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("We enjoy reciprocity with over 450 clubs worldwide")
-                .font(.system(size: 14))
-                .foregroundColor(.secondaryText)
+            Text("RECIPROCAL CLUBS")
+                .font(.system(size: 20, weight: .semibold, design: .serif))
+                .foregroundColor(.oxfordBlue)
 
-            HStack {
-                Text("Request Letter of Introduction")
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundColor(.oxfordBlue)
+            VStack(alignment: .leading, spacing: 12) {
+                Text("We enjoy reciprocity with over 450 clubs worldwide")
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondaryText)
 
-                Spacer()
+                HStack {
+                    Text("Request Letter of Introduction")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundColor(.oxfordBlue)
 
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundColor(.cambridgeBlue)
+                    Spacer()
+
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.cambridgeBlue)
+                }
+                .padding()
+                .frame(maxWidth: .infinity)
+                .background(
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.gray.opacity(0.05))
+                )
             }
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.gray.opacity(0.05))
-            )
         }
         .padding()
         .background(
@@ -225,10 +215,16 @@ struct MoreView: View {
 
     // MARK: - Club News Button
     private var clubNewsButton: some View {
-        VStack(spacing: 12) {
-            newsItemPreview(title: "Dining Room open 23 February for Dinner", date: "February 2026")
-            newsItemPreview(title: "Free Gin Friday - every Friday at lunch", date: "Weekly")
-            newsItemPreview(title: "Sri Lankan Lunch - 25 February", date: "February 2026")
+        VStack(alignment: .leading, spacing: 12) {
+            Text("NEWS")
+                .font(.system(size: 20, weight: .semibold, design: .serif))
+                .foregroundColor(.oxfordBlue)
+
+            VStack(spacing: 12) {
+                newsItemPreview(title: "Dining Room open 23 February for Dinner", date: "February 2026")
+                newsItemPreview(title: "Free Gin Friday - every Friday at lunch", date: "Weekly")
+                newsItemPreview(title: "Sri Lankan Lunch - 25 February", date: "February 2026")
+            }
         }
         .padding()
         .background(
