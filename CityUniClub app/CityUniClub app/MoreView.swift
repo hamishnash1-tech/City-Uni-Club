@@ -5,7 +5,7 @@ struct MoreView: View {
     @State private var showReciprocalClubs = false
     @State private var showClubNews = false
     @State private var showMembershipProfile = false
-    
+
     var member: Member? {
         authManager.currentMember
     }
@@ -14,12 +14,12 @@ struct MoreView: View {
         NavigationStack {
             ZStack {
                 Color.oxfordBlue.ignoresSafeArea()
-                
+
                 ScrollView {
                     VStack(spacing: 24) {
                         // CONTACT SECTION
                         contactSection
-                        
+
                         // MEMBERSHIP PROFILE - Button to Page
                         Button {
                             showMembershipProfile = true
@@ -30,13 +30,13 @@ struct MoreView: View {
                         .navigationDestination(isPresented: $showMembershipProfile) {
                             MembershipProfileView()
                         }
-                        
+
                         // RECIPROCAL CLUBS - Button to Page
                         VStack(alignment: .leading, spacing: 8) {
                             Text("RECIPROCAL CLUBS")
                                 .font(.system(size: 16, weight: .semibold, design: .serif))
                                 .foregroundColor(.oxfordBlue)
-                            
+
                             Button {
                                 showReciprocalClubs = true
                             } label: {
@@ -53,7 +53,7 @@ struct MoreView: View {
                             Text("NEWS")
                                 .font(.system(size: 16, weight: .semibold, design: .serif))
                                 .foregroundColor(.oxfordBlue)
-                            
+
                             Button {
                                 showClubNews = true
                             } label: {
@@ -74,21 +74,21 @@ struct MoreView: View {
             .navigationBarHidden(true)
         }
     }
-    
+
     // MARK: - Contact Section
     private var contactSection: some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("CONTACT")
                 .font(.system(size: 20, weight: .semibold, design: .serif))
                 .foregroundColor(.oxfordBlue)
-            
+
             VStack(alignment: .leading, spacing: 16) {
                 HStack(alignment: .top, spacing: 16) {
                     Image(systemName: "location.fill")
                         .font(.system(size: 18))
                         .foregroundColor(.oxfordBlue)
                         .frame(width: 24)
-                    
+
                     VStack(alignment: .leading, spacing: 2) {
                         Text("42 Crutched Friars")
                             .font(.system(size: 14, weight: .medium))
@@ -98,35 +98,35 @@ struct MoreView: View {
                             .foregroundColor(.darkText)
                     }
                 }
-                
+
                 HStack(alignment: .top, spacing: 16) {
                     Image(systemName: "clock.fill")
                         .font(.system(size: 18))
                         .foregroundColor(.oxfordBlue)
                         .frame(width: 24)
-                    
+
                     Text("Tuesday-Friday, 9am-5pm")
                         .font(.system(size: 14))
                         .foregroundColor(.darkText)
                 }
-                
+
                 HStack(alignment: .top, spacing: 16) {
                     Image(systemName: "phone.fill")
                         .font(.system(size: 18))
                         .foregroundColor(.oxfordBlue)
                         .frame(width: 24)
-                    
+
                     Text("020 7488 1770")
                         .font(.system(size: 14))
                         .foregroundColor(.darkText)
                 }
-                
+
                 HStack(alignment: .top, spacing: 16) {
                     Image(systemName: "envelope.fill")
                         .font(.system(size: 18))
                         .foregroundColor(.oxfordBlue)
                         .frame(width: 24)
-                    
+
                     Text("secretary@cityuniversityclub.co.uk")
                         .font(.system(size: 14))
                         .foregroundColor(.darkText)
@@ -143,7 +143,7 @@ struct MoreView: View {
             )
         }
     }
-    
+
     // MARK: - Membership Profile Button
     private var membershipProfileButton: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -186,7 +186,7 @@ struct MoreView: View {
                 )
         )
     }
-    
+
     // MARK: - Reciprocal Clubs Button
     private var reciprocalClubsButton: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -222,7 +222,7 @@ struct MoreView: View {
                 )
         )
     }
-    
+
     // MARK: - Club News Button
     private var clubNewsButton: some View {
         VStack(spacing: 12) {
@@ -240,7 +240,7 @@ struct MoreView: View {
                 )
         )
     }
-    
+
     private func newsItemPreview(title: String, date: String) -> some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
@@ -248,14 +248,14 @@ struct MoreView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.oxfordBlue)
                     .lineLimit(2)
-                
+
                 Text(date)
                     .font(.system(size: 12))
                     .foregroundColor(.secondaryText)
             }
-            
+
             Spacer()
-            
+
             Image(systemName: "chevron.right")
                 .font(.system(size: 12))
                 .foregroundColor(.cambridgeBlue)

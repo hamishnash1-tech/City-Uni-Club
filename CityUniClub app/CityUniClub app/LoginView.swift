@@ -188,7 +188,7 @@ struct LoginView: View {
                     .padding(.bottom, 20)
             }
         }
-        .onChange(of: authManager.isAuthenticated) { newValue in
+        .onChange(of: authManager.isAuthenticated) { oldValue, newValue in
             // Auth state changed, view will update automatically via App root
         }
     }
