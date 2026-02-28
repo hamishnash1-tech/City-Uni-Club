@@ -206,7 +206,9 @@ struct MembershipProfileView: View {
                     showingChangePassword = true
                 } label: {
                     settingsRow(icon: "lock.fill", label: "Change Password", value: "")
+                        .contentShape(Rectangle())
                 }
+                .buttonStyle(PlainButtonStyle())
                 Divider().background(Color.gray.opacity(0.2))
 
                 settingsRow(icon: "bell.fill", label: "Notifications", value: "Enabled")
