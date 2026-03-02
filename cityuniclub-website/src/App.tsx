@@ -6,6 +6,7 @@ import { Login } from './pages/Login'
 import { Home } from './pages/Home'
 import { Events } from './pages/Events'
 import { News } from './pages/News'
+import { Dining } from './pages/Dining'
 import { ReciprocalClubs } from './pages/ReciprocalClubs'
 import { LOIRequest } from './pages/LOIRequest'
 
@@ -18,6 +19,7 @@ const TabBar: React.FC = () => {
 
   const tabs = [
     { id: 'home', icon: '🏠', label: 'Home', path: '/home' },
+    { id: 'dining', icon: '🍽️', label: 'Dining', path: '/dining' },
     { id: 'events', icon: '📅', label: 'Events', path: '/events' },
     { id: 'news', icon: '📰', label: 'News', path: '/news' },
     { id: 'clubs', icon: '🌍', label: 'Clubs', path: '/reciprocal-clubs' },
@@ -72,6 +74,12 @@ const App: React.FC = () => {
       <Route path="/home" element={
         <ProtectedRoute>
           <MainLayout><Home /></MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/dining" element={
+        <ProtectedRoute>
+          <MainLayout><Dining /></MainLayout>
         </ProtectedRoute>
       } />
       
