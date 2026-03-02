@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "rootDirectory": "cityuniclub-website",
+  "buildCommand": "cd cityuniclub-website && npm run build",
+  "installCommand": "cd cityuniclub-website && npm install",
+  "outputDirectory": "cityuniclub-website/dist"
+}
