@@ -7,6 +7,7 @@ import { Home } from './pages/Home'
 import { Events } from './pages/Events'
 import { News } from './pages/News'
 import { Dining } from './pages/Dining'
+import { Menu } from './pages/Menu'
 import { ReciprocalClubs } from './pages/ReciprocalClubs'
 import { LOIRequest } from './pages/LOIRequest'
 
@@ -80,6 +81,12 @@ const App: React.FC = () => {
       <Route path="/dining" element={
         <ProtectedRoute>
           <MainLayout><Dining /></MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/menu" element={
+        <ProtectedRoute>
+          <MainLayout><Menu /></MainLayout>
         </ProtectedRoute>
       } />
       
