@@ -6,49 +6,35 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-async function authenticate(req: Request, supabaseClient: any) {
-  const authHeader = req.headers.get('Authorization')
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-
-  const token = authHeader.substring(7)
-
-  const { data } = await supabaseClient
-    .from('sessions')
-    .select('member_id')
-    .eq('token', token)
-    .gt('expires_at', new Date().toISOString())
-    .single()
-
-  return data?.member_id || null
-}
-
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
+    if (req.method !== 'POST') {
+      throw new Error('Method not allowed')
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
 
-    const member_id = await authenticate(req, supabaseClient)
-    
-    if (!member_id) {
-      throw new Error('Unauthorized')
+    const { 
+      event_id, 
+      member_email, 
+      guest_count, 
+      guest_emails, 
+      meal_option, 
+      special_requests 
+    } = await req.json()
+
+    if (!event_id || !member_email) {
+      throw new Error('Event ID and member email are required')
     }
 
-    const { event_id, meal_option, guest_count, special_requests } = await req.json()
-
-    if (!event_id || !guest_count) {
-      throw new Error('Event ID and guest count required')
-    }
-
-    // Get event
+    // Get event details
     const { data: event, error: eventError } = await supabaseClient
       .from('events')
       .select('id, price_per_person, event_type')
@@ -62,52 +48,54 @@ serve(async (req: Request) => {
 
     // Validate meal option for lunch_dinner events
     if (event.event_type === 'lunch_dinner' && !meal_option) {
-      throw new Error('Meal option required for lunch/dinner events')
+      throw new Error('Please select lunch or dinner sitting')
     }
 
-    const totalPrice = Number(event.price_per_person) * guest_count
+    // Calculate total price
+    const totalPrice = Number(event.price_per_person) * (1 + (guest_count || 0))
 
     // Create booking
     const { data: booking, error: bookingError } = await supabaseClient
       .from('event_bookings')
       .insert({
         event_id: event_id,
-        member_id: member_id,
+        member_email: member_email,
+        guest_count: guest_count || 0,
+        guest_emails: guest_emails?.filter((email: string) => email.trim() !== '') || [],
         meal_option: meal_option || null,
-        guest_count: guest_count,
         special_requests: special_requests || null,
         total_price: totalPrice,
         status: 'pending',
         booked_at: new Date().toISOString()
       })
-      .select(`
-        *,
-        events (
-          id,
-          title,
-          event_type,
-          event_date
-        )
-      `)
+      .select()
       .single()
 
     if (bookingError) {
+      console.error('Booking error:', bookingError)
       throw bookingError
     }
 
+    // TODO: Send confirmation email to member and guests
+    // This would integrate with an email service like SendGrid, Resend, etc.
+
     return new Response(
-      JSON.stringify({ booking, message: 'Booking created successfully' }),
+      JSON.stringify({ 
+        booking,
+        message: 'Booking confirmed successfully'
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 201
       }
     )
   } catch (error: any) {
+    console.error('Booking error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: error.message === 'Unauthorized' ? 401 : 400
+        status: 400
       }
     )
   }

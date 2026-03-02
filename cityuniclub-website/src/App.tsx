@@ -43,11 +43,13 @@ const TabBar: React.FC = () => {
   )
 }
 
-// Protected Route
+// Protected Route (optional - can make public)
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const auth = useSelector((state: RootState) => state.auth)
   const isAuthenticated = auth.isAuthenticated
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />
+  // For now, allow access without login
+  return <>{children}</>
+  // return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />
 }
 
 // Main Layout with Tabs
@@ -64,7 +66,7 @@ const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 const App: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="/login" element={<Login />} />
       
       <Route path="/home" element={
@@ -93,7 +95,7 @@ const App: React.FC = () => {
       
       <Route path="/loi-request" element={
         <ProtectedRoute>
-          <LOIRequest />
+          <MainLayout><LOIRequest /></MainLayout>
         </ProtectedRoute>
       } />
     </Routes>

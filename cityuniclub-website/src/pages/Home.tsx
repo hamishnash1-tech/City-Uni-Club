@@ -5,6 +5,27 @@ import { RootState } from '../store'
 export const Home: React.FC = () => {
   const auth = useSelector((state: RootState) => state.auth)
   const member = auth.member
+  const isAuthenticated = auth.isAuthenticated
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-oxford-blue flex items-center justify-center p-4">
+        <div className="text-center text-white max-w-md">
+          <div className="w-24 h-24 mx-auto mb-6 bg-white/10 rounded-full flex items-center justify-center">
+            <span className="text-5xl font-serif text-white font-bold">CUC</span>
+          </div>
+          <h1 className="text-4xl font-light mb-4">Welcome to City University Club</h1>
+          <p className="text-cambridge-blue mb-8">A private members club in the heart of London</p>
+          <a 
+            href="/login" 
+            className="inline-block bg-cambridge-blue text-oxford-blue px-8 py-3 rounded-lg font-semibold hover:bg-white transition"
+          >
+            Member Login
+          </a>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="relative min-h-screen">
