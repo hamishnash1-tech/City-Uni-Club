@@ -5,5 +5,11 @@
   "buildCommand": "cd cityuniclub-website && npm run build",
   "installCommand": "cd cityuniclub-website && npm install",
   "outputDirectory": "cityuniclub-website/dist",
-  "nodeVersion": "20.x"
+  "nodeVersion": "20.x",
+  "rewrites": [
+    {
+      "source": "/((?!assets|.*\\.[\\w]+$).*)",
+      "destination": "/index.html"
+    }
+  ]
 }
