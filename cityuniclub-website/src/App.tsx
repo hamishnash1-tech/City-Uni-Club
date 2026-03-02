@@ -1,65 +1,102 @@
 import React from 'react'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { Provider, useSelector } from 'react-redux'
-import { store, RootState } from './store'
-import { Header } from './components/Header'
-import { Footer } from './components/Footer'
-import { Home } from './pages/Home'
+import { useSelector } from 'react-redux'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { RootState } from './store'
 import { Login } from './pages/Login'
+import { Home } from './pages/Home'
+import { Events } from './pages/Events'
+import { News } from './pages/News'
 import { ReciprocalClubs } from './pages/ReciprocalClubs'
 import { LOIRequest } from './pages/LOIRequest'
 
-// Protected Route Component
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth)
-  
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />
-  }
-  
-  return <>{children}</>
-}
+// Bottom Tab Bar
+const TabBar: React.FC = () => {
+  const state = useSelector((state: RootState) => state.ui)
+  const auth = useSelector((state: RootState) => state.auth)
+  const activeTab = state.activeTab
+  const isAuthenticated = auth.isAuthenticated
 
-// Main App Content
-const AppContent: React.FC = () => {
+  const tabs = [
+    { id: 'home', icon: '🏠', label: 'Home', path: '/home' },
+    { id: 'events', icon: '📅', label: 'Events', path: '/events' },
+    { id: 'news', icon: '📰', label: 'News', path: '/news' },
+    { id: 'clubs', icon: '🌍', label: 'Clubs', path: '/reciprocal-clubs' },
+  ]
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-grow">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route
-            path="/member/reciprocal-clubs"
-            element={
-              <ProtectedRoute>
-                <ReciprocalClubs />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/member/loi-request"
-            element={
-              <ProtectedRoute>
-                <LOIRequest />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </main>
-      <Footer />
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 safe-area-bottom">
+      <div className="flex justify-around items-center max-w-lg mx-auto">
+        {tabs.map((tab) => (
+          <a
+            key={tab.id}
+            href={tab.path}
+            className={`flex flex-col items-center p-2 rounded-lg transition ${
+              activeTab === tab.id ? 'text-oxford-blue' : 'text-gray-400'
+            }`}
+          >
+            <span className="text-2xl mb-1">{tab.icon}</span>
+            <span className="text-xs font-medium">{tab.label}</span>
+          </a>
+        ))}
+      </div>
     </div>
   )
 }
 
-// Root App with Provider
+// Protected Route
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const auth = useSelector((state: RootState) => state.auth)
+  const isAuthenticated = auth.isAuthenticated
+  return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />
+}
+
+// Main Layout with Tabs
+const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <div className="pb-20">
+      {children}
+      <TabBar />
+    </div>
+  )
+}
+
+// App Component
 const App: React.FC = () => {
   return (
-    <Provider store={store}>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </Provider>
+    <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<Login />} />
+      
+      <Route path="/home" element={
+        <ProtectedRoute>
+          <MainLayout><Home /></MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/events" element={
+        <ProtectedRoute>
+          <MainLayout><Events /></MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/news" element={
+        <ProtectedRoute>
+          <MainLayout><News /></MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/reciprocal-clubs" element={
+        <ProtectedRoute>
+          <MainLayout><ReciprocalClubs /></MainLayout>
+        </ProtectedRoute>
+      } />
+      
+      <Route path="/loi-request" element={
+        <ProtectedRoute>
+          <LOIRequest />
+        </ProtectedRoute>
+      } />
+    </Routes>
   )
 }
 

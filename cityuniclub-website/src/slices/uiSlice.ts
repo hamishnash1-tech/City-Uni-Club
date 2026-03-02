@@ -1,41 +1,32 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { createSlice } from '@reduxjs/toolkit'
 
 interface UIState {
-  isMobileMenuOpen: boolean
-  isMemberAreaOpen: boolean
-  activeModal: string | null
+  activeTab: string
+  selectedRegion: string
+  isLoading: boolean
 }
 
 const initialState: UIState = {
-  isMobileMenuOpen: false,
-  isMemberAreaOpen: false,
-  activeModal: null,
+  activeTab: 'home',
+  selectedRegion: 'All',
+  isLoading: false,
 }
 
 export const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    toggleMobileMenu: (state) => {
-      state.isMobileMenuOpen = !state.isMobileMenuOpen
+    setActiveTab: (state, action) => {
+      state.activeTab = action.payload
     },
-    toggleMemberArea: (state) => {
-      state.isMemberAreaOpen = !state.isMemberAreaOpen
+    setSelectedRegion: (state, action) => {
+      state.selectedRegion = action.payload
     },
-    openModal: (state, action: PayloadAction<string>) => {
-      state.activeModal = action.payload
-    },
-    closeModal: (state) => {
-      state.activeModal = null
+    setLoading: (state, action) => {
+      state.isLoading = action.payload
     },
   },
 })
 
-export const {
-  toggleMobileMenu,
-  toggleMemberArea,
-  openModal,
-  closeModal,
-} = uiSlice.actions
-
+export const { setActiveTab, setSelectedRegion, setLoading } = uiSlice.actions
 export default uiSlice.reducer

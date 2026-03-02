@@ -1,17 +1,21 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { loadClubsStart, loadClubsSuccess, loadClubsFailure, setRegion, setLoiRequest } from '../slices/memberSlice'
-import { api } from '../services/api'
-import { RootState, AppDispatch } from '../store'
+import { api, ReciprocalClub } from '../services/api'
+import { RootState } from '../store'
+import { setSelectedRegion } from '../slices/uiSlice'
 
 const REGIONS = ['All', 'United Kingdom', 'Europe', 'Asia', 'Americas', 'Africa', 'Oceania']
 
 export const ReciprocalClubs: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch()
   const navigate = useNavigate()
-  const { token } = useSelector((state: RootState) => state.auth)
-  const { clubs, selectedRegion, isLoading } = useSelector((state: RootState) => state.member)
+  const auth = useSelector((state: RootState) => state.auth)
+  const ui = useSelector((state: RootState) => state.ui)
+  const token = auth.token
+  const selectedRegion = ui.selectedRegion
+  const [clubs, setClubs] = useState<ReciprocalClub[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (!token) {
@@ -19,102 +23,101 @@ export const ReciprocalClubs: React.FC = () => {
       return
     }
 
-    const fetchClubs = async () => {
-      dispatch(loadClubsStart())
-      try {
-        const data = await api.getReciprocalClubs(token, selectedRegion)
-        dispatch(loadClubsSuccess(data))
-      } catch (err: any) {
-        dispatch(loadClubsFailure(err.message))
-      }
-    }
+    api.getReciprocalClubs(token, selectedRegion)
+      .then(setClubs)
+      .finally(() => setIsLoading(false))
+  }, [token, selectedRegion, navigate])
 
-    fetchClubs()
-  }, [token, selectedRegion, dispatch, navigate])
-
-  const handleRequestLOI = (club: any) => {
-    dispatch(setLoiRequest({
-      club_id: club.id,
-      arrival_date: '',
-      departure_date: '',
-      purpose: 'Business',
-    }))
-    navigate('/member/loi-request')
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-oxford-blue flex items-center justify-center">
+        <div className="text-white text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cambridge-blue mx-auto mb-4"></div>
+          <p>Loading clubs...</p>
+        </div>
+      </div>
+    )
   }
 
-  const filteredClubs = selectedRegion === 'All' 
-    ? clubs 
-    : clubs.filter(club => club.region === selectedRegion)
-
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="bg-oxford-blue text-white rounded-lg p-6 mb-8">
-          <h1 className="text-3xl font-serif font-bold mb-2">Reciprocal Clubs</h1>
-          <p className="text-cambridge-blue">
-            Access over 450 reciprocal clubs worldwide
-          </p>
-        </div>
+    <div className="min-h-screen bg-oxford-blue pb-20">
+      {/* Header */}
+      <div className="bg-card-white sticky top-0 z-10 pt-12 pb-4 px-4 shadow">
+        <h1 className="text-xl font-semibold text-oxford-blue">Reciprocal Clubs</h1>
+      </div>
 
-        {/* Info Card */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-xl font-bold text-oxford-blue mb-4">Letter of Introduction</h2>
-          <p className="text-gray-700 mb-4">
+      {/* Info Card */}
+      <div className="p-4">
+        <div className="bg-card-white rounded-xl shadow-lg p-4">
+          <h2 className="text-lg font-serif text-oxford-blue font-semibold mb-2">
+            Letter of Introduction
+          </h2>
+          <p className="text-secondary-text text-sm">
             When visiting reciprocal clubs, you may need a Letter of Introduction. 
             Please request your LOI at least 7 days before your visit.
           </p>
         </div>
+      </div>
 
-        {/* Region Filter */}
-        <div className="bg-white rounded-lg shadow p-4 mb-8">
-          <div className="flex flex-wrap gap-2">
-            {REGIONS.map(region => (
-              <button
-                key={region}
-                onClick={() => dispatch(setRegion(region))}
-                className={`px-4 py-2 rounded-lg transition ${
-                  selectedRegion === region
-                    ? 'bg-oxford-blue text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
-              >
-                {region}
-              </button>
-            ))}
-          </div>
+      {/* Region Filter */}
+      <div className="px-4 mb-4">
+        <div className="flex space-x-2 overflow-x-auto pb-2">
+          {REGIONS.map((region) => (
+            <button
+              key={region}
+              onClick={() => dispatch(setSelectedRegion(region))}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition ${
+                selectedRegion === region
+                  ? 'bg-oxford-blue text-white'
+                  : 'bg-card-white text-oxford-blue'
+              }`}
+            >
+              {region}
+            </button>
+          ))}
         </div>
+      </div>
 
-        {/* Clubs List */}
-        {isLoading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-oxford-blue mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading clubs...</p>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredClubs.map(club => (
-              <div key={club.id} className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition">
-                <div className="flex items-start mb-4">
-                  <div className="text-3xl mr-3">🌍</div>
-                  <div>
-                    <h3 className="font-bold text-oxford-blue">{club.name}</h3>
-                    <p className="text-sm text-gray-600">{club.location}, {club.country}</p>
-                  </div>
-                </div>
-                {club.note && (
-                  <p className="text-sm text-cambridge-blue mb-4 italic">{club.note}</p>
-                )}
-                <button
-                  onClick={() => handleRequestLOI(club)}
-                  className="w-full bg-oxford-blue text-white py-2 rounded-lg hover:bg-opacity-90 transition"
-                >
-                  Request LOI
-                </button>
+      {/* Clubs List */}
+      <div className="px-4 space-y-3">
+        {clubs.map((club) => (
+          <div key={club.id} className="bg-card-white rounded-xl shadow-lg p-4">
+            <div className="flex items-start space-x-4">
+              {/* Globe Icon */}
+              <div className="w-12 h-12 bg-gradient-to-br from-cambridge-blue/30 to-oxford-blue/30 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-xl">🌍</span>
               </div>
-            ))}
+
+              {/* Club Info */}
+              <div className="flex-1">
+                <h3 className="font-semibold text-oxford-blue">{club.name}</h3>
+                <div className="flex items-center space-x-2 text-sm text-secondary-text mt-1">
+                  <span>📍 {club.location}</span>
+                  {club.note && (
+                    <>
+                      <span className="text-cambridge-blue">•</span>
+                      <span className="text-cambridge-blue italic">{club.note}</span>
+                    </>
+                  )}
+                </div>
+                <p className="text-xs text-secondary-text mt-1">{club.country}</p>
+              </div>
+
+              {/* Chevron */}
+              <svg className="w-5 h-5 text-secondary-text flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+
+            {/* LOI Button */}
+            <button 
+              onClick={() => navigate('/loi-request', { state: { club } })}
+              className="w-full mt-3 bg-oxford-blue text-white py-2 rounded-lg text-sm font-semibold"
+            >
+              Request Letter of Introduction
+            </button>
           </div>
-        )}
+        ))}
       </div>
     </div>
   )

@@ -1,83 +1,70 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { RootState } from '../store'
 
 export const Home: React.FC = () => {
+  const auth = useSelector((state: RootState) => state.auth)
+  const member = auth.member
+
   return (
-    <div>
-      {/* Hero Section */}
-      <section 
-        className="bg-oxford-blue text-white py-20 bg-cover bg-center"
-        style={{ backgroundImage: "url('/assets/hero-bg.jpg')" }}
+    <div className="relative min-h-screen">
+      {/* Background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=1920')" }}
       >
-        <div className="container mx-auto px-4 text-center">
-          <div className="bg-oxford-blue/80 backdrop-blur-sm inline-block px-8 py-6 rounded-lg">
-            <h1 className="text-5xl font-serif font-bold mb-6">
-              Welcome to City University Club
-            </h1>
-            <p className="text-xl mb-8 max-w-2xl mx-auto">
-              A private members club in the heart of London, offering fine dining, 
-              exclusive events, and reciprocal clubs worldwide.
-            </p>
-            <Link
-              to="/login"
-              className="bg-cambridge-blue text-oxford-blue px-8 py-3 rounded-lg font-semibold hover:bg-white transition"
-            >
-              Member Login
-            </Link>
-          </div>
-        </div>
-      </section>
+        <div className="absolute inset-0 bg-oxford-blue/70"></div>
+      </div>
 
-      {/* About Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-serif font-bold text-oxford-blue mb-6">
-              About Our Club
-            </h2>
-            <p className="text-lg text-gray-700 mb-8">
-              City University Club provides a home away from home for graduates and 
-              academics of City, University of London. Located in the historic heart 
-              of London, we offer a warm welcome and exceptional facilities.
-            </p>
-            <Link
-              to="/about"
-              className="text-oxford-blue font-semibold hover:text-cambridge-blue"
-            >
-              Learn More →
-            </Link>
-          </div>
+      {/* Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
+        {/* Logo */}
+        <div className="w-20 h-20 mb-4 bg-white/20 rounded-full flex items-center justify-center">
+          <span className="text-2xl font-serif text-white font-bold">CUC</span>
         </div>
-      </section>
 
-      {/* Features */}
-      <section className="bg-gray-100 py-16">
-        <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-6 bg-white rounded-lg shadow">
-              <img src="/assets/dining.jpg" alt="Fine Dining" className="w-full h-48 object-cover rounded-lg mb-4" />
-              <h3 className="text-xl font-bold text-oxford-blue mb-2">Fine Dining</h3>
-              <p className="text-gray-600">
-                Enjoy exquisite meals prepared by our talented chefs in our elegant dining room.
-              </p>
+        {/* Welcome */}
+        <p className="text-cambridge-blue text-lg mb-2">Welcome</p>
+        <h1 className="text-4xl font-light text-white mb-8">{member?.first_name || 'Member'}</h1>
+
+        {/* Membership Card */}
+        <div className="w-full max-w-md bg-card-white rounded-2xl shadow-2xl overflow-hidden">
+          {/* Card Header */}
+          <div className="p-5 border-b border-gray-200">
+            <div className="flex items-start space-x-3">
+              <div className="w-14 h-16 bg-oxford-blue/10 rounded flex items-center justify-center">
+                <span className="text-2xl font-serif text-oxford-blue font-bold">CUC</span>
+              </div>
+              <div>
+                <h2 className="text-lg font-serif text-oxford-blue">CITY UNIVERSITY CLUB</h2>
+                <p className="text-xs text-address-gray">42 CRUTCHED FRIARS, EC3N 2AP</p>
+              </div>
             </div>
-            <div className="text-center p-6 bg-white rounded-lg shadow">
-              <div className="text-4xl mb-4">📅</div>
-              <h3 className="text-xl font-bold text-oxford-blue mb-2">Exclusive Events</h3>
-              <p className="text-gray-600">
-                Attend member-only events, from wine tastings to cultural gatherings.
-              </p>
-            </div>
-            <div className="text-center p-6 bg-white rounded-lg shadow">
-              <div className="text-4xl mb-4">🌍</div>
-              <h3 className="text-xl font-bold text-oxford-blue mb-2">Reciprocal Clubs</h3>
-              <p className="text-gray-600">
-                Access over 450 reciprocal clubs worldwide with your membership.
-              </p>
+          </div>
+
+          {/* Member Name */}
+          <div className="py-6 text-center">
+            <p className="text-sm text-secondary-text italic">This is to introduce</p>
+            <h3 className="text-lg font-serif text-oxford-blue font-semibold mt-2">
+              {member?.full_name || 'Member Name'}
+            </h3>
+          </div>
+
+          {/* Card Footer */}
+          <div className="p-5 bg-gray-50">
+            <div className="flex justify-between items-end">
+              <div>
+                <p className="text-xs text-secondary-text">Member Since</p>
+                <p className="text-sm font-semibold text-oxford-blue">2024</p>
+              </div>
+              <div className="text-right">
+                <p className="text-xs font-semibold text-cambridge-blue">{member?.membership_type || 'Membership'}</p>
+                <p className="text-xs text-secondary-text">{member?.membership_number || 'N/A'}</p>
+              </div>
             </div>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   )
 }

@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 export default {
   content: [
     "./index.html",
@@ -7,9 +6,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        'oxford-blue': '#003366',
+        'oxford-blue': '#0A2342',
         'cambridge-blue': '#A3C9D8',
-        'club-gold': '#D4AF37',
+        'card-white': '#F8F9FA',
+        'secondary-text': '#6B7280',
+        'address-gray': '#9CA3AF',
       },
     },
   },

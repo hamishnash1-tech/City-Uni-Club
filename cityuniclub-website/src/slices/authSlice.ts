@@ -1,16 +1,18 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
+export interface Member {
+  id: string
+  email: string
+  full_name: string
+  first_name: string
+  membership_number: string
+  membership_type: string
+}
+
 interface AuthState {
   isAuthenticated: boolean
   token: string | null
-  member: {
-    id: string
-    email: string
-    full_name: string
-    first_name: string
-    membership_number: string
-    membership_type: string
-  } | null
+  member: Member | null
   isLoading: boolean
   error: string | null
 }
@@ -31,7 +33,7 @@ export const authSlice = createSlice({
       state.isLoading = true
       state.error = null
     },
-    loginSuccess: (state, action: PayloadAction<{ token: string; member: AuthState['member'] }>) => {
+    loginSuccess: (state, action: PayloadAction<{ token: string; member: Member }>) => {
       state.isAuthenticated = true
       state.token = action.payload.token
       state.member = action.payload.member
@@ -49,22 +51,8 @@ export const authSlice = createSlice({
       state.member = null
       localStorage.removeItem('authToken')
     },
-    checkAuth: (state) => {
-      const token = localStorage.getItem('authToken')
-      if (token) {
-        state.token = token
-        state.isAuthenticated = true
-      }
-    },
   },
 })
 
-export const {
-  loginStart,
-  loginSuccess,
-  loginFailure,
-  logout,
-  checkAuth,
-} = authSlice.actions
-
+export const { loginStart, loginSuccess, loginFailure, logout } = authSlice.actions
 export default authSlice.reducer
