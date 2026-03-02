@@ -1,6 +1,8 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '../store'
+import cucLogo from '../assets/cuc-logo.png'
+import cucBuilding from '../assets/cuc-building.jpg'
 
 export const Home: React.FC = () => {
   const auth = useSelector((state: RootState) => state.auth)
@@ -12,7 +14,7 @@ export const Home: React.FC = () => {
       <div className="min-h-screen bg-oxford-blue flex items-center justify-center p-4">
         <div className="text-center text-white max-w-md">
           <div className="w-32 h-32 mx-auto mb-6 bg-white/10 rounded-full flex items-center justify-center p-4">
-            <img src="/assets/cuc-logo.png" alt="City University Club" className="w-full h-full object-contain" />
+            <img src={cucLogo} alt="City University Club" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-4xl font-light mb-4">Welcome to City University Club</h1>
           <p className="text-cambridge-blue mb-8">A private members club in the heart of London</p>
@@ -32,7 +34,7 @@ export const Home: React.FC = () => {
       {/* Background - cuc-building image */}
       <div 
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('/assets/cuc-building.jpg')" }}
+        style={{ backgroundImage: `url(${cucBuilding})` }}
       >
         <div className="absolute inset-0 bg-oxford-blue/70"></div>
       </div>
@@ -41,7 +43,7 @@ export const Home: React.FC = () => {
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
         {/* Logo - cuc-logo */}
         <div className="w-32 h-32 mb-4 bg-white/20 rounded-full flex items-center justify-center p-4">
-          <img src="/assets/cuc-logo.png" alt="City University Club" className="w-full h-full object-contain" />
+          <img src={cucLogo} alt="City University Club" className="w-full h-full object-contain" />
         </div>
 
         {/* Welcome */}
