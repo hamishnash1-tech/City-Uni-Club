@@ -5,5 +5,5 @@
   "buildCommand": "cd cityuniclub-website && npm run build",
   "installCommand": "cd cityuniclub-website && npm install",
   "outputDirectory": "cityuniclub-website/dist",
-  "nodeVersion": "18.x"
+  "nodeVersion": "20.x"
 }
