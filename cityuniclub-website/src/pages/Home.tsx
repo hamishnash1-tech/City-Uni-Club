@@ -11,8 +11,8 @@ export const Home: React.FC = () => {
     return (
       <div className="min-h-screen bg-oxford-blue flex items-center justify-center p-4">
         <div className="text-center text-white max-w-md">
-          <div className="w-24 h-24 mx-auto mb-6 bg-white/10 rounded-full flex items-center justify-center">
-            <span className="text-5xl font-serif text-white font-bold">CUC</span>
+          <div className="w-32 h-32 mx-auto mb-6 bg-white/10 rounded-full flex items-center justify-center p-4">
+            <img src="/assets/cuc-logo.png" alt="City University Club" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-4xl font-light mb-4">Welcome to City University Club</h1>
           <p className="text-cambridge-blue mb-8">A private members club in the heart of London</p>
@@ -29,19 +29,19 @@ export const Home: React.FC = () => {
 
   return (
     <div className="relative min-h-screen">
-      {/* Background */}
+      {/* Background - cuc-building image */}
       <div 
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=1920')" }}
+        style={{ backgroundImage: "url('/assets/cuc-building.jpg')" }}
       >
         <div className="absolute inset-0 bg-oxford-blue/70"></div>
       </div>
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
-        {/* Logo */}
-        <div className="w-20 h-20 mb-4 bg-white/20 rounded-full flex items-center justify-center">
-          <span className="text-2xl font-serif text-white font-bold">CUC</span>
+        {/* Logo - cuc-logo */}
+        <div className="w-32 h-32 mb-4 bg-white/20 rounded-full flex items-center justify-center p-4">
+          <img src="/assets/cuc-logo.png" alt="City University Club" className="w-full h-full object-contain" />
         </div>
 
         {/* Welcome */}

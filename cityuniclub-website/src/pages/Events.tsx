@@ -10,7 +10,18 @@ export const Events: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false)
 
   useEffect(() => {
-    api.getEvents().then(setEvents).finally(() => setIsLoading(false))
+    api.getEvents().then((allEvents) => {
+      // Filter out past events
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      
+      const upcomingEvents = allEvents.filter(event => {
+        const eventDate = new Date(event.event_date)
+        return eventDate >= today
+      })
+      
+      setEvents(upcomingEvents)
+    }).finally(() => setIsLoading(false))
   }, [])
 
   const handleBookClick = (event: Event) => {
