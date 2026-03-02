@@ -5,21 +5,26 @@ export const Home: React.FC = () => {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-oxford-blue text-white py-20">
+      <section 
+        className="bg-oxford-blue text-white py-20 bg-cover bg-center"
+        style={{ backgroundImage: "url('/assets/hero-bg.jpg')" }}
+      >
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-serif font-bold mb-6">
-            Welcome to City University Club
-          </h1>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
-            A private members club in the heart of London, offering fine dining, 
-            exclusive events, and reciprocal clubs worldwide.
-          </p>
-          <Link
-            to="/login"
-            className="bg-cambridge-blue text-oxford-blue px-8 py-3 rounded-lg font-semibold hover:bg-white transition"
-          >
-            Member Login
-          </Link>
+          <div className="bg-oxford-blue/80 backdrop-blur-sm inline-block px-8 py-6 rounded-lg">
+            <h1 className="text-5xl font-serif font-bold mb-6">
+              Welcome to City University Club
+            </h1>
+            <p className="text-xl mb-8 max-w-2xl mx-auto">
+              A private members club in the heart of London, offering fine dining, 
+              exclusive events, and reciprocal clubs worldwide.
+            </p>
+            <Link
+              to="/login"
+              className="bg-cambridge-blue text-oxford-blue px-8 py-3 rounded-lg font-semibold hover:bg-white transition"
+            >
+              Member Login
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -49,21 +54,21 @@ export const Home: React.FC = () => {
       <section className="bg-gray-100 py-16">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center p-6">
-              <div className="text-4xl mb-4">🍽️</div>
+            <div className="text-center p-6 bg-white rounded-lg shadow">
+              <img src="/assets/dining.jpg" alt="Fine Dining" className="w-full h-48 object-cover rounded-lg mb-4" />
               <h3 className="text-xl font-bold text-oxford-blue mb-2">Fine Dining</h3>
               <p className="text-gray-600">
                 Enjoy exquisite meals prepared by our talented chefs in our elegant dining room.
               </p>
             </div>
-            <div className="text-center p-6">
+            <div className="text-center p-6 bg-white rounded-lg shadow">
               <div className="text-4xl mb-4">📅</div>
               <h3 className="text-xl font-bold text-oxford-blue mb-2">Exclusive Events</h3>
               <p className="text-gray-600">
                 Attend member-only events, from wine tastings to cultural gatherings.
               </p>
             </div>
-            <div className="text-center p-6">
+            <div className="text-center p-6 bg-white rounded-lg shadow">
               <div className="text-4xl mb-4">🌍</div>
               <h3 className="text-xl font-bold text-oxford-blue mb-2">Reciprocal Clubs</h3>
               <p className="text-gray-600">

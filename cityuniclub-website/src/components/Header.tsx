@@ -23,8 +23,9 @@ export const Header: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <Link to="/" className="text-2xl font-serif font-bold">
-            CITY UNIVERSITY CLUB
+          <Link to="/" className="flex items-center">
+            <img src="/assets/logo.png" alt="City University Club" className="h-12 w-auto mr-3" />
+            <span className="text-2xl font-serif font-bold">CITY UNIVERSITY CLUB</span>
           </Link>
 
           {/* Desktop Navigation */}
