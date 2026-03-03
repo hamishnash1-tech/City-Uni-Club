@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">City University Club</string>
+    <string name="home">Home</string>
+    <string name="dining">Dining</string>
+    <string name="events">Events</string>
+    <string name="news">News</string>
+    <string name="clubs">Clubs</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
+    <string name="welcome">Welcome</string>
+    <string name="member_since">Member Since</string>
+    <string name="membership_type">Membership Type</string>
+</resources>
