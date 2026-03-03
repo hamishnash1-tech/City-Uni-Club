@@ -12,9 +12,7 @@ import { LOIRequest } from './pages/LOIRequest'
 
 // Bottom Tab Bar
 const TabBar: React.FC = () => {
-  const state = useSelector((state: RootState) => state.ui)
   const auth = useSelector((state: RootState) => state.auth)
-  const activeTab = state.activeTab
   const isAuthenticated = auth.isAuthenticated
 
   const tabs = [
@@ -33,7 +31,7 @@ const TabBar: React.FC = () => {
             key={tab.id}
             href={tab.path}
             className={`flex flex-col items-center p-2 rounded-lg transition ${
-              activeTab === tab.id ? 'text-oxford-blue' : 'text-gray-400'
+              isAuthenticated ? 'text-oxford-blue' : 'text-gray-400'
             }`}
           >
             <span className="text-2xl mb-1">{tab.icon}</span>

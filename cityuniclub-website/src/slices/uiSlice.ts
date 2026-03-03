@@ -1,32 +1,34 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+
+export interface LoiRequest {
+  club_id: string
+  arrival_date: string
+  departure_date: string
+  purpose: string
+}
 
 interface UIState {
-  activeTab: string
   selectedRegion: string
-  isLoading: boolean
+  loiRequest: LoiRequest | null
 }
 
 const initialState: UIState = {
-  activeTab: 'home',
   selectedRegion: 'All',
-  isLoading: false,
+  loiRequest: null,
 }
 
 export const uiSlice = createSlice({
   name: 'ui',
   initialState,
   reducers: {
-    setActiveTab: (state, action) => {
-      state.activeTab = action.payload
-    },
-    setSelectedRegion: (state, action) => {
+    setRegion: (state, action: PayloadAction<string>) => {
       state.selectedRegion = action.payload
     },
-    setLoading: (state, action) => {
-      state.isLoading = action.payload
+    setLoiRequest: (state, action: PayloadAction<LoiRequest>) => {
+      state.loiRequest = action.payload
     },
   },
 })
 
-export const { setActiveTab, setSelectedRegion, setLoading } = uiSlice.actions
+export const { setRegion, setLoiRequest } = uiSlice.actions
 export default uiSlice.reducer
