@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 export const Dining: React.FC = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -13,7 +15,6 @@ export const Dining: React.FC = () => {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
-  const [error, setError] = useState('')
 
   const breakfastTimes = ['09:00', '09:30', '10:00', '10:30', '11:00']
   const lunchTimes = ['12:00', '12:30', '13:00', '13:30', '14:00', '14:30']
@@ -22,27 +23,19 @@ export const Dining: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
-    setError('')
-
-    try {
-      // Simulate booking - replace with actual API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // TODO: Integrate with Supabase Edge Function
-      // await fetch('https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/dining/reservations', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // })
-
-      setShowSuccess(true)
-      setTimeout(() => setShowSuccess(false), 3000)
-    } catch (err: any) {
-      setError(err.message || 'Failed to complete booking')
-    } finally {
-      setIsSubmitting(false)
-    }
+    
+    // Simulate booking
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    setShowSuccess(true)
+    setTimeout(() => setShowSuccess(false), 3000)
+    setIsSubmitting(false)
   }
+
+  const menuHighlights = [
+    { name: 'Homemade Soup', image: '/assets/food/soup.jpg', category: 'Starter' },
+    { name: 'Pan Fried Salmon', image: '/assets/food/salmon.jpg', category: 'Main' },
+    { name: 'Sticky Toffee Pudding', image: '/assets/food/cake.jpg', category: 'Dessert' },
+  ]
 
   return (
     <div className="min-h-screen bg-oxford-blue pb-20">
@@ -64,10 +57,45 @@ export const Dining: React.FC = () => {
       )}
 
       {/* Content */}
-      <div className="p-4 max-w-2xl mx-auto">
-        {/* Info Card */}
+      <div className="p-4 max-w-4xl mx-auto">
+        {/* Menu Highlights */}
+        <div className="bg-card-white rounded-xl shadow-lg p-6 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-serif text-oxford-blue font-semibold">Today's Highlights</h2>
+            <button 
+              onClick={() => navigate('/menu')}
+              className="text-cambridge-blue text-sm font-semibold hover:underline flex items-center space-x-1"
+            >
+              <span>View Full Menu</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+          
+          <div className="grid grid-cols-3 gap-4">
+            {menuHighlights.map((item, index) => (
+              <div key={index} className="text-center">
+                <div className="h-32 bg-gray-200 rounded-lg overflow-hidden mb-2">
+                  <img 
+                    src={item.image} 
+                    alt={item.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://via.placeholder.com/200x200?text=Food'
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-secondary-text mb-1">{item.category}</p>
+                <h3 className="text-sm font-semibold text-oxford-blue">{item.name}</h3>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Opening Hours */}
         <div className="bg-card-white rounded-xl shadow-lg p-4 mb-6">
-          <h2 className="text-lg font-serif text-oxford-blue font-semibold mb-2">Opening Hours</h2>
+          <h2 className="text-lg font-serif text-oxford-blue font-semibold mb-3">Opening Hours</h2>
           <div className="space-y-2 text-sm text-secondary-text">
             <div className="flex justify-between">
               <span>Breakfast</span>
@@ -117,45 +145,46 @@ export const Dining: React.FC = () => {
             </div>
           </div>
 
-          {/* Date Selection */}
-          <div className="bg-card-white rounded-xl shadow-lg p-4">
-            <label className="block text-sm font-medium text-oxford-blue mb-3">
-              Select Date
-            </label>
-            <input
-              type="date"
-              value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              min={new Date().toISOString().split('T')[0]}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-oxford-blue focus:border-transparent"
-              required
-            />
-          </div>
-
-          {/* Time Selection */}
-          {formData.date && (
+          {/* Date & Time */}
+          <div className="grid md:grid-cols-2 gap-4">
             <div className="bg-card-white rounded-xl shadow-lg p-4">
               <label className="block text-sm font-medium text-oxford-blue mb-3">
-                Select Time
+                Select Date
               </label>
-              <div className="grid grid-cols-3 gap-2">
-                {times.map((time) => (
-                  <button
-                    key={time}
-                    type="button"
-                    onClick={() => setFormData({ ...formData, time })}
-                    className={`py-3 rounded-lg text-sm font-medium transition ${
-                      formData.time === time
-                        ? 'bg-oxford-blue text-white'
-                        : 'bg-gray-100 text-oxford-blue hover:bg-gray-200'
-                    }`}
-                  >
-                    {time}
-                  </button>
-                ))}
-              </div>
+              <input
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                min={new Date().toISOString().split('T')[0]}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-oxford-blue focus:border-transparent"
+                required
+              />
             </div>
-          )}
+
+            {formData.date && (
+              <div className="bg-card-white rounded-xl shadow-lg p-4">
+                <label className="block text-sm font-medium text-oxford-blue mb-3">
+                  Select Time
+                </label>
+                <div className="grid grid-cols-3 gap-2">
+                  {times.map((time) => (
+                    <button
+                      key={time}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, time })}
+                      className={`py-2 rounded-lg text-xs font-medium transition ${
+                        formData.time === time
+                          ? 'bg-oxford-blue text-white'
+                          : 'bg-gray-100 text-oxford-blue hover:bg-gray-200'
+                      }`}
+                    >
+                      {time}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Guest Count */}
           <div className="bg-card-white rounded-xl shadow-lg p-4">
@@ -242,13 +271,6 @@ export const Dining: React.FC = () => {
               placeholder="Dietary requirements, table preferences, etc."
             />
           </div>
-
-          {/* Error */}
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
 
           {/* Submit Button */}
           <button
