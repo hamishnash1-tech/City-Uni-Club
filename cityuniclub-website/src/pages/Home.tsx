@@ -1,8 +1,6 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '../store'
-import cucLogo from '../assets/cuc-logo.png'
-import cucBuilding from '../assets/cuc-building.jpg'
 
 export const Home: React.FC = () => {
   const auth = useSelector((state: RootState) => state.auth)
@@ -13,8 +11,15 @@ export const Home: React.FC = () => {
     return (
       <div className="min-h-screen bg-oxford-blue flex items-center justify-center p-4">
         <div className="text-center text-white max-w-md">
-          <div className="w-32 h-32 mx-auto mb-6 bg-white/10 rounded-full flex items-center justify-center p-4">
-            <img src={cucLogo} alt="City University Club" className="w-full h-full object-contain" />
+          <div className="w-32 h-32 mx-auto mb-6 bg-white/10 rounded-full flex items-center justify-center p-4 overflow-hidden">
+            <img 
+              src="/assets/cuc-logo.avif" 
+              alt="City University Club" 
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/128?text=CUC'
+              }}
+            />
           </div>
           <h1 className="text-4xl font-light mb-4">Welcome to City University Club</h1>
           <p className="text-cambridge-blue mb-8">A private members club in the heart of London</p>
@@ -34,7 +39,7 @@ export const Home: React.FC = () => {
       {/* Background - cuc-building image */}
       <div 
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${cucBuilding})` }}
+        style={{ backgroundImage: `url('/assets/cuc-building.avif')` }}
       >
         <div className="absolute inset-0 bg-oxford-blue/70"></div>
       </div>
@@ -42,8 +47,15 @@ export const Home: React.FC = () => {
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
         {/* Logo - cuc-logo */}
-        <div className="w-32 h-32 mb-4 bg-white/20 rounded-full flex items-center justify-center p-4">
-          <img src={cucLogo} alt="City University Club" className="w-full h-full object-contain" />
+        <div className="w-32 h-32 mb-4 bg-white/20 rounded-full flex items-center justify-center p-4 overflow-hidden">
+          <img 
+            src="/assets/cuc-logo.avif" 
+            alt="City University Club" 
+            className="w-full h-full object-contain"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/128?text=CUC'
+            }}
+          />
         </div>
 
         {/* Welcome */}
@@ -55,8 +67,15 @@ export const Home: React.FC = () => {
           {/* Card Header */}
           <div className="p-5 border-b border-gray-200">
             <div className="flex items-start space-x-3">
-              <div className="w-14 h-16 bg-oxford-blue/10 rounded flex items-center justify-center">
-                <span className="text-2xl font-serif text-oxford-blue font-bold">CUC</span>
+              <div className="w-14 h-16 bg-oxford-blue/10 rounded flex items-center justify-center overflow-hidden">
+                <img 
+                  src="/assets/cuc-logo.avif" 
+                  alt="CUC" 
+                  className="w-full h-full object-contain p-1"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/56x64?text=CUC'
+                  }}
+                />
               </div>
               <div>
                 <h2 className="text-lg font-serif text-oxford-blue">CITY UNIVERSITY CLUB</h2>
