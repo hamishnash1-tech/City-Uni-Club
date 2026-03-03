@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { loginStart, loginSuccess, loginFailure } from '../slices/authSlice'
-import { api } from '../services/api'
 import { RootState } from '../store'
 
 export const Login: React.FC = () => {
@@ -11,7 +10,7 @@ export const Login: React.FC = () => {
   const auth = useSelector((state: RootState) => state.auth)
   const isLoading = auth.isLoading
   const error = auth.error
-  
+
   const [formData, setFormData] = useState({ email: '', password: '' })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,9 +18,28 @@ export const Login: React.FC = () => {
     dispatch(loginStart())
 
     try {
-      const response = await api.login(formData.email, formData.password)
-      dispatch(loginSuccess({ token: response.session.token, member: response.member }))
-      navigate('/home')
+      // Simulate login for demo (no backend required)
+      await new Promise(resolve => setTimeout(resolve, 500))
+      
+      // Accept any email with password "password123"
+      if (formData.password === 'password123' && formData.email.includes('@')) {
+        const memberData = {
+          id: 'demo-user-id',
+          email: formData.email,
+          full_name: formData.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+          first_name: formData.email.split('@')[0].split('.')[0].charAt(0).toUpperCase() + formData.email.split('@')[0].split('.')[0].slice(1),
+          membership_number: 'CUC-2024-0001',
+          membership_type: 'Full Membership'
+        }
+        
+        dispatch(loginSuccess({ 
+          token: 'demo-token-' + Date.now(), 
+          member: memberData 
+        }))
+        navigate('/home')
+      } else {
+        throw new Error('Invalid email or password. Use password: password123')
+      }
     } catch (err: any) {
       dispatch(loginFailure(err.message || 'Login failed'))
     }
@@ -32,8 +50,15 @@ export const Login: React.FC = () => {
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-12">
-          <div className="w-24 h-24 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center">
-            <span className="text-4xl font-serif text-white font-bold">CUC</span>
+          <div className="w-24 h-24 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center overflow-hidden">
+            <img 
+              src="/assets/cuc-logo.avif" 
+              alt="CUC Logo" 
+              className="w-20 h-20 object-contain"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/80?text=CUC'
+              }}
+            />
           </div>
           <h1 className="text-3xl font-light text-white mb-2">Welcome</h1>
           <p className="text-cambridge-blue font-serif">City University Club</p>
@@ -50,7 +75,7 @@ export const Login: React.FC = () => {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full px-4 py-3 bg-white/10 border border-cambridge-blue/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cambridge-blue"
-              placeholder="email@example.com"
+              placeholder="your.email@example.com"
               required
             />
           </div>
@@ -93,16 +118,9 @@ export const Login: React.FC = () => {
             )}
           </button>
 
-          <div className="text-center">
-            <a href="#" className="text-cambridge-blue text-sm underline">Forgot Password?</a>
+          <div className="text-center text-sm text-gray-400">
+            <p>Demo: Use password <strong className="text-cambridge-blue">password123</strong></p>
           </div>
-
-          <p className="text-center text-xs text-secondary-text mt-6">
-            Contact the secretary for login assistance<br/>
-            <a href="mailto:secretary@cityuniversityclub.co.uk" className="text-cambridge-blue">
-              secretary@cityuniversityclub.co.uk
-            </a>
-          </p>
         </div>
       </div>
     </div>
