@@ -36,12 +36,13 @@ export const Home: React.FC = () => {
 
   return (
     <div className="relative min-h-screen">
-      {/* Background - cuc-building image */}
+      {/* Background - cuc-building image with Oxford Blue overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url('/assets/cuc-building.avif')` }}
       >
-        <div className="absolute inset-0 bg-oxford-blue/70"></div>
+        {/* Oxford Blue Overlay - 35% opacity like iOS app */}
+        <div className="absolute inset-0 bg-oxford-blue/35"></div>
       </div>
 
       {/* Content */}
