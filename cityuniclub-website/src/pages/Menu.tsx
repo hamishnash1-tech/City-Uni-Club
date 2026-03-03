@@ -23,32 +23,32 @@ export const Menu: React.FC = () => {
         { 
           name: 'Homemade Soup of the Day', 
           description: 'Served with crusty bread',
-          image: '/assets/food/soup.jpg'
+          image: '/assets/food/Starters/cuc-soup.avif'
         },
         { 
           name: 'Chilli Garlic Pan Fried Tiger Prawns & Chorizo', 
           description: 'With crispy bread',
-          image: '/assets/food/prawns.jpg'
+          image: '/assets/food/Starters/cuc-prawns.avif'
         },
         { 
           name: 'Aged Cheddar Cheese & Caramelised Red Onion Tart', 
           description: 'With rocket and tomato salad',
-          image: '/assets/food/cocktail.jpg'
+          image: '/assets/food/Starters/cuc-cheese.avif'
         },
         { 
           name: 'Devilled Kidneys', 
           description: 'On toast',
-          image: '/assets/food/bbq.jpg'
+          image: '/assets/food/Starters/cuc-kidneys.avif'
         },
         { 
           name: 'Crispy Ham Hock Croquettes', 
           description: 'With mustard mayo',
-          image: '/assets/food/dessert.jpg'
+          image: '/assets/food/Starters/cuc-ham.avif'
         },
         { 
           name: 'Smoked Salmon Plate', 
           description: 'With brown bread and butter',
-          image: '/assets/food/salmon.jpg'
+          image: '/assets/food/Starters/cuc-salmon.avif'
         },
       ]
     },
@@ -60,32 +60,32 @@ export const Menu: React.FC = () => {
         { 
           name: 'Roast Rump of Lamb', 
           description: 'With seasonal vegetables and gravy',
-          image: '/assets/food/bbq.jpg'
+          image: '/assets/food/Mains/cuc-lamb.avif'
         },
         { 
           name: 'Pan Fried Delice of Salmon', 
           description: 'With samphire and new potatoes',
-          image: '/assets/food/salmon.jpg'
+          image: '/assets/food/Mains/cuc-delice.avif'
         },
         { 
           name: 'Confit Belly of English Pork', 
           description: 'With apple sauce and mash',
-          image: '/assets/food/bbq.jpg'
+          image: '/assets/food/Mains/cuc-pork.avif'
         },
         { 
           name: 'Oven Roasted Free Range Chicken', 
           description: 'With seasonal vegetables',
-          image: '/assets/food/bbq.jpg'
+          image: '/assets/food/Mains/cuc-chicken.avif'
         },
         { 
           name: 'Homemade Truffle Mushroom Tortellinis', 
           description: 'With parmesan cream',
-          image: '/assets/food/pasta.jpg'
+          image: '/assets/food/Mains/cuc-tortellini.avif'
         },
         { 
           name: 'Whole Dover Sole', 
           description: 'With butter and new potatoes',
-          image: '/assets/food/salmon.jpg'
+          image: '/assets/food/Mains/cuc-sole.avif'
         },
       ]
     },
@@ -97,22 +97,22 @@ export const Menu: React.FC = () => {
         { 
           name: 'Apricot and Pistachio Tart', 
           description: 'With crème fraîche',
-          image: '/assets/food/cake.jpg'
+          image: '/assets/food/Pudding/cuc-tart.avif'
         },
         { 
           name: 'Selection of Cheeses', 
           description: 'With crackers and grapes',
-          image: '/assets/food/cheese.jpg'
+          image: '/assets/food/Pudding/cuc-cheeses.avif'
         },
         { 
           name: 'Ice Creams', 
           description: 'Vanilla, chocolate or strawberry',
-          image: '/assets/food/icecream.jpg'
+          image: '/assets/food/Pudding/cuc-ice-cream.avif'
         },
         { 
           name: 'Sticky Toffee Pudding', 
           description: 'With vanilla ice cream',
-          image: '/assets/food/cake.jpg'
+          image: '/assets/food/Pudding/cuc-tart.avif'
         },
       ]
     }
