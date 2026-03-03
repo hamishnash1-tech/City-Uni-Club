@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { setRegion, setLoiRequest } from '../slices/uiSlice'
-import { api } from '../services/api'
+import { reciprocalClubs } from '../data/reciprocalClubs'
 import { RootState } from '../store'
 
-interface ReciprocalClub {
-  id: string
+interface Club {
   name: string
   location: string
   region: string
@@ -14,38 +13,22 @@ interface ReciprocalClub {
   note?: string
 }
 
-const REGIONS = ['All', 'Australia', 'Austria', 'Belgium', 'Canada', 'Europe', 'France', 'Germany', 'Hong Kong', 'India', 'Ireland', 'Italy', 'Japan', 'Kenya', 'Malaysia', 'Netherlands', 'New Zealand', 'Singapore', 'South Africa', 'Spain', 'Thailand', 'UAE', 'United Kingdom', 'USA']
+const REGIONS = ['All', 'United Kingdom', 'Ireland', 'Australia', 'Canada', 'USA', 'Europe', 'Asia', 'Africa', 'Americas', 'Oceania', 'Middle East', 'South America']
 
 export const ReciprocalClubs: React.FC = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const { token } = useSelector((state: RootState) => state.auth)
   const { selectedRegion } = useSelector((state: RootState) => state.ui)
-  const [clubs, setClubs] = useState<ReciprocalClub[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
 
-  useEffect(() => {
+  const handleRequestLOI = (club: Club) => {
     if (!token) {
       navigate('/login')
       return
     }
-
-    setIsLoading(true)
-    api.getReciprocalClubs(token, selectedRegion === 'All' ? undefined : selectedRegion)
-      .then((data) => {
-        setClubs(data)
-        setIsLoading(false)
-      })
-      .catch((err) => {
-        console.error('Error loading clubs:', err)
-        setIsLoading(false)
-      })
-  }, [token, selectedRegion, navigate])
-
-  const handleRequestLOI = (club: ReciprocalClub) => {
     dispatch(setLoiRequest({
-      club_id: club.id,
+      club_id: club.name,
       arrival_date: '',
       departure_date: '',
       purpose: 'Business',
@@ -53,34 +36,24 @@ export const ReciprocalClubs: React.FC = () => {
     navigate('/loi-request')
   }
 
-  const filteredClubs = clubs.filter(club => {
-    if (selectedRegion !== 'All' && club.region !== selectedRegion) return false
-    if (searchTerm && !club.name.toLowerCase().includes(searchTerm.toLowerCase())) return false
+  const filteredClubs = reciprocalClubs.filter(club => {
+    if (selectedRegion !== 'All' && !club.region.includes(selectedRegion) && club.country !== selectedRegion) return false
+    if (searchTerm && !club.name.toLowerCase().includes(searchTerm.toLowerCase()) && 
+        !club.location.toLowerCase().includes(searchTerm.toLowerCase())) return false
     return true
   })
 
-  const getLogoForClub = (club: ReciprocalClub): string => {
+  const getLogoForClub = (club: Club): string => {
     const region = club.region.replace(/\s+/g, '_')
-    const location = club.location.replace(/\s+/g, '_')
+    const location = club.location.replace(/['&]/g, '').replace(/\s+/g, '_')
     const name = club.name.replace(/['&]/g, '').replace(/\s+/g, '_')
     
-    const extensions = ['.png', '.jpg', '.svg', '.webp', '.ico', '.jpeg']
+    const extensions = ['.png', '.jpg', '.svg', '.webp', '.ico', '.jpeg', '.gif']
     for (const ext of extensions) {
       const logoPath = `/assets/club-logos/${region}_${location}_${name}${ext}`
       return logoPath
     }
     return ''
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-oxford-blue flex items-center justify-center">
-        <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cambridge-blue mx-auto mb-4"></div>
-          <p>Loading clubs...</p>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -109,7 +82,7 @@ export const ReciprocalClubs: React.FC = () => {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search clubs..."
+            placeholder="Search clubs by name or location..."
             className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-oxford-blue focus:border-transparent"
           />
           <svg className="w-5 h-5 text-secondary-text absolute left-3 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,10 +117,10 @@ export const ReciprocalClubs: React.FC = () => {
             <p className="text-lg">No clubs found</p>
           </div>
         ) : (
-          filteredClubs.map((club) => {
+          filteredClubs.map((club, index) => {
             const logoPath = getLogoForClub(club)
             return (
-              <div key={club.id} className="bg-card-white rounded-xl shadow-lg p-4 hover:shadow-xl transition">
+              <div key={index} className="bg-card-white rounded-xl shadow-lg p-4 hover:shadow-xl transition">
                 <div className="flex items-start space-x-4">
                   {/* Club Logo */}
                   <div className="w-16 h-16 bg-gradient-to-br from-cambridge-blue/30 to-oxford-blue/30 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
@@ -157,9 +130,10 @@ export const ReciprocalClubs: React.FC = () => {
                       className="w-full h-full object-contain p-1"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none'
+                        ;(e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden')
                       }}
                     />
-                    <span className="text-xl font-serif text-oxford-blue font-bold">{club.name.charAt(0)}</span>
+                    <span className="text-xl font-serif text-oxford-blue font-bold hidden">{club.name.charAt(0)}</span>
                   </div>
 
                   {/* Club Info */}
