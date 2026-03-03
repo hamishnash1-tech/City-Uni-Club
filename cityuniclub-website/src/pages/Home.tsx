@@ -35,20 +35,22 @@ export const Home: React.FC = () => {
   }
 
   return (
-    <div className="relative min-h-screen">
-      {/* Background - cuc-building image with Oxford Blue overlay */}
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background - cuc-building image */}
       <div 
-        className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url('/assets/cuc-building.avif')` }}
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ 
+          backgroundImage: `url('/assets/cuc-building.avif')`,
+        }}
       >
-        {/* Oxford Blue Overlay - 35% opacity like iOS app */}
-        <div className="absolute inset-0 bg-oxford-blue/35"></div>
+        {/* Oxford Blue Overlay - 35% opacity (matching iOS app) */}
+        <div className="absolute inset-0 bg-oxford-blue" style={{ opacity: 0.35 }}></div>
       </div>
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen p-4">
         {/* Logo - cuc-logo */}
-        <div className="w-32 h-32 mb-4 bg-white/20 rounded-full flex items-center justify-center p-4 overflow-hidden">
+        <div className="w-32 h-32 mb-4 bg-white/20 rounded-full flex items-center justify-center p-4 overflow-hidden shadow-2xl">
           <img 
             src="/assets/cuc-logo.avif" 
             alt="City University Club" 
@@ -60,11 +62,11 @@ export const Home: React.FC = () => {
         </div>
 
         {/* Welcome */}
-        <p className="text-cambridge-blue text-lg mb-2">Welcome</p>
+        <p className="text-cambridge-blue text-lg mb-2 font-medium">Welcome</p>
         <h1 className="text-4xl font-light text-white mb-8">{member?.first_name || 'Member'}</h1>
 
         {/* Membership Card */}
-        <div className="w-full max-w-md bg-card-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="w-full max-w-md bg-card-white rounded-2xl shadow-2xl overflow-hidden border border-white/20">
           {/* Card Header */}
           <div className="p-5 border-b border-gray-200">
             <div className="flex items-start space-x-3">
@@ -79,7 +81,7 @@ export const Home: React.FC = () => {
                 />
               </div>
               <div>
-                <h2 className="text-lg font-serif text-oxford-blue">CITY UNIVERSITY CLUB</h2>
+                <h2 className="text-lg font-serif text-oxford-blue font-semibold">CITY UNIVERSITY CLUB</h2>
                 <p className="text-xs text-address-gray">42 CRUTCHED FRIARS, EC3N 2AP</p>
               </div>
             </div>
