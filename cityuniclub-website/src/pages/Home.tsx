@@ -7,33 +7,6 @@ export const Home: React.FC = () => {
   const member = auth.member
   const isAuthenticated = auth.isAuthenticated
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-oxford-blue flex items-center justify-center p-4">
-        <div className="text-center text-white max-w-md">
-          <div className="w-32 h-32 mx-auto mb-6 bg-white/10 rounded-full flex items-center justify-center p-4 overflow-hidden">
-            <img 
-              src="/assets/cuc-logo.avif" 
-              alt="City University Club" 
-              className="w-full h-full object-contain"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/128?text=CUC'
-              }}
-            />
-          </div>
-          <h1 className="text-4xl font-light mb-4">Welcome to City University Club</h1>
-          <p className="text-cambridge-blue mb-8">A private members club in the heart of London</p>
-          <a 
-            href="/login" 
-            className="inline-block bg-cambridge-blue text-oxford-blue px-8 py-3 rounded-lg font-semibold hover:bg-white transition"
-          >
-            Member Login
-          </a>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Background - cuc-building image */}
@@ -61,53 +34,51 @@ export const Home: React.FC = () => {
           />
         </div>
 
-        {/* Welcome */}
-        <p className="text-cambridge-blue text-lg mb-2 font-medium">Welcome</p>
-        <h1 className="text-4xl font-light text-white mb-8">{member?.first_name || 'Member'}</h1>
+        {/* Club Name */}
+        <h1 className="text-4xl font-serif font-bold text-white mb-2">CITY UNIVERSITY CLUB</h1>
+        <p className="text-cambridge-blue text-lg mb-8">42 Crutched Friars, London EC3N 2AP</p>
 
-        {/* Membership Card */}
-        <div className="w-full max-w-md bg-card-white rounded-2xl shadow-2xl overflow-hidden border border-white/20">
-          {/* Card Header */}
-          <div className="p-5 border-b border-gray-200">
-            <div className="flex items-start space-x-3">
-              <div className="w-14 h-16 bg-oxford-blue/10 rounded flex items-center justify-center overflow-hidden">
-                <img 
-                  src="/assets/cuc-logo.avif" 
-                  alt="CUC" 
-                  className="w-full h-full object-contain p-1"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://via.placeholder.com/56x64?text=CUC'
-                  }}
-                />
-              </div>
-              <div>
-                <h2 className="text-lg font-serif text-oxford-blue font-semibold">CITY UNIVERSITY CLUB</h2>
-                <p className="text-xs text-address-gray">42 CRUTCHED FRIARS, EC3N 2AP</p>
-              </div>
-            </div>
-          </div>
+        {/* Info Cards */}
+        <div className="grid md:grid-cols-3 gap-6 max-w-4xl w-full">
+          {/* Dining Card */}
+          <a href="/dining" className="bg-card-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 text-center hover:bg-white transition">
+            <div className="text-4xl mb-3">🍽️</div>
+            <h3 className="text-xl font-serif text-oxford-blue font-semibold mb-2">Dining</h3>
+            <p className="text-sm text-secondary-text">Book a table & view menu</p>
+          </a>
 
-          {/* Member Name */}
-          <div className="py-6 text-center">
-            <p className="text-sm text-secondary-text italic">This is to introduce</p>
-            <h3 className="text-lg font-serif text-oxford-blue font-semibold mt-2">
-              {member?.full_name || 'Member Name'}
-            </h3>
-          </div>
+          {/* Events Card */}
+          <a href="/events" className="bg-card-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 text-center hover:bg-white transition">
+            <div className="text-4xl mb-3">📅</div>
+            <h3 className="text-xl font-serif text-oxford-blue font-semibold mb-2">Events</h3>
+            <p className="text-sm text-secondary-text">Upcoming club events</p>
+          </a>
 
-          {/* Card Footer */}
-          <div className="p-5 bg-gray-50">
-            <div className="flex justify-between items-end">
-              <div>
-                <p className="text-xs text-secondary-text">Member Since</p>
-                <p className="text-sm font-semibold text-oxford-blue">2024</p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs font-semibold text-cambridge-blue">{member?.membership_type || 'Membership'}</p>
-                <p className="text-xs text-secondary-text">{member?.membership_number || 'N/A'}</p>
-              </div>
-            </div>
-          </div>
+          {/* News Card */}
+          <a href="/news" className="bg-card-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 text-center hover:bg-white transition">
+            <div className="text-4xl mb-3">📰</div>
+            <h3 className="text-xl font-serif text-oxford-blue font-semibold mb-2">News</h3>
+            <p className="text-sm text-secondary-text">Club news & updates</p>
+          </a>
+        </div>
+
+        {/* Member Area Button */}
+        <div className="mt-12">
+          {isAuthenticated ? (
+            <a 
+              href="/reciprocal-clubs" 
+              className="inline-block bg-cambridge-blue text-oxford-blue px-8 py-4 rounded-lg font-semibold hover:bg-white transition shadow-lg"
+            >
+              🌍 Member Area (Reciprocal Clubs)
+            </a>
+          ) : (
+            <a 
+              href="/login" 
+              className="inline-block bg-cambridge-blue text-oxford-blue px-8 py-4 rounded-lg font-semibold hover:bg-white transition shadow-lg"
+            >
+              🔐 Member Login
+            </a>
+          )}
         </div>
       </div>
     </div>

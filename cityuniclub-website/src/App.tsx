@@ -72,27 +72,19 @@ const App: React.FC = () => {
       <Route path="/login" element={<Login />} />
       
       <Route path="/home" element={
-        <ProtectedRoute>
-          <MainLayout><Home /></MainLayout>
-        </ProtectedRoute>
+        <MainLayout><Home /></MainLayout>
       } />
       
       <Route path="/dining" element={
-        <ProtectedRoute>
-          <MainLayout><Dining /></MainLayout>
-        </ProtectedRoute>
+        <MainLayout><Dining /></MainLayout>
       } />
       
       <Route path="/events" element={
-        <ProtectedRoute>
-          <MainLayout><Events /></MainLayout>
-        </ProtectedRoute>
+        <MainLayout><Events /></MainLayout>
       } />
       
       <Route path="/news" element={
-        <ProtectedRoute>
-          <MainLayout><News /></MainLayout>
-        </ProtectedRoute>
+        <MainLayout><News /></MainLayout>
       } />
       
       <Route path="/reciprocal-clubs" element={
