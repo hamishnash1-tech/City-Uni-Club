@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-session-token, prefer',
+  'Access-Control-Allow-Headers': 'Content-Type, x-session-token',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
@@ -15,8 +15,6 @@ async function authenticate(req: Request, supabaseClient: any) {
     return null
   }
 
-  console.log('Validating session token:', sessionToken.substring(0, 8) + '...')
-
   // Check if it's a session token (UUID format)
   const { data, error } = await supabaseClient
     .from('sessions')
@@ -26,22 +24,19 @@ async function authenticate(req: Request, supabaseClient: any) {
     .single()
 
   if (error) {
-    console.error('Session validation error:', error.message)
     return null
   }
 
-  console.log('Session valid for member:', data?.member_id)
   return data?.member_id || null
 }
 
 serve(async (req: Request) => {
-  console.log('LOI Request - Method:', req.method)
-  console.log('LOI Request - Headers:', Object.fromEntries(req.headers))
-  
-  // Handle CORS preflight
+  // Handle CORS preflight FIRST
   if (req.method === 'OPTIONS') {
-    console.log('CORS preflight request')
-    return new Response('ok', { headers: corsHeaders, status: 204 })
+    return new Response(null, { 
+      status: 204,
+      headers: corsHeaders
+    })
   }
 
   if (req.method !== 'POST') {

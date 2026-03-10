@@ -1,4 +1,4 @@
-import { EDGE_FUNCTIONS_URL } from './supabase'
+import { EDGE_FUNCTIONS_URL, SUPABASE_ANON_KEY } from './supabase'
 
 const API_BASE = EDGE_FUNCTIONS_URL
 
@@ -113,7 +113,7 @@ export const api = {
       headers: {
         'Content-Type': 'application/json',
         'x-session-token': token,
-        'prefer': 'return=minimal'
+        'apikey': SUPABASE_ANON_KEY,
       },
       body: JSON.stringify(request),
     })
