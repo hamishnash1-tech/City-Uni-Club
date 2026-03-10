@@ -6,10 +6,9 @@ import { RootState } from '../store'
 
 export const LOIRequest: React.FC = () => {
   const navigate = useNavigate()
-  const location = useLocation()
   const auth = useSelector((state: RootState) => state.auth)
   const token = auth.token
-  const club = location.state?.club
+  const loiRequest = useSelector((state: RootState) => state.ui.loiRequest)
 
   const [formData, setFormData] = useState({
     arrival_date: '',
@@ -20,27 +19,58 @@ export const LOIRequest: React.FC = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
+  // Debug: Log club and token on mount
+  React.useEffect(() => {
+    console.log('LOI Request - Token:', token ? 'Present' : 'Missing')
+    console.log('LOI Request - Club:', loiRequest)
+    if (!loiRequest?.club_id) {
+      setError('No club selected. Please go back and select a club.')
+    }
+    if (!token) {
+      setError('You must be logged in to submit an LOI request.')
+    }
+  }, [loiRequest, token])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!token || !club) return
+    console.log('Submit clicked')
+    
+    if (!token) {
+      setError('You must be logged in to submit an LOI request.')
+      return
+    }
+    
+    if (!loiRequest?.club_id) {
+      setError('No club selected. Please go back and select a club.')
+      return
+    }
 
+    if (!formData.arrival_date || !formData.departure_date) {
+      setError('Please fill in both arrival and departure dates.')
+      return
+    }
+
+    console.log('Submitting LOI request...')
     setIsLoading(true)
     setError('')
 
     try {
-      // Use club.id if available, otherwise use club_name
-      const clubId = club.id || club.club_id || club.name
-      
+      // Use club_id from Redux store
+      const clubId = loiRequest.club_id
+      console.log('Club ID:', clubId)
+
       await api.createLoiRequest(token, {
         club_id: clubId,
         arrival_date: formData.arrival_date,
         departure_date: formData.departure_date,
-        purpose: 'Business',
+        purpose: loiRequest.purpose || 'Business',
         special_requests: undefined,
       })
+      console.log('LOI request submitted successfully!')
       setSuccess(true)
       setTimeout(() => navigate('/reciprocal-clubs'), 2000)
     } catch (err: any) {
+      console.error('LOI request error:', err)
       setError(err.message || 'Failed to submit request')
     } finally {
       setIsLoading(false)
@@ -82,15 +112,15 @@ export const LOIRequest: React.FC = () => {
       {/* Content */}
       <div className="p-4 space-y-4">
         {/* Club Info */}
-        {club && (
+        {loiRequest && (
           <div className="bg-card-white rounded-xl shadow-lg p-4">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-gradient-to-br from-cambridge-blue/30 to-oxford-blue/30 rounded-full flex items-center justify-center">
                 <span className="text-xl">🌍</span>
               </div>
               <div>
-                <h3 className="font-semibold text-oxford-blue">{club.name}</h3>
-                <p className="text-sm text-secondary-text">{club.location}, {club.country}</p>
+                <h3 className="font-semibold text-oxford-blue">{loiRequest.club_name || 'Selected Club'}</h3>
+                <p className="text-sm text-secondary-text">{loiRequest.club_location}, {loiRequest.club_country}</p>
               </div>
             </div>
           </div>
