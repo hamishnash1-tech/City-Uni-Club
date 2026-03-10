@@ -8,7 +8,7 @@ const corsHeaders = {
 
 async function authenticate(req: Request, supabaseClient: any) {
   const authHeader = req.headers.get('Authorization')
-  
+
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return null
   }
@@ -37,15 +37,37 @@ serve(async (req: Request) => {
     )
 
     const member_id = await authenticate(req, supabaseClient)
-    
+
     if (!member_id) {
       throw new Error('Unauthorized')
     }
 
     const { club_id, arrival_date, departure_date, purpose, special_requests } = await req.json()
 
-    if (!club_id || !arrival_date || !departure_date || !purpose) {
+    if (!club_id || !arrival_date || !departure_date) {
       throw new Error('Missing required fields')
+    }
+
+    // Get member details
+    const { data: member } = await supabaseClient
+      .from('members')
+      .select('email, full_name, first_name, membership_number')
+      .eq('id', member_id)
+      .single()
+
+    if (!member) {
+      throw new Error('Member not found')
+    }
+
+    // Get club details
+    const { data: club } = await supabaseClient
+      .from('reciprocal_clubs')
+      .select('name, location, country, contact_email')
+      .eq('id', club_id)
+      .single()
+
+    if (!club) {
+      throw new Error('Club not found')
     }
 
     // Create LOI request
@@ -56,7 +78,7 @@ serve(async (req: Request) => {
         member_id: member_id,
         arrival_date: arrival_date,
         departure_date: departure_date,
-        purpose: purpose,
+        purpose: purpose || 'Business',
         special_requests: special_requests || null,
         status: 'pending'
       })
@@ -66,7 +88,8 @@ serve(async (req: Request) => {
           id,
           name,
           location,
-          country
+          country,
+          contact_email
         )
       `)
       .single()
@@ -75,9 +98,85 @@ serve(async (req: Request) => {
       throw requestError
     }
 
+    // Send email to the reciprocal club
+    const clubEmail = club.contact_email || 'secretary@cityuniversityclub.co.uk'
+    const resendApiKey = Deno.env.get('RESEND_API_KEY')
+
+    if (resendApiKey) {
+      try {
+        const emailContent = `
+<html>
+  <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <h2 style="color: #002147;">Letter of Introduction Request</h2>
+
+    <p>Dear Secretary,</p>
+
+    <p>I hope this letter finds you well.</p>
+
+    <p>I am writing to request a Letter of Introduction for my upcoming visit to <strong>${club.location}</strong>.</p>
+
+    <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid #002147; margin: 20px 0;">
+      <h3 style="margin-top: 0; color: #002147;">Member Details</h3>
+      <p><strong>Name:</strong> ${member.full_name}<br>
+      <strong>Email:</strong> ${member.email}<br>
+      <strong>Membership Number:</strong> ${member.membership_number}</p>
+    </div>
+
+    <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid #A3C1AD; margin: 20px 0;">
+      <h3 style="margin-top: 0; color: #002147;">Visit Details</h3>
+      <p><strong>Club:</strong> ${club.name}<br>
+      <strong>Arrival Date:</strong> ${arrival_date}<br>
+      <strong>Departure Date:</strong> ${departure_date}<br>
+      <strong>Purpose of Visit:</strong> ${purpose || 'Business/Leisure'}</p>
+    </div>
+
+    <p>I would be grateful if you could provide me with a Letter of Introduction to present to the club upon my visit.</p>
+
+    <p>Please let me know if you require any additional information.</p>
+
+    <p>Thank you for your assistance.</p>
+
+    <p>Best regards,<br>
+    <strong>${member.full_name}</strong><br>
+    ${member.email}</p>
+
+    <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
+
+    <p style="color: #666; font-size: 12px;">
+      <strong>City University Club</strong><br>
+      42 Crutched Friars, London EC3N 2AP<br>
+      secretary@cityuniversityclub.co.uk
+    </p>
+  </body>
+</html>`
+
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${resendApiKey}`,
+          },
+          body: JSON.stringify({
+            from: 'City University Club <loi@cityuniversityclub.co.uk>',
+            to: [clubEmail],
+            cc: ['secretary@cityuniversityclub.co.uk'],
+            subject: `Letter of Introduction Request - ${member.full_name}`,
+            html: emailContent,
+          }),
+        })
+      } catch (emailError) {
+        console.error('Failed to send email:', emailError)
+        // Don't fail the request if email fails
+      }
+    }
+
     return new Response(
-      JSON.stringify({ request, message: 'LOI request submitted successfully' }),
-      { 
+      JSON.stringify({ 
+        request, 
+        message: 'LOI request submitted successfully',
+        email_sent: !!resendApiKey
+      }),
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 201
       }
@@ -85,7 +184,7 @@ serve(async (req: Request) => {
   } catch (error: any) {
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: error.message === 'Unauthorized' ? 401 : 400
       }
