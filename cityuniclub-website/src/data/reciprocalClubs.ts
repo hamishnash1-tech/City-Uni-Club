@@ -9,10 +9,10 @@ export interface Club {
 
 export const reciprocalClubs: Club[] = [
   // ========== UNITED KINGDOM - LONDON ==========
+  { id: '1425eb2d-bbde-460b-ab30-dfea80d2ed04', name: 'Test Club', location: 'London', region: 'United Kingdom', country: 'England', contact_email: 'anand@cambridgembn.com' },
   { name: "Buck's Club", location: 'London', region: 'United Kingdom', country: 'England' },
   { name: 'Bush Hill Park Golf Club', location: 'London', region: 'United Kingdom', country: 'England' },
   { name: 'Eccentric Club (Snail Club)', location: 'London', region: 'United Kingdom', country: 'England' },
-  { name: 'Test Club', location: 'London', region: 'United Kingdom', country: 'England', note: 'Test Club - anand@cambridgembn.com' },
   { name: 'Gymkhana Club', location: 'London', region: 'United Kingdom', country: 'England' },
   { name: 'Lansdowne Club', location: 'London', region: 'United Kingdom', country: 'England', note: 'Evenings only' },
   { name: 'National Liberal Club', location: 'London', region: 'United Kingdom', country: 'England', note: 'Evenings only' },

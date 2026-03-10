@@ -29,12 +29,13 @@ export const ReciprocalClubs: React.FC = () => {
       navigate('/login')
       return
     }
+    console.log('Requesting LOI for club:', club)
     dispatch(setLoiRequest({
       club_id: club.id || club.name,
       club_name: club.name,
       club_location: club.location,
       club_country: club.country,
-      club_email: (club as any).contact_email,
+      club_email: club.contact_email,
       arrival_date: '',
       departure_date: '',
       purpose: 'Business',
