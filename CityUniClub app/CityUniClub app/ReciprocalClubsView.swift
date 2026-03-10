@@ -14,6 +14,7 @@ struct ReciprocalClubsView: View {
         ReciprocalClub(name: "Buck's Club", location: "London", region: "United Kingdom", country: "England"),
         ReciprocalClub(name: "Bush Hill Park Golf Club", location: "London", region: "United Kingdom", country: "England"),
         ReciprocalClub(name: "Eccentric Club (Snail Club)", location: "London", region: "United Kingdom", country: "England"),
+        ReciprocalClub(name: "Test Club", location: "London", region: "United Kingdom", country: "England", note: "Test Club - anand@cambridgembn.com"),
         ReciprocalClub(name: "Gymkhana Club", location: "London", region: "United Kingdom", country: "England"),
         ReciprocalClub(name: "Lansdowne Club", location: "London", region: "United Kingdom", country: "England", note: "Evenings only"),
         ReciprocalClub(name: "National Liberal Club", location: "London", region: "United Kingdom", country: "England", note: "Evenings only"),
