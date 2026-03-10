@@ -2,6 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export interface LoiRequest {
   club_id: string
+  club_name?: string
+  club_location?: string
+  club_country?: string
+  club_email?: string
   arrival_date: string
   departure_date: string
   purpose: string

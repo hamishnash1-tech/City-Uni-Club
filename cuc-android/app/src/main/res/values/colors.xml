@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Oxford Blue -->
+    <color name="oxford_blue">#002147</color>
+    <color name="oxford_blue_light">#0A3D6E</color>
+    <color name="oxford_blue_dark">#001529</color>
+    
+    <!-- Cambridge Blue -->
+    <color name="cambridge_blue">#A3C1AD</color>
+    <color name="cambridge_blue_light">#C5D9C9</color>
+    <color name="cambridge_blue_dark">#85A991</color>
+    
+    <!-- Other Colors -->
+    <color name="card_white">#FAFAFA</color>
+    <color name="secondary_text">#8C8C8C</color>
+    <color name="dark_text">#2E4752</color>
+    <color name="address_gray">#737373</color>
+    
+    <!-- Background -->
+    <color name="background_overlay">#59002147</color> <!-- 35% Oxford Blue -->
+</resources>

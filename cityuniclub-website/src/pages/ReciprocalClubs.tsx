@@ -6,11 +6,13 @@ import { reciprocalClubs } from '../data/reciprocalClubs'
 import { RootState } from '../store'
 
 interface Club {
+  id?: string
   name: string
   location: string
   region: string
   country: string
   note?: string
+  contact_email?: string
 }
 
 const REGIONS = ['All', 'United Kingdom', 'Ireland', 'Australia', 'Canada', 'USA', 'Europe', 'Asia', 'Africa', 'Americas', 'Oceania', 'Middle East', 'South America']
@@ -28,7 +30,11 @@ export const ReciprocalClubs: React.FC = () => {
       return
     }
     dispatch(setLoiRequest({
-      club_id: club.name,
+      club_id: club.id || club.name,
+      club_name: club.name,
+      club_location: club.location,
+      club_country: club.country,
+      club_email: (club as any).contact_email,
       arrival_date: '',
       departure_date: '',
       purpose: 'Business',

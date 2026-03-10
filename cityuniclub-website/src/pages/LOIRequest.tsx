@@ -28,8 +28,11 @@ export const LOIRequest: React.FC = () => {
     setError('')
 
     try {
+      // Use club.id if available, otherwise use club_name
+      const clubId = club.id || club.club_id || club.name
+      
       await api.createLoiRequest(token, {
-        club_id: club.id,
+        club_id: clubId,
         arrival_date: formData.arrival_date,
         departure_date: formData.departure_date,
         purpose: 'Business',

@@ -59,12 +59,25 @@ serve(async (req: Request) => {
       throw new Error('Member not found')
     }
 
-    // Get club details
-    const { data: club } = await supabaseClient
-      .from('reciprocal_clubs')
-      .select('name, location, country, contact_email')
-      .eq('id', club_id)
-      .single()
+    // Get club details - club_id could be UUID or name
+    let club
+    if (club_id.includes('-')) {
+      // It's a UUID
+      const { data: clubData } = await supabaseClient
+        .from('reciprocal_clubs')
+        .select('id, name, location, country, contact_email')
+        .eq('id', club_id)
+        .single()
+      club = clubData
+    } else {
+      // It's a name, find by name
+      const { data: clubData } = await supabaseClient
+        .from('reciprocal_clubs')
+        .select('id, name, location, country, contact_email')
+        .ilike('name', `%${club_id}%`)
+        .single()
+      club = clubData
+    }
 
     if (!club) {
       throw new Error('Club not found')

@@ -1,0 +1,5152 @@
+[
+  {
+    "id": "c1",
+    "name": "Club del Progreso",
+    "location": "Buenos Aires",
+    "country": "Argentina",
+    "region": "ARGENTINA",
+    "address": "Sarmiento 1334, Buenos Aires, Argentina",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c2",
+    "name": "The Adelaide Club",
+    "location": "Adelaide",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "165 North Terrace, Adelaide SA 5000",
+    "email": "admin@adelaide-club.asn.au",
+    "notes": ""
+  },
+  {
+    "id": "c3",
+    "name": "Public Schools Club",
+    "location": "Adelaide",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "207 East Tce, Adelaide SA 5000",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c4",
+    "name": "The Queen Adelaide Club",
+    "location": "Adelaide",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "110 Pulteney Street, Adelaide SA 5000",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c5",
+    "name": "The Brisbane Club",
+    "location": "Brisbane",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "241 Adelaide St, Brisbane QLD 4000",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c6",
+    "name": "Brisbane Polo Club",
+    "location": "Brisbane",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "130 Newnham Rd, Wyaralong QLD 4310",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c7",
+    "name": "The Moreton Club",
+    "location": "Brisbane",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "390 Queen St, Brisbane QLD 4000",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c8",
+    "name": "Tattersall's Club",
+    "location": "Brisbane",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "215 Queen St, Brisbane QLD 4000",
+    "email": "reception@tattersallsclub.com.au",
+    "notes": ""
+  },
+  {
+    "id": "c9",
+    "name": "Echuca Club",
+    "location": "Echuca",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "564 High St, Echuca VIC 3564",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c10",
+    "name": "The Hamilton Club",
+    "location": "Hamilton",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "51 Gray St, Hamilton VIC 3300",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c11",
+    "name": "RACV Healesville Country Club",
+    "location": "Healesville",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "Healesville-Kinglake Rd, Healesville VIC 3777",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c12",
+    "name": "Athenaeum Club",
+    "location": "Hobart",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "Davey St, Hobart TAS 7000",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c13",
+    "name": "Tasmanian Club",
+    "location": "Hobart",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "Macquarie St, Hobart TAS 7000",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c14",
+    "name": "Queen Mary Club",
+    "location": "Hobart",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "Hobart TAS 7000",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c15",
+    "name": "The Launceston Club",
+    "location": "Launceston",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "37 Paterson St, Launceston TAS 7250",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c16",
+    "name": "Alexandra Club",
+    "location": "Melbourne",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "Melbourne VIC 3000",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c17",
+    "name": "The Australian Club (Melbourne)",
+    "location": "Melbourne",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "36 Collins St, Melbourne VIC 3000",
+    "email": "secretary@theaustralianclub.com.au",
+    "notes": ""
+  },
+  {
+    "id": "c18",
+    "name": "Melbourne Club",
+    "location": "Melbourne",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "36 Collins St, Melbourne VIC 3000",
+    "email": "frontdesk@melbourneclub.com.au",
+    "notes": ""
+  },
+  {
+    "id": "c19",
+    "name": "Melbourne Savage Club",
+    "location": "Melbourne",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "12 Bank Pl, Melbourne VIC 3000",
+    "email": "melbournesavageclub@bigpond.com",
+    "notes": ""
+  },
+  {
+    "id": "c20",
+    "name": "RACV Club",
+    "location": "Melbourne",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "501 Bourke St, Melbourne VIC 3000",
+    "email": "racvclub@racv.com.au",
+    "notes": ""
+  },
+  {
+    "id": "c21",
+    "name": "The Newcastle Club",
+    "location": "Newcastle",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "NSW, Australia",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c22",
+    "name": "The United Services Club",
+    "location": "Queensland",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "183 Wickham Tce, Brisbane QLD 4000",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c23",
+    "name": "Royal Automobile Club (Sydney)",
+    "location": "Sydney",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "89 Macquarie St, Sydney NSW 2000",
+    "email": "info@racnsw.com.au",
+    "notes": ""
+  },
+  {
+    "id": "c24",
+    "name": "The Australasian Pioneer's Club",
+    "location": "Sydney",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "Sydney NSW 2000",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c25",
+    "name": "Tattersalls (Sydney)",
+    "location": "Sydney",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "181 Elizabeth St, Sydney NSW 2000",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c26",
+    "name": "The Australian Club (Sydney)",
+    "location": "Sydney",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "165 Macquarie St, Sydney NSW 2000",
+    "email": "reception@australianclub.org",
+    "notes": ""
+  },
+  {
+    "id": "c27",
+    "name": "The Karrakatta Club",
+    "location": "Perth",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "357 Karrakatta Ave, Shenton Park WA 6008",
+    "email": "office@karrakatta.asn.au",
+    "notes": ""
+  },
+  {
+    "id": "c28",
+    "name": "Downs Club",
+    "location": "Toowoomba",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "37 Russell St, Toowoomba QLD 4350",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c29",
+    "name": "North Queensland Club",
+    "location": "Townsville",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "230 Flinders St, Townsville QLD 4810",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c30",
+    "name": "The Geelong Club",
+    "location": "Victoria",
+    "country": "Australia",
+    "region": "AUSTRALIA",
+    "address": "30 Moorabool St, Geelong VIC 3220",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c31",
+    "name": "St Johann's Club",
+    "location": "Vienna",
+    "country": "Austria",
+    "region": "AUSTRIA",
+    "address": "Vienna, Austria",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c32",
+    "name": "Wiener Rennverein",
+    "location": "Vienna",
+    "country": "Austria",
+    "region": "AUSTRIA",
+    "address": "Freudenauerstrasse, Vienna, Austria",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c33",
+    "name": "The Jockey Club (Vienna)",
+    "location": "Vienna",
+    "country": "Austria",
+    "region": "AUSTRIA",
+    "address": "Vienna, Austria",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c34",
+    "name": "Country Club (Kitzbuhel)",
+    "location": "Kitzbuhel",
+    "country": "Austria",
+    "region": "AUSTRIA",
+    "address": "Kitzb\u00fchel, Austria",
+    "email": "info@kitzbuehel.cc",
+    "notes": ""
+  },
+  {
+    "id": "c35",
+    "name": "Cercle de Lorraine",
+    "location": "Brussels",
+    "country": "Belgium",
+    "region": "BELGIUM",
+    "address": "51 Avenue du Prince d'Orange, 1180 Brussels",
+    "email": "info@cerclelorraine.be",
+    "notes": ""
+  },
+  {
+    "id": "c36",
+    "name": "De Warande",
+    "location": "Brussels",
+    "country": "Belgium",
+    "region": "BELGIUM",
+    "address": "Warandepark, Brussels, Belgium",
+    "email": "info@warande.be",
+    "notes": ""
+  },
+  {
+    "id": "c37",
+    "name": "Cercle Wallonie (Brussels)",
+    "location": "Brussels",
+    "country": "Belgium",
+    "region": "BELGIUM",
+    "address": "Brussels, Belgium",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c38",
+    "name": "International Club Ch\u00e2teau Sainte-Anne",
+    "location": "Brussels",
+    "country": "Belgium",
+    "region": "BELGIUM",
+    "address": "Brussels, Belgium",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c39",
+    "name": "International Club of Flanders",
+    "location": "Ghent",
+    "country": "Belgium",
+    "region": "BELGIUM",
+    "address": "Ghent, Belgium",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c40",
+    "name": "Soci\u00e9t\u00e9 Royal Litt\u00e9raire Club",
+    "location": "Ghent",
+    "country": "Belgium",
+    "region": "BELGIUM",
+    "address": "Ghent, Belgium",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c41",
+    "name": "The Cercle Wallonie (Namur)",
+    "location": "Namur",
+    "country": "Belgium",
+    "region": "BELGIUM",
+    "address": "Namur, Belgium",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c42",
+    "name": "Soci\u00e9t\u00e9 Litt\u00e9raire",
+    "location": "Liege",
+    "country": "Belgium",
+    "region": "BELGIUM",
+    "address": "Liege, Belgium",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c43",
+    "name": "Cercle du Lac",
+    "location": "Louvain-la-Neuve",
+    "country": "Belgium",
+    "region": "BELGIUM",
+    "address": "Louvain-la-Neuve, Belgium",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c44",
+    "name": "The Royal Hamilton Amateur Dinghy Club",
+    "location": "Hamilton",
+    "country": "Bermuda",
+    "region": "BERMUDA",
+    "address": "Hamilton, Bermuda",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c45",
+    "name": "The Circulo de la Union",
+    "location": "La Paz",
+    "country": "Bolivia",
+    "region": "BOLIVIA",
+    "address": "La Paz, Bolivia",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c46",
+    "name": "Union Club 1884",
+    "location": "Sofia",
+    "country": "Bulgaria",
+    "region": "BULGARIA",
+    "address": "Sofia, Bulgaria",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c47",
+    "name": "The Residence Exclusive Club",
+    "location": "Sofia",
+    "country": "Bulgaria",
+    "region": "BULGARIA",
+    "address": "Sofia, Bulgaria",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c48",
+    "name": "Royal Glenora Club",
+    "location": "Edmonton",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "11160 River Valley Rd, Edmonton AB T5J 2G7",
+    "email": "info@royalglenora.com",
+    "notes": ""
+  },
+  {
+    "id": "c49",
+    "name": "Cypress Club",
+    "location": "Medicine Hat",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Medicine Hat, AB",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c50",
+    "name": "The Bow Valley Club",
+    "location": "Calgary",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "205 5 Ave SW, Calgary AB T2P 2V7",
+    "email": "info@bowvalleyclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c51",
+    "name": "Calgary Winter Club",
+    "location": "Calgary",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "4611 14 St NW, Calgary AB T3B 1C6",
+    "email": "info@calgarywintersclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c52",
+    "name": "The Windsor Club",
+    "location": "Windsor",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Windsor, ON",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c53",
+    "name": "The Belleville Club",
+    "location": "Belleville",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Belleville, ON",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c54",
+    "name": "Calgary Petroleum Club",
+    "location": "Calgary",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "319 5 Ave SW, Calgary AB T2P 0L5",
+    "email": "frontdesk@calgarypc.ca",
+    "notes": ""
+  },
+  {
+    "id": "c55",
+    "name": "The Glencoe Club",
+    "location": "Calgary",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "636 29 Ave SW, Calgary AB T2S 0N1",
+    "email": "info@glencoeclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c56",
+    "name": "The Ranchmen's Club",
+    "location": "Calgary",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "710 13 Ave SW, Calgary AB T2R 0K9",
+    "email": "enquiries@ranchmenclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c57",
+    "name": "The Hamilton Club",
+    "location": "Hamilton ON",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "6 Main St E, Hamilton ON L8N 1E7",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c58",
+    "name": "London Club",
+    "location": "London ON",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "London, ON",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c59",
+    "name": "Manitoba Club",
+    "location": "Winnipeg",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "194 Broadway, Winnipeg MB R3C 0R2",
+    "email": "reception@manitobaclub.mb.ca",
+    "notes": ""
+  },
+  {
+    "id": "c60",
+    "name": "St. Catharine's Club",
+    "location": "St. Catharines",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "St. Catharines, ON",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c61",
+    "name": "Adelaide Club of Toronto",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Adelaide St, Toronto, ON",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c62",
+    "name": "Albany Club of Toronto",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "91 King St E, Toronto ON M5C 1G3",
+    "email": "info@albanyclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c63",
+    "name": "The Badminton and Racquet Club",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Toronto, ON",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c64",
+    "name": "Boulevard Club",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "1491 Lakeshore Blvd W, Toronto ON M6K 3C2",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c65",
+    "name": "The Arts and Letters Club",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "14 Elm St, Toronto ON M5G 1G7",
+    "email": "info@artsandlettersclub.ca",
+    "notes": ""
+  },
+  {
+    "id": "c66",
+    "name": "Donalda Club",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "401 Donalda Club Rd, Toronto ON M3A 2B1",
+    "email": "info@donaldaclub.ca",
+    "notes": ""
+  },
+  {
+    "id": "c67",
+    "name": "Royal Canadian Yacht Club",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "141 St George St, Toronto ON M5R 2L9",
+    "email": "info@rcyc.ca",
+    "notes": ""
+  },
+  {
+    "id": "c68",
+    "name": "The National Club",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "303 Bay St, Toronto ON M5H 2R1",
+    "email": "info@thenationalclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c69",
+    "name": "The Toronto Hunt",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "1355 Kingston Rd, Toronto ON M1N 1P2",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c70",
+    "name": "The Faculty Club (Toronto)",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "University of Toronto, Toronto, ON",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c71",
+    "name": "The University Club of Toronto",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "380 University Ave, Toronto ON M5G 1R6",
+    "email": "info@universityclub.ca",
+    "notes": ""
+  },
+  {
+    "id": "c72",
+    "name": "Toronto Cricket, Skating and Curling Club",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "141 Wilson Ave, Toronto ON M5M 3A3",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c73",
+    "name": "Toronto Athletic Club",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Toronto, ON",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c74",
+    "name": "Royal Canadian Military Institute",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "426 University Ave, Toronto ON M5G 1S9",
+    "email": "info@rcmi.org",
+    "notes": ""
+  },
+  {
+    "id": "c75",
+    "name": "Ladies Golf Club of Toronto",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Toronto, ON",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c76",
+    "name": "Verity",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "111 Queen St E, Toronto ON M5C 1S2",
+    "email": "info@verity.ca",
+    "notes": ""
+  },
+  {
+    "id": "c77",
+    "name": "Cambridge Club (Toronto)",
+    "location": "Toronto",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Toronto, ON",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c78",
+    "name": "The Forest & Stream Club",
+    "location": "Dorval QC",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Dorval, QC",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c79",
+    "name": "Garrison Club Inc.",
+    "location": "Quebec City",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Quebec City, QC",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c80",
+    "name": "St. James Club (Montreal)",
+    "location": "Montreal",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "1145 Union Ave, Montreal QC H3B 3C2",
+    "email": "info@stjames.ca",
+    "notes": ""
+  },
+  {
+    "id": "c81",
+    "name": "University Club of Montreal",
+    "location": "Montreal",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "1420 Rue Drummond, Montreal QC H3G 1V9",
+    "email": "info@universityclubmontreal.ca",
+    "notes": ""
+  },
+  {
+    "id": "c82",
+    "name": "Club Sportif MAA",
+    "location": "Montreal",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "2070 Rue Peel, Montreal QC H3A 1W6",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c83",
+    "name": "The McGill Faculty Club",
+    "location": "Montreal",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "3450 McTavish, Montreal QC H3A 1X9",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c84",
+    "name": "Ottawa Hunt & Golf Club",
+    "location": "Ottawa",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "1 Hunt Club Rd, Ottawa ON K1V 0X7",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c85",
+    "name": "Rideau Club",
+    "location": "Ottawa",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "99 Bank St 15th Floor, Ottawa ON K1P 6B9",
+    "email": "genman@rideauclub.ca",
+    "notes": ""
+  },
+  {
+    "id": "c86",
+    "name": "Britannia Yacht Club",
+    "location": "Ottawa",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "2777 Cassels St, Ottawa ON K2B 6N6",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c87",
+    "name": "Pointe-Clare Yacht Club",
+    "location": "Pointe-Clare",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Pointe-Claire, QC",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c88",
+    "name": "The Fredericton Club",
+    "location": "Fredericton",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Fredericton, NB",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c89",
+    "name": "The Union Club (Saint John)",
+    "location": "Saint John NB",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Saint John, NB",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c90",
+    "name": "Winnipeg Squash Racquet Club",
+    "location": "Winnipeg",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Winnipeg, MB",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c91",
+    "name": "Vancouver Lawn Tennis and Badminton Club",
+    "location": "Vancouver",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "1630 W 15th Ave, Vancouver BC V6J 2K2",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c92",
+    "name": "Union Club of British Columbia",
+    "location": "Vancouver",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "805 Gordon St, Victoria BC V8W 1Z5",
+    "email": "secretary@unionclub.bc.ca",
+    "notes": ""
+  },
+  {
+    "id": "c93",
+    "name": "Terminal City Club",
+    "location": "Vancouver",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "837 W Hastings St, Vancouver BC V6C 1B6",
+    "email": "info@tcclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c94",
+    "name": "The University Women's Club of Vancouver",
+    "location": "Vancouver",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "Vancouver, BC",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c95",
+    "name": "The Saskatoon Club",
+    "location": "Saskatoon",
+    "country": "Canada",
+    "region": "CANADA",
+    "address": "417 21 St E, Saskatoon SK S7K 0C2",
+    "email": "info@saskatoonclub.ca",
+    "notes": ""
+  },
+  {
+    "id": "c96",
+    "name": "United Club (Jersey)",
+    "location": "St. Helier Jersey",
+    "country": "Channel Islands",
+    "region": "CHANNEL ISLANDS",
+    "address": "St. Helier, Jersey",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c97",
+    "name": "United Club (Guernsey)",
+    "location": "St. Peter Port Guernsey",
+    "country": "Channel Islands",
+    "region": "CHANNEL ISLANDS",
+    "address": "St. Peter Port, Guernsey",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c98",
+    "name": "Club de la Union (Punta Arenas)",
+    "location": "Punta Arenas",
+    "country": "Chile",
+    "region": "CHILE",
+    "address": "Punta Arenas, Chile",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c99",
+    "name": "Club de la Union (Santiago)",
+    "location": "Santiago",
+    "country": "Chile",
+    "region": "CHILE",
+    "address": "Santiago, Chile",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c100",
+    "name": "Club Naval",
+    "location": "Valparaiso",
+    "country": "Chile",
+    "region": "CHILE",
+    "address": "Valparaiso, Chile",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c101",
+    "name": "Club Vina del Mar",
+    "location": "Vina del Mar",
+    "country": "Chile",
+    "region": "CHILE",
+    "address": "Vina del Mar, Chile",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c102",
+    "name": "Beijing Riviera Country Club",
+    "location": "Beijing",
+    "country": "China",
+    "region": "CHINA",
+    "address": "No 1 Xiang Jiang North Rd, Chaoyang, Beijing",
+    "email": "info@beijingriviera.com",
+    "notes": ""
+  },
+  {
+    "id": "c103",
+    "name": "Beijing American Club",
+    "location": "Beijing",
+    "country": "China",
+    "region": "CHINA",
+    "address": "Capital Mansion, 6 Xinyuannan Rd, Chaoyang, Beijing",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c104",
+    "name": "Shanghai Racquet Club",
+    "location": "Shanghai",
+    "country": "China",
+    "region": "CHINA",
+    "address": "Shanghai, China",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c105",
+    "name": "The Shanghai Town & Country Club",
+    "location": "Shanghai",
+    "country": "China",
+    "region": "CHINA",
+    "address": "Shanghai, China",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c106",
+    "name": "The Gun Club",
+    "location": "Bogota",
+    "country": "Colombia",
+    "region": "COLOMBIA",
+    "address": "Bogota, Colombia",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c107",
+    "name": "Club Colombia",
+    "location": "Cali",
+    "country": "Colombia",
+    "region": "COLOMBIA",
+    "address": "Cali, Colombia",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c108",
+    "name": "Club de Ejecutivos",
+    "location": "Cali",
+    "country": "Colombia",
+    "region": "COLOMBIA",
+    "address": "Cali, Colombia",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c109",
+    "name": "Club Cartagena",
+    "location": "Cartagena",
+    "country": "Colombia",
+    "region": "COLOMBIA",
+    "address": "Cartagena, Colombia",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c110",
+    "name": "Serrezuela Country Club",
+    "location": "Mesa",
+    "country": "Colombia",
+    "region": "COLOMBIA",
+    "address": "Mesa, Colombia",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c111",
+    "name": "Club Union (Costa Rica)",
+    "location": "San Jose",
+    "country": "Costa Rica",
+    "region": "COSTA RICA",
+    "address": "San Jose, Costa Rica",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c112",
+    "name": "Hemingway International Yacht Club",
+    "location": "Havana",
+    "country": "Cuba",
+    "region": "CUBA",
+    "address": "Havana, Cuba",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c113",
+    "name": "Prague Business Club",
+    "location": "Prague",
+    "country": "Czech Republic",
+    "region": "CZECH REPUBLIC",
+    "address": "Prague, Czech Republic",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c114",
+    "name": "The Royal Danish Yacht Club",
+    "location": "Copenhagen",
+    "country": "Denmark",
+    "region": "DENMARK",
+    "address": "Tuborg Havnepark 15, 2900 Hellerup, Denmark",
+    "email": "kryds@kryds.dk",
+    "notes": ""
+  },
+  {
+    "id": "c115",
+    "name": "Club Sociedad Union Quito",
+    "location": "Quito",
+    "country": "Ecuador",
+    "region": "ECUADOR",
+    "address": "Quito, Ecuador",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c116",
+    "name": "Club de la Union de Guayaquil",
+    "location": "Guayaquil",
+    "country": "Ecuador",
+    "region": "ECUADOR",
+    "address": "Guayaquil, Ecuador",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c117",
+    "name": "Club Campestre Cuscatlan",
+    "location": "San Salvador",
+    "country": "El Salvador",
+    "region": "EL SALVADOR",
+    "address": "San Salvador, El Salvador",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c118",
+    "name": "Cairo Capital Club",
+    "location": "Cairo",
+    "country": "Egypt",
+    "region": "EGYPT",
+    "address": "Cairo, Egypt",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c119",
+    "name": "Saint James (Paris)",
+    "location": "Paris",
+    "country": "France",
+    "region": "FRANCE",
+    "address": "43 Av. Bugeaud, 75116 Paris, France",
+    "email": "contact@saintjamesparis.com",
+    "notes": ""
+  },
+  {
+    "id": "c120",
+    "name": "Standard Athletic Club",
+    "location": "Paris",
+    "country": "France",
+    "region": "FRANCE",
+    "address": "Paris, France",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c121",
+    "name": "International Club Berlin",
+    "location": "Berlin",
+    "country": "Germany",
+    "region": "GERMANY",
+    "address": "Berlin, Germany",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c122",
+    "name": "Industrie-Club Bremen",
+    "location": "Bremen",
+    "country": "Germany",
+    "region": "GERMANY",
+    "address": "Am Wall 179, 28195 Bremen, Germany",
+    "email": "info@industrie-club-bremen.de",
+    "notes": ""
+  },
+  {
+    "id": "c123",
+    "name": "Anglo-German Club",
+    "location": "Hamburg",
+    "country": "Germany",
+    "region": "GERMANY",
+    "address": "Harvestehuder Weg 44, 20149 Hamburg, Germany",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c124",
+    "name": "Business Club (Hamburg)",
+    "location": "Hamburg",
+    "country": "Germany",
+    "region": "GERMANY",
+    "address": "Hamburg, Germany",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c125",
+    "name": "Der Kieler Kaufman",
+    "location": "Kiel",
+    "country": "Germany",
+    "region": "GERMANY",
+    "address": "Kiel, Germany",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c126",
+    "name": "Club International (Leipzig)",
+    "location": "Leipzig",
+    "country": "Germany",
+    "region": "GERMANY",
+    "address": "Leipzig, Germany",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c127",
+    "name": "Wirtschaft Club Stuttgart",
+    "location": "Stuttgart",
+    "country": "Germany",
+    "region": "GERMANY",
+    "address": "Stuttgart, Germany",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c128",
+    "name": "The Athens Club",
+    "location": "Athens",
+    "country": "Greece",
+    "region": "GREECE",
+    "address": "Filellinon 14, Athens 105 57, Greece",
+    "email": "secretary@athensclub.gr",
+    "notes": ""
+  },
+  {
+    "id": "c129",
+    "name": "Piraeus Marine Club",
+    "location": "Piraeus",
+    "country": "Greece",
+    "region": "GREECE",
+    "address": "Piraeus, Greece",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c130",
+    "name": "Refinery",
+    "location": "Hong Kong",
+    "country": "Hong Kong",
+    "region": "HONG KONG",
+    "address": "Hong Kong",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c131",
+    "name": "The Helena May",
+    "location": "Hong Kong",
+    "country": "Hong Kong",
+    "region": "HONG KONG",
+    "address": "35 Garden Rd, Central, Hong Kong",
+    "email": "info@helenamay.com",
+    "notes": ""
+  },
+  {
+    "id": "c132",
+    "name": "Club Lusitano",
+    "location": "Hong Kong",
+    "country": "Hong Kong",
+    "region": "HONG KONG",
+    "address": "16 Ice House St, Central, Hong Kong",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c133",
+    "name": "Kowloon Cricket Club",
+    "location": "Hong Kong",
+    "country": "Hong Kong",
+    "region": "HONG KONG",
+    "address": "10 Cox's Rd, Yau Ma Tei, Hong Kong",
+    "email": "office@kcc.org.hk",
+    "notes": ""
+  },
+  {
+    "id": "c134",
+    "name": "Hong Kong Savage Club",
+    "location": "Hong Kong",
+    "country": "Hong Kong",
+    "region": "HONG KONG",
+    "address": "Hong Kong",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c135",
+    "name": "Hong Kong Football Club",
+    "location": "Hong Kong",
+    "country": "Hong Kong",
+    "region": "HONG KONG",
+    "address": "3 Sports Rd, Happy Valley, Hong Kong",
+    "email": "football@hkfc.com",
+    "notes": ""
+  },
+  {
+    "id": "c136",
+    "name": "The Ladies Recreation Club",
+    "location": "Hong Kong",
+    "country": "Hong Kong",
+    "region": "HONG KONG",
+    "address": "Hong Kong",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c137",
+    "name": "Brody House",
+    "location": "Budapest",
+    "country": "Hungary",
+    "region": "HUNGARY",
+    "address": "Brody Sandor utca 10, Budapest, Hungary",
+    "email": "hello@brodyhouse.com",
+    "notes": ""
+  },
+  {
+    "id": "c138",
+    "name": "Karnavati Club",
+    "location": "Ahmedabad",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Sindhu Bhavan Marg, Bodakdev, Ahmedabad 380054",
+    "email": "info@karnavaticlub.com",
+    "notes": ""
+  },
+  {
+    "id": "c139",
+    "name": "The Belvedere Golf and Country Club",
+    "location": "Ahmedabad",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Ahmedabad, Gujarat",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c140",
+    "name": "Reforms Club",
+    "location": "Amravati",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Amravati, Maharashtra",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c141",
+    "name": "Catholic Club (Bangalore)",
+    "location": "Bangalore",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Bangalore, Karnataka",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c142",
+    "name": "Bikaner Heritage Club",
+    "location": "Bikaner",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Bikaner, Rajasthan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c143",
+    "name": "Madras Gymkhana Club",
+    "location": "Chennai",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Anna Salai, Chennai 600002",
+    "email": "secretary@madrasgymkhana.org",
+    "notes": ""
+  },
+  {
+    "id": "c144",
+    "name": "International Club (Cochin)",
+    "location": "Cochin",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Cochin, Kerala",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c145",
+    "name": "World Integrity Center",
+    "location": "Dehradun",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Dehradun, Uttarakhand",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c146",
+    "name": "Best Western Resort Country Club",
+    "location": "Gurgaon",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Gurgaon, Haryana",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c147",
+    "name": "The Ashok Club",
+    "location": "Jaipur",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Jaipur, Rajasthan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c148",
+    "name": "The Jodhpur Presidency Club",
+    "location": "Jaipur",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Jodhpur, Rajasthan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c149",
+    "name": "Jaisal Club",
+    "location": "Jaisalmer",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Jaisalmer, Rajasthan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c150",
+    "name": "Jodhpur Gymkhana",
+    "location": "Jaisalmer",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Jodhpur, Rajasthan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c151",
+    "name": "The Princeton Club",
+    "location": "Kolkata",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Kolkata, West Bengal",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c152",
+    "name": "Calcutta Rowing Club",
+    "location": "Kolkata",
+    "country": "India",
+    "region": "INDIA",
+    "address": "4 River Side Rd, Kolkata 700023",
+    "email": "calcuttarowingclub@gmail.com",
+    "notes": ""
+  },
+  {
+    "id": "c153",
+    "name": "Calcutta Ladies Golf Club",
+    "location": "Kolkata",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Tollygunj, Kolkata",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c154",
+    "name": "Calcutta Polo Club",
+    "location": "Kolkata",
+    "country": "India",
+    "region": "INDIA",
+    "address": "51/1 Ham Road, Kolkata 700027",
+    "email": "secretary@calcuttapoloclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c155",
+    "name": "Rama Varma Union Club",
+    "location": "Kottayam",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Kottayam, Kerala",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c156",
+    "name": "Oudh Gymkhana Club",
+    "location": "Lucknow",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Lucknow, Uttar Pradesh",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c157",
+    "name": "Golden Swan Country Club",
+    "location": "Mumbai",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Mumbai, Maharashtra",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c158",
+    "name": "Club Emerald",
+    "location": "Mumbai",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Mumbai, Maharashtra",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c159",
+    "name": "Bombay Sailing Club",
+    "location": "Mumbai",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Apollo Bunder, Mumbai 400001",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c160",
+    "name": "Wodehouse Gymkhana Club",
+    "location": "Mumbai",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Mumbai, Maharashtra",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c161",
+    "name": "Catholic Gymkhana",
+    "location": "Mumbai",
+    "country": "India",
+    "region": "INDIA",
+    "address": "LD Ruparel Marg, Mumbai 400036",
+    "email": "info@catholicgymkhana.net",
+    "notes": ""
+  },
+  {
+    "id": "c162",
+    "name": "The MGM Club",
+    "location": "New Delhi",
+    "country": "India",
+    "region": "INDIA",
+    "address": "New Delhi",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c163",
+    "name": "Residency Club",
+    "location": "Pune",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Pune, Maharashtra",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c164",
+    "name": "Deccan Gymkhana",
+    "location": "Pune",
+    "country": "India",
+    "region": "INDIA",
+    "address": "91 Shivajinagar, Pune 411016",
+    "email": "office@deccangyms.com",
+    "notes": ""
+  },
+  {
+    "id": "c165",
+    "name": "Royal Connaught Boat Club",
+    "location": "Pune",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Pune, Maharashtra",
+    "email": "secretary@rcbc.in",
+    "notes": ""
+  },
+  {
+    "id": "c166",
+    "name": "PYC Hindu Gymkhana",
+    "location": "Pune",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Pune, Maharashtra",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c167",
+    "name": "Ajmer Club",
+    "location": "Rajasthan",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Ajmer, Rajasthan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c168",
+    "name": "Shillong Club",
+    "location": "Shillong",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Shillong, Meghalaya",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c169",
+    "name": "Salem Club",
+    "location": "Tamil Nadu",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Salem, Tamil Nadu",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c170",
+    "name": "Suncity Club",
+    "location": "Vadodara",
+    "country": "India",
+    "region": "INDIA",
+    "address": "Vadodara, Gujarat",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c171",
+    "name": "Financial Club",
+    "location": "Jakarta",
+    "country": "Indonesia",
+    "region": "INDONESIA",
+    "address": "Citibank Tower 23F, Jakarta",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c172",
+    "name": "Mercantile Athletic Club",
+    "location": "Jakarta",
+    "country": "Indonesia",
+    "region": "INDONESIA",
+    "address": "Jakarta",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c173",
+    "name": "The American Club (Jakarta)",
+    "location": "Jakarta",
+    "country": "Indonesia",
+    "region": "INDONESIA",
+    "address": "Jakarta",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c174",
+    "name": "Circolo Bononia",
+    "location": "Bologna",
+    "country": "Italy",
+    "region": "ITALY",
+    "address": "Via Farini 4, 40124 Bologna",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c175",
+    "name": "Circulo Ravennate e Dei Forestieri",
+    "location": "Ravenna",
+    "country": "Italy",
+    "region": "ITALY",
+    "address": "Ravenna, Italy",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c176",
+    "name": "Circolo Artistico Tunnel Club",
+    "location": "Genova",
+    "country": "Italy",
+    "region": "ITALY",
+    "address": "Genova, Italy",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c177",
+    "name": "Circolo Antico Tiro a Volo",
+    "location": "Rome",
+    "country": "Italy",
+    "region": "ITALY",
+    "address": "Rome, Italy",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c178",
+    "name": "Kobe Club",
+    "location": "Kobe",
+    "country": "Japan",
+    "region": "JAPAN",
+    "address": "11-1 Yamamoto-Dori, Chuo-ku, Kobe 650-0003",
+    "email": "kobeclub@kobeclub.org",
+    "notes": ""
+  },
+  {
+    "id": "c179",
+    "name": "Tokyo Club",
+    "location": "Tokyo",
+    "country": "Japan",
+    "region": "JAPAN",
+    "address": "3-2-6 Kasumigaseki, Chiyoda-ku, Tokyo 100-0013",
+    "email": "info@tokyoclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c180",
+    "name": "The Foreign Correspondents Club (Tokyo)",
+    "location": "Tokyo",
+    "country": "Japan",
+    "region": "JAPAN",
+    "address": "Yurakucho Denki Bldg, 1-7-1 Yurakucho, Tokyo",
+    "email": "fccjsec@fccj.or.jp",
+    "notes": ""
+  },
+  {
+    "id": "c181",
+    "name": "Tokyo American Club",
+    "location": "Tokyo",
+    "country": "Japan",
+    "region": "JAPAN",
+    "address": "2-1-2 Azabudai, Minato-ku, Tokyo 106-8649",
+    "email": "tac@tac-club.org",
+    "notes": ""
+  },
+  {
+    "id": "c182",
+    "name": "Yokohama Country & Athletic Club",
+    "location": "Yokohama",
+    "country": "Japan",
+    "region": "JAPAN",
+    "address": "238 Yamate-cho, Naka-ku, Yokohama 231-0862",
+    "email": "admin@ycac.or.jp",
+    "notes": ""
+  },
+  {
+    "id": "c183",
+    "name": "King Hussein Club",
+    "location": "Amman",
+    "country": "Jordan",
+    "region": "JORDAN",
+    "address": "Amman, Jordan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c184",
+    "name": "Seven Private Members Club",
+    "location": "Almaty",
+    "country": "Kazakhstan",
+    "region": "KAZAKHSTAN",
+    "address": "Almaty, Kazakhstan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c185",
+    "name": "Eldoret Club",
+    "location": "Eldoret",
+    "country": "Kenya",
+    "region": "KENYA",
+    "address": "Eldoret, Kenya",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c186",
+    "name": "Nanyuki Sports Club",
+    "location": "Nanyuki",
+    "country": "Kenya",
+    "region": "KENYA",
+    "address": "Nanyuki, Kenya",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c187",
+    "name": "Njoro Country Club",
+    "location": "Njoro",
+    "country": "Kenya",
+    "region": "KENYA",
+    "address": "Njoro, Kenya",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c188",
+    "name": "The Capital Club (Nairobi)",
+    "location": "Nairobi",
+    "country": "Kenya",
+    "region": "KENYA",
+    "address": "Nairobi, Kenya",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c189",
+    "name": "The Impala Club",
+    "location": "Nairobi",
+    "country": "Kenya",
+    "region": "KENYA",
+    "address": "Nairobi, Kenya",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c190",
+    "name": "Seoul Club",
+    "location": "Seoul",
+    "country": "Korea",
+    "region": "KOREA",
+    "address": "45 Mugyo-ro, Jung-gu, Seoul",
+    "email": "seoulclub@seoulclub.org",
+    "notes": ""
+  },
+  {
+    "id": "c191",
+    "name": "Le Yacht Club (Beirut)",
+    "location": "Beirut",
+    "country": "Lebanon",
+    "region": "LEBANON",
+    "address": "Beirut, Lebanon",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c192",
+    "name": "Cercle Munster",
+    "location": "Luxembourg",
+    "country": "Luxembourg",
+    "region": "LUXEMBOURG",
+    "address": "Luxembourg",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c193",
+    "name": "Porto Montenegro Yacht Club",
+    "location": "Tivat",
+    "country": "Montenegro",
+    "region": "MONTENEGRO",
+    "address": "Porto Montenegro, Tivat, Montenegro",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c194",
+    "name": "The Mulika Club",
+    "location": "Blantyre",
+    "country": "Malawi",
+    "region": "MALAWI",
+    "address": "Blantyre, Malawi",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c195",
+    "name": "Royal Ipoh Club",
+    "location": "Ipoh",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Jalan Club, 30000 Ipoh, Perak",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c196",
+    "name": "Johor Cultural and Sports Club",
+    "location": "Johor",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Johor, Malaysia",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c197",
+    "name": "The Kinabalu Club",
+    "location": "Kinabalu",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Kota Kinabalu, Sabah",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c198",
+    "name": "The Kinabalu Yacht Club",
+    "location": "Kinabalu",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Kota Kinabalu, Sabah",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c199",
+    "name": "Kulim Club",
+    "location": "Kulim Kedah",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Kulim, Kedah",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c200",
+    "name": "Royal Commonwealth Society (KL)",
+    "location": "Kuala Lumpur",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Kuala Lumpur, Malaysia",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c201",
+    "name": "Royal Selangor Club",
+    "location": "Kuala Lumpur",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Jalan Raja, 50480 Kuala Lumpur",
+    "email": "rsc@rsc.org.my",
+    "notes": ""
+  },
+  {
+    "id": "c202",
+    "name": "Penang Sports Club",
+    "location": "Penang",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Jalan Kelab, 10460 Georgetown, Penang",
+    "email": "info@psc1904.com",
+    "notes": ""
+  },
+  {
+    "id": "c203",
+    "name": "Penang Club",
+    "location": "Penang",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Jalan Larut, 10050 Georgetown, Penang",
+    "email": "info@penangclub.com.my",
+    "notes": ""
+  },
+  {
+    "id": "c204",
+    "name": "Kuantan Club",
+    "location": "Pahang",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Kuantan, Pahang",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c205",
+    "name": "Palm Resort (Senai)",
+    "location": "Senai",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "1 Jalan Persiaran Golf, 81300 Skudai, Johor",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c206",
+    "name": "Sandakan Yacht Club",
+    "location": "Sabah",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Sandakan, Sabah",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c207",
+    "name": "Royal Sungei Ujong Club",
+    "location": "Seremban",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Seremban, Negeri Sembilan",
+    "email": "admin@rsuc.com.my",
+    "notes": ""
+  },
+  {
+    "id": "c208",
+    "name": "Royal Kampung Club",
+    "location": "Selangor",
+    "country": "Malaysia",
+    "region": "MALAYSIA",
+    "address": "Selangor, Malaysia",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c209",
+    "name": "Casino Maltese",
+    "location": "Valletta",
+    "country": "Malta",
+    "region": "MALTA",
+    "address": "Valletta, Malta",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c210",
+    "name": "The Malta Union Club",
+    "location": "Sliema",
+    "country": "Malta",
+    "region": "MALTA",
+    "address": "Sliema, Malta",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c211",
+    "name": "Mauritius Gymkhana Club",
+    "location": "Mauritius",
+    "country": "Mauritius",
+    "region": "MAURITIUS",
+    "address": "Port Louis, Mauritius",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c212",
+    "name": "University Club de Guadalajara",
+    "location": "Guadalajara",
+    "country": "Mexico",
+    "region": "MEXICO",
+    "address": "Guadalajara, Jalisco, Mexico",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c213",
+    "name": "The University Club of Mexico",
+    "location": "Mexico City",
+    "country": "Mexico",
+    "region": "MEXICO",
+    "address": "Mexico City, Mexico",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c214",
+    "name": "The Estrella del Mar Golf and Beach Resort",
+    "location": "Sinaloa",
+    "country": "Mexico",
+    "region": "MEXICO",
+    "address": "Sinaloa, Mexico",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c215",
+    "name": "Thirty Nine (Monaco)",
+    "location": "Monte Carlo",
+    "country": "Monaco",
+    "region": "MONACO",
+    "address": "Monte Carlo, Monaco",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c216",
+    "name": "De Industreele Groote Club",
+    "location": "Amsterdam",
+    "country": "Netherlands",
+    "region": "NETHERLANDS",
+    "address": "Dam 27, 1012 JS Amsterdam",
+    "email": "info@igc.nl",
+    "notes": ""
+  },
+  {
+    "id": "c217",
+    "name": "Nieuwe of Litteraire Societeit de Witte",
+    "location": "The Hague",
+    "country": "Netherlands",
+    "region": "NETHERLANDS",
+    "address": "Plein 24, 2511 CS The Hague",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c218",
+    "name": "De Wittenburg",
+    "location": "Wassenaar",
+    "country": "Netherlands",
+    "region": "NETHERLANDS",
+    "address": "Wassenaar, Netherlands",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c219",
+    "name": "The Herensocieteit Amicitia te Leiden",
+    "location": "Leiden",
+    "country": "Netherlands",
+    "region": "NETHERLANDS",
+    "address": "Leiden, Netherlands",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c220",
+    "name": "Societeit De Dieu Alkmaar",
+    "location": "Alkmaar",
+    "country": "Netherlands",
+    "region": "NETHERLANDS",
+    "address": "Alkmaar, Netherlands",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c221",
+    "name": "The Christchurch Club",
+    "location": "Christchurch",
+    "country": "New Zealand",
+    "region": "NEW ZEALAND",
+    "address": "161 Cambridge Tce, Christchurch 8013",
+    "email": "secretary@christchurchclub.co.nz",
+    "notes": ""
+  },
+  {
+    "id": "c222",
+    "name": "Canterbury Club",
+    "location": "Christchurch",
+    "country": "New Zealand",
+    "region": "NEW ZEALAND",
+    "address": "Christchurch, NZ",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c223",
+    "name": "University of Canterbury Club",
+    "location": "Christchurch",
+    "country": "New Zealand",
+    "region": "NEW ZEALAND",
+    "address": "Christchurch, NZ",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c224",
+    "name": "The Dunedin Club",
+    "location": "Dunedin",
+    "country": "New Zealand",
+    "region": "NEW ZEALAND",
+    "address": "Dunedin, NZ",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c225",
+    "name": "The Invercargill Club",
+    "location": "Invercargill",
+    "country": "New Zealand",
+    "region": "NEW ZEALAND",
+    "address": "Invercargill, NZ",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c226",
+    "name": "Hawke's Bay Club",
+    "location": "Napier",
+    "country": "New Zealand",
+    "region": "NEW ZEALAND",
+    "address": "Napier, NZ",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c227",
+    "name": "Tauranga Club",
+    "location": "Tauranga",
+    "country": "New Zealand",
+    "region": "NEW ZEALAND",
+    "address": "Tauranga, NZ",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c228",
+    "name": "Wellesley Club",
+    "location": "Wellington",
+    "country": "New Zealand",
+    "region": "NEW ZEALAND",
+    "address": "Wellington, NZ",
+    "email": "secretary@wellesleyclub.co.nz",
+    "notes": ""
+  },
+  {
+    "id": "c229",
+    "name": "Lagos Yacht Club",
+    "location": "Lagos",
+    "country": "Nigeria",
+    "region": "NIGERIA",
+    "address": "Lagos, Nigeria",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c230",
+    "name": "The Chenab Club",
+    "location": "Faisalabad",
+    "country": "Pakistan",
+    "region": "PAKISTAN",
+    "address": "Faisalabad, Pakistan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c231",
+    "name": "Islamabad Club",
+    "location": "Islamabad",
+    "country": "Pakistan",
+    "region": "PAKISTAN",
+    "address": "Islamabad, Pakistan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c232",
+    "name": "The Punjab Club",
+    "location": "Lahore",
+    "country": "Pakistan",
+    "region": "PAKISTAN",
+    "address": "Lahore, Pakistan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c233",
+    "name": "The Arabian Sea Country Club",
+    "location": "Karachi",
+    "country": "Pakistan",
+    "region": "PAKISTAN",
+    "address": "Karachi, Pakistan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c234",
+    "name": "Peshawar Golf Club",
+    "location": "Peshawar",
+    "country": "Pakistan",
+    "region": "PAKISTAN",
+    "address": "Peshawar, Pakistan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c235",
+    "name": "Gwadar Gymkhana",
+    "location": "Gwadar",
+    "country": "Pakistan",
+    "region": "PAKISTAN",
+    "address": "Gwadar, Pakistan",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c236",
+    "name": "Club Empresarial",
+    "location": "Lima",
+    "country": "Peru",
+    "region": "PERU",
+    "address": "Lima, Peru",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c237",
+    "name": "Manila Club",
+    "location": "Manila",
+    "country": "Philippines",
+    "region": "PHILIPPINES",
+    "address": "Manila, Philippines",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c238",
+    "name": "Casino Espanol de Manila",
+    "location": "Manila",
+    "country": "Philippines",
+    "region": "PHILIPPINES",
+    "address": "Manila, Philippines",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c239",
+    "name": "The Manila Boat Club",
+    "location": "Manila",
+    "country": "Philippines",
+    "region": "PHILIPPINES",
+    "address": "Manila, Philippines",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c240",
+    "name": "Business Centre Club (Poland)",
+    "location": "Warsaw",
+    "country": "Poland",
+    "region": "POLAND",
+    "address": "Warsaw, Poland",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c241",
+    "name": "Polish Business Roundtable Club",
+    "location": "Warsaw",
+    "country": "Poland",
+    "region": "POLAND",
+    "address": "Warsaw, Poland",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c242",
+    "name": "Circolo Eca de Queiroz",
+    "location": "Lisbon",
+    "country": "Portugal",
+    "region": "PORTUGAL",
+    "address": "Lisbon, Portugal",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c243",
+    "name": "Gr\u00e9mio Liter\u00e1rio",
+    "location": "Lisbon",
+    "country": "Portugal",
+    "region": "PORTUGAL",
+    "address": "Rua Ivens 37, 1200-226 Lisbon",
+    "email": "gremio@gremliterario.pt",
+    "notes": ""
+  },
+  {
+    "id": "c244",
+    "name": "Royal British Club (Lisbon)",
+    "location": "Lisbon",
+    "country": "Portugal",
+    "region": "PORTUGAL",
+    "address": "Lisbon, Portugal",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c245",
+    "name": "Club Portuense",
+    "location": "Porto",
+    "country": "Portugal",
+    "region": "PORTUGAL",
+    "address": "Rua do Breiner 22, Porto, Portugal",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c246",
+    "name": "The Club de Viseu",
+    "location": "Viseu",
+    "country": "Portugal",
+    "region": "PORTUGAL",
+    "address": "Viseu, Portugal",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c247",
+    "name": "Capital Club (Moscow)",
+    "location": "Moscow",
+    "country": "Russia",
+    "region": "RUSSIA",
+    "address": "Moscow, Russia",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c248",
+    "name": "The Kelia Club",
+    "location": "Moscow",
+    "country": "Russia",
+    "region": "RUSSIA",
+    "address": "Moscow, Russia",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c249",
+    "name": "The British Club (Singapore)",
+    "location": "Singapore",
+    "country": "Singapore",
+    "region": "SINGAPORE",
+    "address": "73 Bukit Tinggi Rd, Singapore 289761",
+    "email": "enquiry@britishclub.org.sg",
+    "notes": ""
+  },
+  {
+    "id": "c250",
+    "name": "Ceylon Sports Club",
+    "location": "Singapore",
+    "country": "Singapore",
+    "region": "SINGAPORE",
+    "address": "Singapore",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c251",
+    "name": "Raffles Town Club",
+    "location": "Singapore",
+    "country": "Singapore",
+    "region": "SINGAPORE",
+    "address": "1 Plymouth Ave, Singapore 297753",
+    "email": "info@raffles-townclub.com.sg",
+    "notes": ""
+  },
+  {
+    "id": "c252",
+    "name": "Raffles Marina",
+    "location": "Singapore",
+    "country": "Singapore",
+    "region": "SINGAPORE",
+    "address": "10 Tuas West Dr, Singapore 638404",
+    "email": "rfm@raffles-marina.com",
+    "notes": ""
+  },
+  {
+    "id": "c253",
+    "name": "Singapore Cricket Club",
+    "location": "Singapore",
+    "country": "Singapore",
+    "region": "SINGAPORE",
+    "address": "Connaught Drive, Singapore 179681",
+    "email": "scc@scc.org.sg",
+    "notes": ""
+  },
+  {
+    "id": "c254",
+    "name": "Singapore Recreation Club",
+    "location": "Singapore",
+    "country": "Singapore",
+    "region": "SINGAPORE",
+    "address": "B02-01, Singapore 179577",
+    "email": "sra@sra.org.sg",
+    "notes": ""
+  },
+  {
+    "id": "c255",
+    "name": "The National University of Singapore Society",
+    "location": "Singapore",
+    "country": "Singapore",
+    "region": "SINGAPORE",
+    "address": "Singapore",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c256",
+    "name": "The American Club Singapore",
+    "location": "Singapore",
+    "country": "Singapore",
+    "region": "SINGAPORE",
+    "address": "10 Claymore Hill, Singapore 229573",
+    "email": "enquiries@amclub.org.sg",
+    "notes": ""
+  },
+  {
+    "id": "c257",
+    "name": "The Tower Club of Singapore",
+    "location": "Singapore",
+    "country": "Singapore",
+    "region": "SINGAPORE",
+    "address": "Republic Plaza, 9 Raffles Pl, Singapore 048619",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c258",
+    "name": "The Owl Club",
+    "location": "Cape Town",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "Cape Town, South Africa",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c259",
+    "name": "The Ideas Cartel",
+    "location": "Cape Town",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "Cape Town, South Africa",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c260",
+    "name": "Seven Seas Club (Cape Town)",
+    "location": "Cape Town",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "Cape Town, South Africa",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c261",
+    "name": "The Durban Club",
+    "location": "Durban",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "93-96 Victoria Embankment, Durban 4001",
+    "email": "info@durbanclub.co.za",
+    "notes": ""
+  },
+  {
+    "id": "c262",
+    "name": "Durban Country Club",
+    "location": "Durban",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "Isaiah Ntshangase Rd, Durban",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c263",
+    "name": "East London Golf Club",
+    "location": "East London",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "East London, South Africa",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c264",
+    "name": "The Country Club (Johannesburg)",
+    "location": "Johannesburg",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "Johannesburg, South Africa",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c265",
+    "name": "Rand Club",
+    "location": "Johannesburg",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "33 Loveday St, Johannesburg 2107",
+    "email": "info@randclub.co.za",
+    "notes": ""
+  },
+  {
+    "id": "c266",
+    "name": "The Wanderers Club",
+    "location": "Johannesburg",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "21 North St, Illovo, Johannesburg",
+    "email": "wanderers@wanderers.co.za",
+    "notes": ""
+  },
+  {
+    "id": "c267",
+    "name": "The Kimberley Club",
+    "location": "Kimberley",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "70-72 Du Toitspan Rd, Kimberley",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c268",
+    "name": "Victoria Country Club",
+    "location": "Pietermaritzburg",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "Pietermaritzburg, KwaZulu-Natal",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c269",
+    "name": "Pietersburg Club",
+    "location": "Pietersburg",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "Polokwane (Pietersburg), Limpopo",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c270",
+    "name": "Port Elizabeth St Georges Club",
+    "location": "Port Elizabeth",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "Port Elizabeth (Gqeberha), South Africa",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c271",
+    "name": "Inanda Club",
+    "location": "Sandton",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "Sandton, Johannesburg",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c272",
+    "name": "Seven Seas Club (Simonstad)",
+    "location": "Simonstad",
+    "country": "South Africa",
+    "region": "SOUTH AFRICA",
+    "address": "Simonstad, Western Cape",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c273",
+    "name": "Circulo Ecuestre",
+    "location": "Barcelona",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Carrer de Balmes 169, 08006 Barcelona",
+    "email": "info@circuloecuestre.es",
+    "notes": ""
+  },
+  {
+    "id": "c274",
+    "name": "Circulo del Liceo",
+    "location": "Barcelona",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "La Rambla 65, 08002 Barcelona",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c275",
+    "name": "Sociedad Bilbaina",
+    "location": "Bilbao",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Calle Navarra 2, 48001 Bilbao",
+    "email": "secretaria@sociedadbilbaina.com",
+    "notes": ""
+  },
+  {
+    "id": "c276",
+    "name": "Club Financiero Atlantico",
+    "location": "Coruna",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "La Coru\u00f1a, Spain",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c277",
+    "name": "Real Circulo de la Amistad",
+    "location": "Cordoba",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Calle Alfonso XIII 14, 14001 C\u00f3rdoba",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c278",
+    "name": "Casino de Madrid",
+    "location": "Madrid",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Calle de Alcal\u00e1 15, 28014 Madrid",
+    "email": "casino@casinomadrid.es",
+    "notes": ""
+  },
+  {
+    "id": "c279",
+    "name": "Real Gran Pena",
+    "location": "Madrid",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Calle de Fernando VI 2, 28004 Madrid",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c280",
+    "name": "The Real Casino De Murcia",
+    "location": "Murcia",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Calle Traper\u00eda 22, 30001 Murcia",
+    "email": "info@casinomurcia.com",
+    "notes": ""
+  },
+  {
+    "id": "c281",
+    "name": "Club Antares (Seville)",
+    "location": "Seville",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Seville, Spain",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c282",
+    "name": "Real Circulo de Labradores y Proprietarios",
+    "location": "Seville",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Plaza de San Leandro 2, 41003 Seville",
+    "email": "secretaria@realcirculo.es",
+    "notes": ""
+  },
+  {
+    "id": "c283",
+    "name": "Club de Mar",
+    "location": "Palma de Mallorca",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Paseo Mar\u00edtimo, Palma de Mallorca",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c284",
+    "name": "Nuevo Casino de Pamplona",
+    "location": "Pamplona",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Pamplona, Spain",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c285",
+    "name": "Real Sociedad de Valenciana de Agricultura",
+    "location": "Valencia",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Valencia, Spain",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c286",
+    "name": "Club Financiero Vigo",
+    "location": "Vigo",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Vigo, Spain",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c287",
+    "name": "Real Club Nautico de Gran Canaria",
+    "location": "Canary Islands",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Las Palmas, Gran Canaria",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c288",
+    "name": "Gabinete Literario",
+    "location": "Canary Islands",
+    "country": "Spain",
+    "region": "SPAIN",
+    "address": "Las Palmas, Gran Canaria",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c289",
+    "name": "Colombo Club",
+    "location": "Colombo",
+    "country": "Sri Lanka",
+    "region": "SRI LANKA",
+    "address": "Colombo, Sri Lanka",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c290",
+    "name": "The Capri Club",
+    "location": "Colombo",
+    "country": "Sri Lanka",
+    "region": "SRI LANKA",
+    "address": "Colombo, Sri Lanka",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c291",
+    "name": "Dutch Burgher Union",
+    "location": "Colombo",
+    "country": "Sri Lanka",
+    "region": "SRI LANKA",
+    "address": "Colombo, Sri Lanka",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c292",
+    "name": "Colombo Swimming Club",
+    "location": "Colombo",
+    "country": "Sri Lanka",
+    "region": "SRI LANKA",
+    "address": "Colombo, Sri Lanka",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c293",
+    "name": "Singhalese Sports Club",
+    "location": "Colombo",
+    "country": "Sri Lanka",
+    "region": "SRI LANKA",
+    "address": "Maitland Place, Colombo 7",
+    "email": "secretary@sscricket.lk",
+    "notes": ""
+  },
+  {
+    "id": "c294",
+    "name": "The Hill Club",
+    "location": "Nuwara Eliya",
+    "country": "Sri Lanka",
+    "region": "SRI LANKA",
+    "address": "29 Grand Hotel Rd, Nuwara Eliya",
+    "email": "hillclub@sltnet.lk",
+    "notes": ""
+  },
+  {
+    "id": "c295",
+    "name": "The Royal Bachelors' Club",
+    "location": "Gothenburg",
+    "country": "Sweden",
+    "region": "SWEDEN",
+    "address": "Gothenburg, Sweden",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c296",
+    "name": "Hansaklubben",
+    "location": "Malmo",
+    "country": "Sweden",
+    "region": "SWEDEN",
+    "address": "Malm\u00f6, Sweden",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c297",
+    "name": "Sallskapet",
+    "location": "Stockholm",
+    "country": "Sweden",
+    "region": "SWEDEN",
+    "address": "Stockholm, Sweden",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c298",
+    "name": "Villa Pauli",
+    "location": "Stockholm",
+    "country": "Sweden",
+    "region": "SWEDEN",
+    "address": "Djursholm, Stockholm, Sweden",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c299",
+    "name": "The Military Club of Stockholm",
+    "location": "Stockholm",
+    "country": "Sweden",
+    "region": "SWEDEN",
+    "address": "Stockholm, Sweden",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c300",
+    "name": "Club de Bale",
+    "location": "Basel",
+    "country": "Switzerland",
+    "region": "SWITZERLAND",
+    "address": "Basel, Switzerland",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c301",
+    "name": "The British Club (Bangkok)",
+    "location": "Bangkok",
+    "country": "Thailand",
+    "region": "THAILAND",
+    "address": "189 Suriwong Rd, Bangkok 10500",
+    "email": "manager@britishclubbangkok.org",
+    "notes": ""
+  },
+  {
+    "id": "c302",
+    "name": "Pacific City Club",
+    "location": "Bangkok",
+    "country": "Thailand",
+    "region": "THAILAND",
+    "address": "Bangkok, Thailand",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c303",
+    "name": "The Foreign Correspondents Club (Bangkok)",
+    "location": "Bangkok",
+    "country": "Thailand",
+    "region": "THAILAND",
+    "address": "Bangkok, Thailand",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c304",
+    "name": "The Royal Nuku Alofa Club",
+    "location": "Nuku'alofa",
+    "country": "Tonga",
+    "region": "TONGA",
+    "address": "Nuku'alofa, Tonga",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c305",
+    "name": "The Club (Abu Dhabi)",
+    "location": "Abu Dhabi",
+    "country": "UAE",
+    "region": "UAE",
+    "address": "Abu Dhabi, UAE",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c306",
+    "name": "The Capital Club (Dubai)",
+    "location": "Dubai",
+    "country": "UAE",
+    "region": "UAE",
+    "address": "Gate Village 7, DIFC, Dubai",
+    "email": "info@capitalclubdubai.com",
+    "notes": ""
+  },
+  {
+    "id": "c307",
+    "name": "The Club Inc",
+    "location": "Birmingham AL",
+    "country": "USA",
+    "region": "USA",
+    "address": "1 Robert S Smith Dr, Birmingham AL 35213",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c308",
+    "name": "Athelstan Club",
+    "location": "Mobile AL",
+    "country": "USA",
+    "region": "USA",
+    "address": "Mobile, AL",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c309",
+    "name": "Petroleum Club of Anchorage",
+    "location": "Anchorage AK",
+    "country": "USA",
+    "region": "USA",
+    "address": "Anchorage, AK",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c310",
+    "name": "University Club of Phoenix",
+    "location": "Phoenix AZ",
+    "country": "USA",
+    "region": "USA",
+    "address": "39 E Monte Vista Rd, Phoenix AZ 85004",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c311",
+    "name": "The 1836 Club",
+    "location": "Little Rock AR",
+    "country": "USA",
+    "region": "USA",
+    "address": "Little Rock, AR",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c312",
+    "name": "Petroleum Club at Sundale",
+    "location": "Bakersfield CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Bakersfield, CA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c313",
+    "name": "Berkeley City Club",
+    "location": "Berkeley CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "2315 Durant Ave, Berkeley CA 94704",
+    "email": "info@berkeleycityclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c314",
+    "name": "Ingomar Club",
+    "location": "Eureka CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "1125 H St, Eureka CA 95501",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c315",
+    "name": "Magic Castle",
+    "location": "Los Angeles CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "7001 Franklin Ave, Hollywood CA 90028",
+    "email": "info@magiccastle.com",
+    "notes": ""
+  },
+  {
+    "id": "c316",
+    "name": "Griffin Club (Los Angeles)",
+    "location": "Los Angeles CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "1260 W 29th St, Los Angeles CA 90007",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c317",
+    "name": "Casa Abrego Club",
+    "location": "Monterey CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Monterey, CA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c318",
+    "name": "California Yacht Club",
+    "location": "Marina del Rey CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "4469 Admiralty Way, Marina del Rey CA 90292",
+    "email": "info@calyachtclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c319",
+    "name": "Balboa Bay Club",
+    "location": "Newport Beach CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "1221 W Coast Hwy, Newport Beach CA 92663",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c320",
+    "name": "University Athletic Club",
+    "location": "Newport Beach CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Newport Beach, CA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c321",
+    "name": "Sutter Club",
+    "location": "Sacramento CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "1220 9th St, Sacramento CA 95814",
+    "email": "info@sutterclub.org",
+    "notes": ""
+  },
+  {
+    "id": "c322",
+    "name": "Marines Memorial Club",
+    "location": "San Francisco CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "609 Sutter St, San Francisco CA 94102",
+    "email": "marinesmemorial@marinesmemorial.org",
+    "notes": ""
+  },
+  {
+    "id": "c323",
+    "name": "City Club of San Francisco",
+    "location": "San Francisco CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "155 Sansome St, San Francisco CA 94104",
+    "email": "info@cityclubofsf.com",
+    "notes": ""
+  },
+  {
+    "id": "c324",
+    "name": "St Francis Yacht Club",
+    "location": "San Francisco CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "99 Yacht Rd, San Francisco CA 94123",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c325",
+    "name": "University Club of San Francisco",
+    "location": "San Francisco CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "800 Powell St, San Francisco CA 94108",
+    "email": "info@ucsf.org",
+    "notes": ""
+  },
+  {
+    "id": "c326",
+    "name": "Santa Barbara Club",
+    "location": "Santa Barbara CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "1105 Chapala St, Santa Barbara CA 93101",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c327",
+    "name": "SCC San Jose",
+    "location": "San Jose CA",
+    "country": "USA",
+    "region": "USA",
+    "address": "San Jose, CA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c328",
+    "name": "El Paso Club",
+    "location": "Colorado Springs CO",
+    "country": "USA",
+    "region": "USA",
+    "address": "30 W Platte Ave, Colorado Springs CO 80903",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c329",
+    "name": "The Denver Athletic Club",
+    "location": "Denver CO",
+    "country": "USA",
+    "region": "USA",
+    "address": "1325 Glenarm Pl, Denver CO 80204",
+    "email": "membership@denverathleticclub.cc",
+    "notes": ""
+  },
+  {
+    "id": "c330",
+    "name": "The Denver Club",
+    "location": "Denver CO",
+    "country": "USA",
+    "region": "USA",
+    "address": "518 17th St, Denver CO 80202",
+    "email": "info@thedenverclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c331",
+    "name": "The Denver Press Club",
+    "location": "Denver CO",
+    "country": "USA",
+    "region": "USA",
+    "address": "1330 Glenarm Pl, Denver CO 80204",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c332",
+    "name": "Cactus Club (Denver)",
+    "location": "Denver CO",
+    "country": "USA",
+    "region": "USA",
+    "address": "Denver, CO",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c333",
+    "name": "The University Club (Denver)",
+    "location": "Denver CO",
+    "country": "USA",
+    "region": "USA",
+    "address": "Denver, CO",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c334",
+    "name": "The Elm City Club",
+    "location": "New Haven CT",
+    "country": "USA",
+    "region": "USA",
+    "address": "155 Temple St, New Haven CT 06510",
+    "email": "info@elmcityclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c335",
+    "name": "New Haven Lawn Club",
+    "location": "New Haven CT",
+    "country": "USA",
+    "region": "USA",
+    "address": "205 Park St, New Haven CT 06511",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c336",
+    "name": "The Hartford Club",
+    "location": "Hartford CT",
+    "country": "USA",
+    "region": "USA",
+    "address": "46 Prospect St, Hartford CT 06103",
+    "email": "info@hartfordclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c337",
+    "name": "Town & County Club (Hartford)",
+    "location": "Hartford CT",
+    "country": "USA",
+    "region": "USA",
+    "address": "Hartford, CT",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c338",
+    "name": "The Thames Club",
+    "location": "New London CT",
+    "country": "USA",
+    "region": "USA",
+    "address": "New London, CT",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c339",
+    "name": "The Soundview Club",
+    "location": "Stamford CT",
+    "country": "USA",
+    "region": "USA",
+    "address": "Stamford, CT",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c340",
+    "name": "University and Whist Club",
+    "location": "Wilmington DE",
+    "country": "USA",
+    "region": "USA",
+    "address": "805 N Broom St, Wilmington DE 19806",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c341",
+    "name": "Epping Forest Yacht Club",
+    "location": "Jacksonville FL",
+    "country": "USA",
+    "region": "USA",
+    "address": "1830 Epping Forest Dr W, Jacksonville FL 32217",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c342",
+    "name": "River Club (Jacksonville)",
+    "location": "Jacksonville FL",
+    "country": "USA",
+    "region": "USA",
+    "address": "Jacksonville, FL",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c343",
+    "name": "Governors Club",
+    "location": "Tallahassee FL",
+    "country": "USA",
+    "region": "USA",
+    "address": "202 1/2 S Adams St, Tallahassee FL 32301",
+    "email": "info@govclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c344",
+    "name": "Tampa Club",
+    "location": "Tampa FL",
+    "country": "USA",
+    "region": "USA",
+    "address": "101 E Kennedy Blvd, Tampa FL 33602",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c345",
+    "name": "Indian Hills Country Club",
+    "location": "Atlanta GA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Atlanta, GA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c346",
+    "name": "The Pinnacle Club",
+    "location": "Augusta GA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Augusta, GA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c347",
+    "name": "The Chatham Club",
+    "location": "Savannah GA",
+    "country": "USA",
+    "region": "USA",
+    "address": "300 Bull St, Savannah GA 31401",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c348",
+    "name": "Outrigger Canoe Club",
+    "location": "Honolulu HI",
+    "country": "USA",
+    "region": "USA",
+    "address": "2909 Kalakaua Ave, Honolulu HI 96815",
+    "email": "info@outriggercanoeclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c349",
+    "name": "The Pacific Club",
+    "location": "Honolulu HI",
+    "country": "USA",
+    "region": "USA",
+    "address": "1451 Queen Emma St, Honolulu HI 96813",
+    "email": "pacificclub@pacificclub.org",
+    "notes": ""
+  },
+  {
+    "id": "c350",
+    "name": "Adventurers Club",
+    "location": "Honolulu HI",
+    "country": "USA",
+    "region": "USA",
+    "address": "Honolulu, HI",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c351",
+    "name": "The Arid Club Inc",
+    "location": "Boise ID",
+    "country": "USA",
+    "region": "USA",
+    "address": "1101 W Idaho St, Boise ID 83702",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c352",
+    "name": "University Club of Chicago",
+    "location": "Chicago IL",
+    "country": "USA",
+    "region": "USA",
+    "address": "76 E Monroe St, Chicago IL 60603",
+    "email": "info@ucco.com",
+    "notes": ""
+  },
+  {
+    "id": "c353",
+    "name": "The Union League Club of Chicago",
+    "location": "Chicago IL",
+    "country": "USA",
+    "region": "USA",
+    "address": "65 W Jackson Blvd, Chicago IL 60604",
+    "email": "info@ulcc.org",
+    "notes": ""
+  },
+  {
+    "id": "c354",
+    "name": "The Cliff Dwellers",
+    "location": "Chicago IL",
+    "country": "USA",
+    "region": "USA",
+    "address": "200 S Michigan Ave, Chicago IL 60604",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c355",
+    "name": "The Decatur Club",
+    "location": "Decatur IL",
+    "country": "USA",
+    "region": "USA",
+    "address": "Decatur, IL",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c356",
+    "name": "University Club of Rockford",
+    "location": "Rockford IL",
+    "country": "USA",
+    "region": "USA",
+    "address": "Rockford, IL",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c357",
+    "name": "The Antelope Club",
+    "location": "Indianapolis IN",
+    "country": "USA",
+    "region": "USA",
+    "address": "Indianapolis, IN",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c358",
+    "name": "The Columbia Club",
+    "location": "Indianapolis IN",
+    "country": "USA",
+    "region": "USA",
+    "address": "121 Monument Cir, Indianapolis IN 46204",
+    "email": "info@columbiaclub.org",
+    "notes": ""
+  },
+  {
+    "id": "c359",
+    "name": "The University Club of Indianapolis",
+    "location": "Indianapolis IN",
+    "country": "USA",
+    "region": "USA",
+    "address": "Indianapolis, IN",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c360",
+    "name": "The Outing Club",
+    "location": "Davenport IA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Davenport, IA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c361",
+    "name": "Des Moines Embassy Club",
+    "location": "Des Moines IA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Des Moines, IA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c362",
+    "name": "The Metropolitan Club",
+    "location": "Covington KY",
+    "country": "USA",
+    "region": "USA",
+    "address": "Covington, KY",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c363",
+    "name": "The University Club (Louisville)",
+    "location": "Louisville KY",
+    "country": "USA",
+    "region": "USA",
+    "address": "Louisville, KY",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c364",
+    "name": "The Pendennis Club",
+    "location": "Louisville KY",
+    "country": "USA",
+    "region": "USA",
+    "address": "218 W Muhammad Ali Blvd, Louisville KY 40202",
+    "email": "pendennis@pendennis.com",
+    "notes": ""
+  },
+  {
+    "id": "c365",
+    "name": "City Club of Baton Rouge",
+    "location": "Baton Rouge LA",
+    "country": "USA",
+    "region": "USA",
+    "address": "355 Third St, Baton Rouge LA 70801",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c366",
+    "name": "The Shreveport Club",
+    "location": "Shreveport LA",
+    "country": "USA",
+    "region": "USA",
+    "address": "400 Travis St, Shreveport LA 71101",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c367",
+    "name": "The Petroleum Club of Lafayette",
+    "location": "Lafayette LA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Lafayette, LA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c368",
+    "name": "The Pioneer Club of Lake Charles",
+    "location": "Lake Charles LA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Lake Charles, LA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c369",
+    "name": "The Center Club",
+    "location": "Baltimore MD",
+    "country": "USA",
+    "region": "USA",
+    "address": "100 Light St, Baltimore MD 21202",
+    "email": "info@centerclub.org",
+    "notes": ""
+  },
+  {
+    "id": "c370",
+    "name": "Engineers' Club",
+    "location": "Baltimore MD",
+    "country": "USA",
+    "region": "USA",
+    "address": "Baltimore, MD",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c371",
+    "name": "Mount Vernon Club",
+    "location": "Baltimore MD",
+    "country": "USA",
+    "region": "USA",
+    "address": "8 W Mt Vernon Pl, Baltimore MD 21201",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c372",
+    "name": "John Hopkins Club",
+    "location": "Baltimore MD",
+    "country": "USA",
+    "region": "USA",
+    "address": "Baltimore, MD",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c373",
+    "name": "The College Club of Boston",
+    "location": "Boston MA",
+    "country": "USA",
+    "region": "USA",
+    "address": "44 Commonwealth Ave, Boston MA 02116",
+    "email": "info@thecollegeclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c374",
+    "name": "St. Botolph Club",
+    "location": "Boston MA",
+    "country": "USA",
+    "region": "USA",
+    "address": "199 Commonwealth Ave, Boston MA 02116",
+    "email": "office@stbotolphclub.org",
+    "notes": ""
+  },
+  {
+    "id": "c375",
+    "name": "Harvard Club of Boston",
+    "location": "Boston MA",
+    "country": "USA",
+    "region": "USA",
+    "address": "374 Commonwealth Ave, Boston MA 02215",
+    "email": "contact@harvardclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c376",
+    "name": "The Fay Club",
+    "location": "Fitchburg MA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Fitchburg, MA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c377",
+    "name": "Wamsutta Club",
+    "location": "New Bedford MA",
+    "country": "USA",
+    "region": "USA",
+    "address": "427 County St, New Bedford MA 02740",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c378",
+    "name": "Worcester Club",
+    "location": "Worcester MA",
+    "country": "USA",
+    "region": "USA",
+    "address": "39 Elm St, Worcester MA 01609",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c379",
+    "name": "Birmingham Athletic Club",
+    "location": "Detroit MI",
+    "country": "USA",
+    "region": "USA",
+    "address": "Birmingham, MI",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c380",
+    "name": "Detroit Athletic Club",
+    "location": "Detroit MI",
+    "country": "USA",
+    "region": "USA",
+    "address": "241 Madison St, Detroit MI 48226",
+    "email": "info@the-dac.com",
+    "notes": ""
+  },
+  {
+    "id": "c381",
+    "name": "Ann Arbor City Club",
+    "location": "Ann Arbor MI",
+    "country": "USA",
+    "region": "USA",
+    "address": "1830 Washtenaw Ave, Ann Arbor MI 48104",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c382",
+    "name": "Kitchi Gammi Club",
+    "location": "Duluth MN",
+    "country": "USA",
+    "region": "USA",
+    "address": "831 E Superior St, Duluth MN 55802",
+    "email": "info@kitchigammiclub.org",
+    "notes": ""
+  },
+  {
+    "id": "c383",
+    "name": "The Woman's Club of Minneapolis",
+    "location": "Minneapolis MN",
+    "country": "USA",
+    "region": "USA",
+    "address": "410 Oak Grove St, Minneapolis MN 55403",
+    "email": "info@womansclub.org",
+    "notes": ""
+  },
+  {
+    "id": "c384",
+    "name": "University Club of Saint Paul",
+    "location": "Saint Paul MN",
+    "country": "USA",
+    "region": "USA",
+    "address": "420 Summit Ave, St Paul MN 55102",
+    "email": "info@universityclubofstpaul.com",
+    "notes": ""
+  },
+  {
+    "id": "c385",
+    "name": "The Great Southern Club",
+    "location": "Gulfport MS",
+    "country": "USA",
+    "region": "USA",
+    "address": "Gulfport, MS",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c386",
+    "name": "Capital Club (Jackson MS)",
+    "location": "Jackson MS",
+    "country": "USA",
+    "region": "USA",
+    "address": "Jackson, MS",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c387",
+    "name": "The Carriage Club",
+    "location": "Kansas City MO",
+    "country": "USA",
+    "region": "USA",
+    "address": "Kansas City, MO",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c388",
+    "name": "St. Louis Club",
+    "location": "St. Louis MO",
+    "country": "USA",
+    "region": "USA",
+    "address": "7701 Forsyth Blvd, St. Louis MO 63105",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c389",
+    "name": "The Racquet Club (St. Louis)",
+    "location": "St. Louis MO",
+    "country": "USA",
+    "region": "USA",
+    "address": "476 N Kingshighway Blvd, St. Louis MO 63108",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c390",
+    "name": "Missouri Athletic Club",
+    "location": "St. Louis MO",
+    "country": "USA",
+    "region": "USA",
+    "address": "405 Washington Ave, St. Louis MO 63102",
+    "email": "info@mac-stl.org",
+    "notes": ""
+  },
+  {
+    "id": "c391",
+    "name": "Morristown Club",
+    "location": "Morristown NJ",
+    "country": "USA",
+    "region": "USA",
+    "address": "Morristown, NJ",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c392",
+    "name": "Park Avenue Club",
+    "location": "Newark NJ",
+    "country": "USA",
+    "region": "USA",
+    "address": "184 Park Ave, Florham Park NJ 07932",
+    "email": "info@parkaveclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c393",
+    "name": "The Montauk Club",
+    "location": "Brooklyn NY",
+    "country": "USA",
+    "region": "USA",
+    "address": "25 Eighth Ave, Brooklyn NY 11217",
+    "email": "info@montaukclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c394",
+    "name": "The Saturn Club",
+    "location": "Buffalo NY",
+    "country": "USA",
+    "region": "USA",
+    "address": "977 Delaware Ave, Buffalo NY 14209",
+    "email": "saturn@saturnclub.org",
+    "notes": ""
+  },
+  {
+    "id": "c395",
+    "name": "Cosmopolitan Club",
+    "location": "Manhattan NY",
+    "country": "USA",
+    "region": "USA",
+    "address": "122 E 66th St, New York NY 10065",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c396",
+    "name": "Women's National Republican Club",
+    "location": "Manhattan NY",
+    "country": "USA",
+    "region": "USA",
+    "address": "3 W 51st St, New York NY 10019",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c397",
+    "name": "The Salmagundi Club",
+    "location": "Manhattan NY",
+    "country": "USA",
+    "region": "USA",
+    "address": "47 Fifth Ave, New York NY 10003",
+    "email": "info@salmagundi.org",
+    "notes": ""
+  },
+  {
+    "id": "c398",
+    "name": "The Explorers Club",
+    "location": "Manhattan NY",
+    "country": "USA",
+    "region": "USA",
+    "address": "46 E 70th St, New York NY 10021",
+    "email": "info@explorers.org",
+    "notes": ""
+  },
+  {
+    "id": "c399",
+    "name": "Genesee Valley Club",
+    "location": "Rochester NY",
+    "country": "USA",
+    "region": "USA",
+    "address": "421 Alexander St, Rochester NY 14607",
+    "email": "info@gvclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c400",
+    "name": "The Mohawk Club",
+    "location": "Schenectady NY",
+    "country": "USA",
+    "region": "USA",
+    "address": "Schenectady, NY",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c401",
+    "name": "Century Club (Syracuse)",
+    "location": "Syracuse NY",
+    "country": "USA",
+    "region": "USA",
+    "address": "Syracuse, NY",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c402",
+    "name": "Charlotte City Club",
+    "location": "Charlotte NC",
+    "country": "USA",
+    "region": "USA",
+    "address": "121 W Trade St, Charlotte NC 28202",
+    "email": "info@charlottecityclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c403",
+    "name": "University Club (Durham)",
+    "location": "Durham NC",
+    "country": "USA",
+    "region": "USA",
+    "address": "Durham, NC",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c404",
+    "name": "Cincinnati Athletic Club",
+    "location": "Cincinnati OH",
+    "country": "USA",
+    "region": "USA",
+    "address": "651 Vine St, Cincinnati OH 45202",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c405",
+    "name": "Queen City Club",
+    "location": "Cincinnati OH",
+    "country": "USA",
+    "region": "USA",
+    "address": "331 E 4th St, Cincinnati OH 45202",
+    "email": "info@queencityclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c406",
+    "name": "The Union Club (Cleveland)",
+    "location": "Cleveland OH",
+    "country": "USA",
+    "region": "USA",
+    "address": "1211 Euclid Ave, Cleveland OH 44115",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c407",
+    "name": "The Toledo Club",
+    "location": "Toledo OH",
+    "country": "USA",
+    "region": "USA",
+    "address": "235 14th St, Toledo OH 43624",
+    "email": "info@toledoclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c408",
+    "name": "Petroleum Club of Oklahoma City",
+    "location": "Oklahoma City OK",
+    "country": "USA",
+    "region": "USA",
+    "address": "100 N Broadway Ave, Oklahoma City OK 73102",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c409",
+    "name": "University Club (Portland)",
+    "location": "Portland OR",
+    "country": "USA",
+    "region": "USA",
+    "address": "1235 SW 10th Ave, Portland OR 97205",
+    "email": "info@universityclubportland.org",
+    "notes": ""
+  },
+  {
+    "id": "c410",
+    "name": "Racquet Club of Philadelphia",
+    "location": "Philadelphia PA",
+    "country": "USA",
+    "region": "USA",
+    "address": "215 S 16th St, Philadelphia PA 19102",
+    "email": "rcpinfo@rcphl.org",
+    "notes": ""
+  },
+  {
+    "id": "c411",
+    "name": "Germantown Cricket Club",
+    "location": "Philadelphia PA",
+    "country": "USA",
+    "region": "USA",
+    "address": "411 W Manheim St, Philadelphia PA 19144",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c412",
+    "name": "Allegheny HYP Club",
+    "location": "Pittsburgh PA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Pittsburgh, PA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c413",
+    "name": "Edgeworth Club",
+    "location": "Pittsburgh PA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Sewickley, PA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c414",
+    "name": "Hope Club",
+    "location": "Providence RI",
+    "country": "USA",
+    "region": "USA",
+    "address": "6 Thomas St, Providence RI 02903",
+    "email": "info@hopeclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c415",
+    "name": "University Club of Providence",
+    "location": "Providence RI",
+    "country": "USA",
+    "region": "USA",
+    "address": "Providence, RI",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c416",
+    "name": "Providence Art Club",
+    "location": "Providence RI",
+    "country": "USA",
+    "region": "USA",
+    "address": "11 Thomas St, Providence RI 02903",
+    "email": "info@providenceartclub.org",
+    "notes": ""
+  },
+  {
+    "id": "c417",
+    "name": "The Green Boundary Club",
+    "location": "Aiken SC",
+    "country": "USA",
+    "region": "USA",
+    "address": "Aiken, SC",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c418",
+    "name": "The Wanderer (Charleston)",
+    "location": "Charleston SC",
+    "country": "USA",
+    "region": "USA",
+    "address": "Charleston, SC",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c419",
+    "name": "The Palmetto Club",
+    "location": "Columbia SC",
+    "country": "USA",
+    "region": "USA",
+    "address": "1231 Blanding St, Columbia SC 29201",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c420",
+    "name": "Poinsett Club",
+    "location": "Greenville SC",
+    "country": "USA",
+    "region": "USA",
+    "address": "807 E Washington St, Greenville SC 29601",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c421",
+    "name": "Piedmont Club",
+    "location": "Spartanburg SC",
+    "country": "USA",
+    "region": "USA",
+    "address": "Spartanburg, SC",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c422",
+    "name": "The Walden Club",
+    "location": "Chattanooga TN",
+    "country": "USA",
+    "region": "USA",
+    "address": "Chattanooga, TN",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c423",
+    "name": "Mountain City Club",
+    "location": "Chattanooga TN",
+    "country": "USA",
+    "region": "USA",
+    "address": "729 Chestnut St, Chattanooga TN 37402",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c424",
+    "name": "Nashville City Club",
+    "location": "Nashville TN",
+    "country": "USA",
+    "region": "USA",
+    "address": "One Nashville Pl, Nashville TN 37219",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c425",
+    "name": "Austin Club",
+    "location": "Austin TX",
+    "country": "USA",
+    "region": "USA",
+    "address": "110 E 2nd St, Austin TX 78701",
+    "email": "info@austinclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c426",
+    "name": "Headliners Club",
+    "location": "Austin TX",
+    "country": "USA",
+    "region": "USA",
+    "address": "221 W 6th St, Austin TX 78701",
+    "email": "info@headlinersclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c427",
+    "name": "Park City Club (Dallas)",
+    "location": "Dallas TX",
+    "country": "USA",
+    "region": "USA",
+    "address": "5956 Sherry Ln, Dallas TX 75225",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c428",
+    "name": "El Paso Club",
+    "location": "El Paso TX",
+    "country": "USA",
+    "region": "USA",
+    "address": "El Paso, TX",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c429",
+    "name": "Petroleum Club of Fort Worth",
+    "location": "Fort Worth TX",
+    "country": "USA",
+    "region": "USA",
+    "address": "Fort Worth, TX",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c430",
+    "name": "Petroleum Club of Houston",
+    "location": "Houston TX",
+    "country": "USA",
+    "region": "USA",
+    "address": "800 Bell St, Houston TX 77002",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c431",
+    "name": "Petroleum Club of San Antonio",
+    "location": "San Antonio TX",
+    "country": "USA",
+    "region": "USA",
+    "address": "San Antonio, TX",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c432",
+    "name": "Alta Club",
+    "location": "Salt Lake City UT",
+    "country": "USA",
+    "region": "USA",
+    "address": "100 E South Temple, Salt Lake City UT 84111",
+    "email": "secretary@altaclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c433",
+    "name": "Farmington Country Club",
+    "location": "Charlottesville VA",
+    "country": "USA",
+    "region": "USA",
+    "address": "Charlottesville, VA",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c434",
+    "name": "City Tavern Club",
+    "location": "Washington DC area",
+    "country": "USA",
+    "region": "USA",
+    "address": "138 Wisconsin Ave NW, Washington DC 20007",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c435",
+    "name": "Norfolk Yacht & Country Club",
+    "location": "Norfolk VA",
+    "country": "USA",
+    "region": "USA",
+    "address": "7001 Hampton Blvd, Norfolk VA 23505",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c436",
+    "name": "Arts Club of Washington",
+    "location": "Washington DC",
+    "country": "USA",
+    "region": "USA",
+    "address": "2017 I St NW, Washington DC 20006",
+    "email": "info@artsclubofwashington.org",
+    "notes": ""
+  },
+  {
+    "id": "c437",
+    "name": "National Democratic Club",
+    "location": "Washington DC",
+    "country": "USA",
+    "region": "USA",
+    "address": "30 Ivy St SE, Washington DC 20003",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c438",
+    "name": "The George Town Club",
+    "location": "Washington DC",
+    "country": "USA",
+    "region": "USA",
+    "address": "1530 Wisconsin Ave NW, Washington DC 20007",
+    "email": "info@georgetownclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c439",
+    "name": "Dacor (Washington)",
+    "location": "Washington DC",
+    "country": "USA",
+    "region": "USA",
+    "address": "1801 F St NW, Washington DC 20006",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c440",
+    "name": "Bellevue Club",
+    "location": "Bellevue WA",
+    "country": "USA",
+    "region": "USA",
+    "address": "11200 SE 6th St, Bellevue WA 98004",
+    "email": "info@bellevueclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c441",
+    "name": "College Club of Seattle",
+    "location": "Seattle WA",
+    "country": "USA",
+    "region": "USA",
+    "address": "1511 6th Ave, Seattle WA 98101",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c442",
+    "name": "Sunset Club (Seattle)",
+    "location": "Seattle WA",
+    "country": "USA",
+    "region": "USA",
+    "address": "1114 Minor Ave, Seattle WA 98101",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c443",
+    "name": "The Tacoma Club",
+    "location": "Tacoma WA",
+    "country": "USA",
+    "region": "USA",
+    "address": "950 Broadway, Tacoma WA 98402",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c444",
+    "name": "The Spokane Club",
+    "location": "Spokane WA",
+    "country": "USA",
+    "region": "USA",
+    "address": "1002 W Riverside Ave, Spokane WA 99201",
+    "email": "info@spokaneclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c445",
+    "name": "The Madison Club",
+    "location": "Madison WI",
+    "country": "USA",
+    "region": "USA",
+    "address": "5 E Wilson St, Madison WI 53703",
+    "email": "info@madisonclub.com",
+    "notes": ""
+  },
+  {
+    "id": "c446",
+    "name": "Milwaukee Athletic Club",
+    "location": "Milwaukee WI",
+    "country": "USA",
+    "region": "USA",
+    "address": "758 N Broadway, Milwaukee WI 53202",
+    "email": "info@macwi.com",
+    "notes": ""
+  },
+  {
+    "id": "c447",
+    "name": "Milwaukee Club",
+    "location": "Milwaukee WI",
+    "country": "USA",
+    "region": "USA",
+    "address": "706 N Jefferson St, Milwaukee WI 53202",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c448",
+    "name": "University Club of Milwaukee",
+    "location": "Milwaukee WI",
+    "country": "USA",
+    "region": "USA",
+    "address": "924 E Wells St, Milwaukee WI 53202",
+    "email": "info@universityclubmilwaukee.com",
+    "notes": ""
+  },
+  {
+    "id": "c449",
+    "name": "Club Uruguay",
+    "location": "Montevideo",
+    "country": "Uruguay",
+    "region": "URUGUAY",
+    "address": "Montevideo, Uruguay",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "c450",
+    "name": "The Hanoi Club",
+    "location": "Hanoi",
+    "country": "Vietnam",
+    "region": "VIETNAM",
+    "address": "76 Yen Phu, Ba Dinh, Hanoi",
+    "email": "info@hanoiclub.com.vn",
+    "notes": ""
+  },
+  {
+    "id": "c451",
+    "name": "The Bulawayo Club",
+    "location": "Bulawayo",
+    "country": "Zimbabwe",
+    "region": "ZIMBABWE",
+    "address": "12th Ave & Fort St, Bulawayo, Zimbabwe",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk1",
+    "name": "Buck's Club",
+    "location": "LONDON",
+    "country": "United Kingdom",
+    "region": "LONDON",
+    "address": "18 Clifford Street, London W1S 3RF",
+    "email": "secretary@bucksclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk2",
+    "name": "Bush Hill Park Golf Club",
+    "location": "LONDON",
+    "country": "United Kingdom",
+    "region": "LONDON",
+    "address": "Bush Hill, Winchmore Hill, London N21 2BU",
+    "email": "stewart@bhpgc.com",
+    "notes": ""
+  },
+  {
+    "id": "uk3",
+    "name": "Eccentric Club (Snail Club)",
+    "location": "LONDON",
+    "country": "United Kingdom",
+    "region": "LONDON",
+    "address": "48 Greek Street, Soho, London W1D 4EF",
+    "email": "secretary@snailclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk4",
+    "name": "Gymkhana Club (Indian Gymkhana)",
+    "location": "LONDON",
+    "country": "United Kingdom",
+    "region": "LONDON",
+    "address": "Osterley Road, Southall, London UB2 4AA",
+    "email": "manager@indiangymkhanaclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk5",
+    "name": "Lansdowne Club",
+    "location": "LONDON",
+    "country": "United Kingdom",
+    "region": "LONDON",
+    "address": "9 Fitzmaurice Place, London W1J 5AD",
+    "email": "receptiondesk@lansdowneclub.com",
+    "notes": ""
+  },
+  {
+    "id": "uk6",
+    "name": "National Liberal Club",
+    "location": "LONDON",
+    "country": "United Kingdom",
+    "region": "LONDON",
+    "address": "Whitehall Place, London SW1A 2HE",
+    "email": "secretariat@nlc.org.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk7",
+    "name": "Oxford and Cambridge Club",
+    "location": "LONDON",
+    "country": "United Kingdom",
+    "region": "LONDON",
+    "address": "71\u201377 Pall Mall, London SW1Y 5HD",
+    "email": "reservations@oandc.uk.com",
+    "notes": ""
+  },
+  {
+    "id": "uk8",
+    "name": "Royal Over-Seas League",
+    "location": "LONDON",
+    "country": "United Kingdom",
+    "region": "LONDON",
+    "address": "Park Place, St James's Street, London SW1A 1LR",
+    "email": "info@rosl.org.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk9",
+    "name": "University Women's Club",
+    "location": "LONDON",
+    "country": "United Kingdom",
+    "region": "LONDON",
+    "address": "2 Audley Square, London W1K 1DB",
+    "email": "uwc@uwc-london.com",
+    "notes": ""
+  },
+  {
+    "id": "uk10",
+    "name": "Winchester House Club",
+    "location": "LONDON",
+    "country": "United Kingdom",
+    "region": "LONDON",
+    "address": "10 Lower Richmond Road, Putney, London SW15 1JN",
+    "email": "secretary@winchesterhouseclub.com",
+    "notes": ""
+  },
+  {
+    "id": "uk11",
+    "name": "Bath and Country Club",
+    "location": "BATH",
+    "country": "United Kingdom",
+    "region": "BATH",
+    "address": "Queen's Parade, Bath BA1 2NJ",
+    "email": "secretary@bathandcountyclub.com",
+    "notes": ""
+  },
+  {
+    "id": "uk12",
+    "name": "The Bedford Club",
+    "location": "BEDFORD",
+    "country": "United Kingdom",
+    "region": "BEDFORD",
+    "address": "11 De Parys Avenue, Bedford MK40 2TX",
+    "email": "secretary@bedfordclub.org",
+    "notes": ""
+  },
+  {
+    "id": "uk13",
+    "name": "The Sandhurst Club",
+    "location": "BERKSHIRE",
+    "country": "United Kingdom",
+    "region": "BERKSHIRE",
+    "address": "Wellington Road, Sandhurst GU47 9BL",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk14",
+    "name": "St. Paul's Club",
+    "location": "BIRMINGHAM",
+    "country": "United Kingdom",
+    "region": "BIRMINGHAM",
+    "address": "Edgbaston Hall, Church Road, Birmingham B15 3TB",
+    "email": "info@stpaulsclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk15",
+    "name": "The Bradford Club",
+    "location": "BRADFORD",
+    "country": "United Kingdom",
+    "region": "BRADFORD",
+    "address": "1 Piece Hall Yard, Bradford BD1 1PJ",
+    "email": "ana.bradfordclub@virgin.net",
+    "notes": ""
+  },
+  {
+    "id": "uk16",
+    "name": "The Clifton Club",
+    "location": "BRISTOL",
+    "country": "United Kingdom",
+    "region": "BRISTOL",
+    "address": "22 The Mall, Clifton, Bristol BS8 4DS",
+    "email": "enquiries@thecliftonclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk17",
+    "name": "Bristol Savages",
+    "location": "BRISTOL",
+    "country": "United Kingdom",
+    "region": "BRISTOL",
+    "address": "Red Lodge, Park Row, Bristol BS1 5LJ",
+    "email": "admin@bristol1904arts.org",
+    "notes": ""
+  },
+  {
+    "id": "uk18",
+    "name": "Hawks' Club",
+    "location": "CAMBRIDGE",
+    "country": "United Kingdom",
+    "region": "CAMBRIDGE",
+    "address": "18 Portugal Place, Cambridge CB5 8AF",
+    "email": "manager@hawksclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk19",
+    "name": "University Pitt Club",
+    "location": "CAMBRIDGE",
+    "country": "United Kingdom",
+    "region": "CAMBRIDGE",
+    "address": "22 Jesus Lane, Cambridge CB5 8BA",
+    "email": "businessmanager@universitypittclub.org.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk20",
+    "name": "Kent and Canterbury Club",
+    "location": "CANTERBURY",
+    "country": "United Kingdom",
+    "region": "CANTERBURY",
+    "address": "22 Old Dover Road, Canterbury CT1 3BQ",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk21",
+    "name": "The Chelmsford Club",
+    "location": "CHELMSFORD",
+    "country": "United Kingdom",
+    "region": "CHELMSFORD",
+    "address": "c/o Chelmsford City Council, Duke Street, Chelmsford CM1 1JE",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk22",
+    "name": "The New Club",
+    "location": "CHELTENHAM",
+    "country": "United Kingdom",
+    "region": "CHELTENHAM",
+    "address": "2 Montpellier Parade, Cheltenham GL50 1UD",
+    "email": "secretary@thenewclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk23",
+    "name": "Old Boys and Green Park Club",
+    "location": "CHELTENHAM",
+    "country": "United Kingdom",
+    "region": "CHELTENHAM",
+    "address": "Cheltenham",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk24",
+    "name": "Chester City Club",
+    "location": "CHESTER",
+    "country": "United Kingdom",
+    "region": "CHESTER",
+    "address": "St Peter's Churchyard, Northgate Street, Chester CH1 2HG",
+    "email": "manager@chestercityclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk25",
+    "name": "The Essex Golf & County Club",
+    "location": "COLCHESTER",
+    "country": "United Kingdom",
+    "region": "COLCHESTER",
+    "address": "Stapleford Abbotts, Essex RM4 1JU",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk26",
+    "name": "Devonshire Club",
+    "location": "EASTBOURNE",
+    "country": "United Kingdom",
+    "region": "EASTBOURNE",
+    "address": "Westdown House, Hartington Place, Eastbourne BN21 3BN",
+    "email": "office@devonshireclubeastbourne.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk27",
+    "name": "Harrogate Club",
+    "location": "HARROGATE",
+    "country": "United Kingdom",
+    "region": "HARROGATE",
+    "address": "36 Victoria Avenue, Harrogate HG1 5PR",
+    "email": "info@harrogateclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk28",
+    "name": "Leander Club",
+    "location": "HENLEY-ON-THAMES",
+    "country": "United Kingdom",
+    "region": "HENLEY-ON-THAMES",
+    "address": "Henley-on-Thames, Oxfordshire RG9 2LP",
+    "email": "membership@leander.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk29",
+    "name": "Phyllis Court Club",
+    "location": "HENLEY-ON-THAMES",
+    "country": "United Kingdom",
+    "region": "HENLEY-ON-THAMES",
+    "address": "Marlow Road, Henley-on-Thames RG9 2HT",
+    "email": "rcpn@phylliscourt.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk30",
+    "name": "Hove Club",
+    "location": "HOVE",
+    "country": "United Kingdom",
+    "region": "HOVE",
+    "address": "Newtown Road, Hove BN3 4HL",
+    "email": "info@thehoveclub.com",
+    "notes": ""
+  },
+  {
+    "id": "uk31",
+    "name": "Unity Business Club \u2013 Leeds",
+    "location": "LEEDS",
+    "country": "United Kingdom",
+    "region": "LEEDS",
+    "address": "Leeds",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk32",
+    "name": "Artists Club",
+    "location": "LIVERPOOL",
+    "country": "United Kingdom",
+    "region": "LIVERPOOL",
+    "address": "Liverpool",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk33",
+    "name": "Athenaeum Club",
+    "location": "LIVERPOOL",
+    "country": "United Kingdom",
+    "region": "LIVERPOOL",
+    "address": "Church Alley, Liverpool L1 3DD",
+    "email": "reception@theathenaeum.org.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk34",
+    "name": "St. James's Club",
+    "location": "MANCHESTER",
+    "country": "United Kingdom",
+    "region": "MANCHESTER",
+    "address": "Manchester",
+    "email": "marketing@stjc.org.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk35",
+    "name": "The Manchester Tennis & Racquet Club",
+    "location": "MANCHESTER",
+    "country": "United Kingdom",
+    "region": "MANCHESTER",
+    "address": "33 Blackfriars Road, Manchester M3 7DB",
+    "email": "manager@mtrc.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk36",
+    "name": "Northern Counties Club",
+    "location": "NEWCASTLE-UPON-TYNE",
+    "country": "United Kingdom",
+    "region": "NEWCASTLE-UPON-TYNE",
+    "address": "11 Hood Street, Newcastle upon Tyne NE1 6LH",
+    "email": "secretary@northerncountiesclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk37",
+    "name": "Northampton and County Club",
+    "location": "NORTHAMPTON",
+    "country": "United Kingdom",
+    "region": "NORTHAMPTON",
+    "address": "Northampton",
+    "email": "secretary@northamptonandcountyclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk38",
+    "name": "Norfolk Club",
+    "location": "NORWICH",
+    "country": "United Kingdom",
+    "region": "NORWICH",
+    "address": "17 Upper King Street, Norwich NR3 1RB",
+    "email": "clubsecretary@thenorfolkclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk39",
+    "name": "Strangers Club",
+    "location": "NORWICH",
+    "country": "United Kingdom",
+    "region": "NORWICH",
+    "address": "22\u201324 Elm Hill, Norwich NR3 1HG",
+    "email": "admin@strangersclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk40",
+    "name": "Nottingham Club",
+    "location": "NOTTINGHAM",
+    "country": "United Kingdom",
+    "region": "NOTTINGHAM",
+    "address": "25 Goldsmith Street, Nottingham NG1 5LB",
+    "email": "secretary@thenottinghamclub.com",
+    "notes": ""
+  },
+  {
+    "id": "uk41",
+    "name": "Vincent's Club",
+    "location": "OXFORD",
+    "country": "United Kingdom",
+    "region": "OXFORD",
+    "address": "1a King Edward Street, Oxford OX1 4JB",
+    "email": "steward@vincents.org",
+    "notes": ""
+  },
+  {
+    "id": "uk42",
+    "name": "Gridiron Club",
+    "location": "OXFORD",
+    "country": "United Kingdom",
+    "region": "OXFORD",
+    "address": "Oxford",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk43",
+    "name": "Royal Albert Yacht Club",
+    "location": "PORTSMOUTH",
+    "country": "United Kingdom",
+    "region": "PORTSMOUTH",
+    "address": "Portsmouth",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk44",
+    "name": "Castle Club",
+    "location": "ROCHESTER",
+    "country": "United Kingdom",
+    "region": "ROCHESTER",
+    "address": "Rochester",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk45",
+    "name": "Royal Air Force Yacht Club",
+    "location": "SOUTHAMPTON",
+    "country": "United Kingdom",
+    "region": "SOUTHAMPTON",
+    "address": "Riverside House, Rope Walk, Hamble SO31 4HD",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk46",
+    "name": "Potters Club",
+    "location": "STOKE-ON-TRENT",
+    "country": "United Kingdom",
+    "region": "STOKE-ON-TRENT",
+    "address": "Stoke-on-Trent",
+    "email": "info@thepottersclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk47",
+    "name": "Sheffield Club",
+    "location": "SHEFFIELD",
+    "country": "United Kingdom",
+    "region": "SHEFFIELD",
+    "address": "Sheffield",
+    "email": "admin@sheffieldclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk48",
+    "name": "Bury St Edmunds Farmers Club",
+    "location": "SUFFOLK",
+    "country": "United Kingdom",
+    "region": "SUFFOLK",
+    "address": "10 Northgate Street, Bury St Edmunds IP33 1HQ",
+    "email": "reception@bsefc.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk49",
+    "name": "Ipswich and Suffolk Club",
+    "location": "SUFFOLK",
+    "country": "United Kingdom",
+    "region": "SUFFOLK",
+    "address": "Ipswich",
+    "email": "enquiries@ipswichandsuffolkclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk50",
+    "name": "Leeds Unity Club",
+    "location": "YORKSHIRE",
+    "country": "United Kingdom",
+    "region": "YORKSHIRE",
+    "address": "Leeds",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk51",
+    "name": "Armagh Club",
+    "location": "ARMAGH",
+    "country": "United Kingdom",
+    "region": "ARMAGH",
+    "address": "Armagh",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk52",
+    "name": "Ulster Reform Club",
+    "location": "BELFAST",
+    "country": "United Kingdom",
+    "region": "BELFAST",
+    "address": "4 Royal Avenue, Belfast BT1 1DA",
+    "email": "info@ulsterreformclub.com",
+    "notes": ""
+  },
+  {
+    "id": "uk53",
+    "name": "Royal Dublin Society",
+    "location": "DUBLIN",
+    "country": "United Kingdom",
+    "region": "DUBLIN",
+    "address": "Merrion Road, Ballsbridge, Dublin 4",
+    "email": "members@rds.ie",
+    "notes": ""
+  },
+  {
+    "id": "uk54",
+    "name": "The Stephen's Green Hibernian Club",
+    "location": "DUBLIN",
+    "country": "United Kingdom",
+    "region": "DUBLIN",
+    "address": "9 St Stephen's Green, Dublin 2",
+    "email": "info@sghc.ie",
+    "notes": ""
+  },
+  {
+    "id": "uk55",
+    "name": "Royal Irish Automobile Club",
+    "location": "DUBLIN",
+    "country": "United Kingdom",
+    "region": "DUBLIN",
+    "address": "15 Dawson Street, Dublin 2",
+    "email": "info@riac.ie",
+    "notes": ""
+  },
+  {
+    "id": "uk56",
+    "name": "The United Arts Club",
+    "location": "DUBLIN",
+    "country": "United Kingdom",
+    "region": "DUBLIN",
+    "address": "3 Upper Fitzwilliam Street, Dublin 2",
+    "email": "info@unitedartsclubdublin.com",
+    "notes": ""
+  },
+  {
+    "id": "uk57",
+    "name": "Royal Northern and University Club",
+    "location": "ABERDEEN",
+    "country": "United Kingdom",
+    "region": "ABERDEEN",
+    "address": "9 Albyn Place, Aberdeen AB10 1YE",
+    "email": "secretary@rnuc.org.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk58",
+    "name": "The New Club",
+    "location": "EDINBURGH",
+    "country": "United Kingdom",
+    "region": "EDINBURGH",
+    "address": "86 Princes Street, Edinburgh EH2 2BB",
+    "email": "reception@newclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk59",
+    "name": "The Royal Scots Club",
+    "location": "EDINBURGH",
+    "country": "United Kingdom",
+    "region": "EDINBURGH",
+    "address": "29\u201331 Abercromby Place, Edinburgh EH3 6QE",
+    "email": "info@royalscotsclub.com",
+    "notes": ""
+  },
+  {
+    "id": "uk60",
+    "name": "The Scottish Arts Club",
+    "location": "EDINBURGH",
+    "country": "United Kingdom",
+    "region": "EDINBURGH",
+    "address": "24 Rutland Square, Edinburgh EH1 2BW",
+    "email": "administrator@scottishartsclub.com",
+    "notes": ""
+  },
+  {
+    "id": "uk61",
+    "name": "Royal Perth Golfing Society & County & City Club",
+    "location": "PERTH",
+    "country": "United Kingdom",
+    "region": "PERTH",
+    "address": "1 Atholl Crescent, Perth PH1 5NG",
+    "email": "secretary@rpgs.org.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk62",
+    "name": "Western Club",
+    "location": "GLASGOW",
+    "country": "United Kingdom",
+    "region": "GLASGOW",
+    "address": "32 Royal Exchange Square, Glasgow G1 3AB",
+    "email": "secretary@westernclub.co.uk",
+    "notes": ""
+  },
+  {
+    "id": "uk63",
+    "name": "St. Rule Club",
+    "location": "ST.",
+    "country": "United Kingdom",
+    "region": "ST. ANDREWS",
+    "address": "12 The Links, St Andrews KY16 9JB",
+    "email": "",
+    "notes": ""
+  },
+  {
+    "id": "uk64",
+    "name": "Cardiff & County Club",
+    "location": "CARDIFF",
+    "country": "United Kingdom",
+    "region": "CARDIFF",
+    "address": "Westgate Street, Cardiff CF10 1DA",
+    "email": "secretary@cardiffandcountyclub.com",
+    "notes": ""
+  }
+]
