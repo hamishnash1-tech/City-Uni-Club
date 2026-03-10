@@ -37,6 +37,40 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchLoiRequests()
+
+    // Set up realtime subscription for new LOI requests
+    const channel = supabase
+      .channel('loi_requests_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'loi_requests'
+        },
+        (payload) => {
+          console.log('🔔 New LOI request received!', payload)
+          // Refresh the list when new request arrives
+          fetchLoiRequests()
+          // Show browser notification if supported
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('New LOI Request', {
+              body: `New Letter of Introduction request submitted`,
+              icon: '/vite.svg'
+            })
+          }
+        }
+      )
+      .subscribe()
+
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
   }, [])
 
   const fetchLoiRequests = async () => {
