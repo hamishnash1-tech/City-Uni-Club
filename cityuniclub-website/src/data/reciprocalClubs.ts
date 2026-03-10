@@ -1,10 +1,12 @@
 // Complete reciprocal clubs list from Reciplist2024.docx - ALL 450+ CLUBS
 export interface Club {
+  id?: string
   name: string
   location: string
   region: string
   country: string
   note?: string
+  contact_email?: string
 }
 
 export const reciprocalClubs: Club[] = [
