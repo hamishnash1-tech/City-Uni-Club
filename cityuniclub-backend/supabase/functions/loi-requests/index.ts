@@ -3,31 +3,52 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-session-token',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-session-token, prefer',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
 async function authenticate(req: Request, supabaseClient: any) {
   // Use custom header instead of Authorization to avoid Supabase JWT validation
-  const sessionToken = req.headers.get('X-Session-Token')
+  const sessionToken = req.headers.get('x-session-token')
 
   if (!sessionToken) {
     return null
   }
 
+  console.log('Validating session token:', sessionToken.substring(0, 8) + '...')
+
   // Check if it's a session token (UUID format)
-  const { data } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from('sessions')
     .select('member_id')
     .eq('token', sessionToken)
     .gt('expires_at', new Date().toISOString())
     .single()
 
+  if (error) {
+    console.error('Session validation error:', error.message)
+    return null
+  }
+
+  console.log('Session valid for member:', data?.member_id)
   return data?.member_id || null
 }
 
 serve(async (req: Request) => {
+  console.log('LOI Request - Method:', req.method)
+  console.log('LOI Request - Headers:', Object.fromEntries(req.headers))
+  
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    console.log('CORS preflight request')
+    return new Response('ok', { headers: corsHeaders, status: 204 })
+  }
+
+  if (req.method !== 'POST') {
+    return new Response(
+      JSON.stringify({ error: 'Method not allowed' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 405 }
+    )
   }
 
   try {
@@ -36,16 +57,18 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
 
-    // Debug: Log headers
-    console.log('Headers:', Object.fromEntries(req.headers))
-
+    console.log('Authenticating request...')
     const member_id = await authenticate(req, supabaseClient)
 
-    console.log('Member ID:', member_id)
-
     if (!member_id) {
-      throw new Error('Unauthorized - no valid session')
+      console.log('Authentication failed')
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized - no valid session' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+      )
     }
+
+    console.log('Authenticated member:', member_id)
 
     const { club_id, arrival_date, departure_date, purpose, special_requests } = await req.json()
 
@@ -200,11 +223,12 @@ serve(async (req: Request) => {
       }
     )
   } catch (error: any) {
+    console.error('LOI request error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: error.message === 'Unauthorized' ? 401 : 400
+        status: error.message === 'Unauthorized - no valid session' ? 401 : 400
       }
     )
   }
