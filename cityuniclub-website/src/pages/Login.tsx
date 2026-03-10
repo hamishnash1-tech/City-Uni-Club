@@ -112,9 +112,10 @@ export const Login: React.FC = () => {
           </button>
 
           <div className="text-center text-sm text-gray-400 bg-white/5 p-4 rounded-lg">
-            <p className="mb-1">🔑 Test Credentials:</p>
-            <p className="mb-1">Email: <strong className="text-cambridge-blue">secretary@cityuniversityclub.co.uk</strong></p>
-            <p>Password: <strong className="text-cambridge-blue">password123</strong></p>
+            <p className="mb-2">🔑 Login with your membership credentials</p>
+            <p className="text-xs">
+              Use the email address registered with your City University Club membership
+            </p>
           </div>
         </div>
       </div>
