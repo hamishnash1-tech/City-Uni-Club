@@ -108,12 +108,11 @@ export const api = {
       special_requests?: string
     }
   ): Promise<any> {
-    const response = await fetch(`${API_BASE}/loi-requests`, {
+    // Use Vercel API route instead of Supabase Edge Function (CORS issues)
+    const response = await fetch('/api/loi-requests', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-        'apikey': SUPABASE_ANON_KEY,
         'x-session-token': token,
       },
       body: JSON.stringify(request),
