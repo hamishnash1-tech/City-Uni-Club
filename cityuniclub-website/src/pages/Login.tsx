@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { loginStart, loginSuccess, loginFailure } from '../slices/authSlice'
+import { api } from '../services/api'
 import { RootState } from '../store'
 
 export const Login: React.FC = () => {
@@ -15,7 +16,7 @@ export const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     console.log('Login attempt:', { email: formData.email, password: formData.password })
     dispatch(loginStart())
 
@@ -25,29 +26,18 @@ export const Login: React.FC = () => {
       return
     }
 
-    if (formData.password !== 'password123') {
-      dispatch(loginFailure('Password must be: password123'))
-      return
-    }
-
     try {
-      // Simulate successful login
-      const memberData = {
-        id: 'demo-user-' + Date.now(),
-        email: formData.email,
-        full_name: formData.email.split('@')[0].replace(/[._]/g, ' ').toUpperCase(),
-        first_name: formData.email.split('@')[0].split('.')[0].toUpperCase(),
-        membership_number: 'CUC-2024-0001',
-        membership_type: 'Full Membership'
-      }
-      
-      console.log('Login successful:', memberData)
-      
-      dispatch(loginSuccess({ 
-        token: 'demo-token-' + Date.now(), 
-        member: memberData 
+      // Call real API
+      console.log('Calling login API...')
+      const response = await api.login(formData.email, formData.password)
+      console.log('Login successful:', response)
+
+      dispatch(loginSuccess({
+        token: response.session.token,
+        member: response.member
       }))
-      
+
+      console.log('Navigating to home...')
       // Navigate to home
       navigate('/home')
     } catch (err: any) {
@@ -122,8 +112,8 @@ export const Login: React.FC = () => {
           </button>
 
           <div className="text-center text-sm text-gray-400 bg-white/5 p-4 rounded-lg">
-            <p className="mb-2">🔑 Demo Login</p>
-            <p className="mb-1">Email: <strong className="text-cambridge-blue">any@email.com</strong></p>
+            <p className="mb-1">🔑 Test Credentials:</p>
+            <p className="mb-1">Email: <strong className="text-cambridge-blue">secretary@cityuniversityclub.co.uk</strong></p>
             <p>Password: <strong className="text-cambridge-blue">password123</strong></p>
           </div>
         </div>
