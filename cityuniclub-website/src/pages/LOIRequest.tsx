@@ -14,8 +14,6 @@ export const LOIRequest: React.FC = () => {
   const [formData, setFormData] = useState({
     arrival_date: '',
     departure_date: '',
-    purpose: 'Business',
-    special_requests: '',
   })
 
   const [isLoading, setIsLoading] = useState(false)
@@ -34,8 +32,8 @@ export const LOIRequest: React.FC = () => {
         club_id: club.id,
         arrival_date: formData.arrival_date,
         departure_date: formData.departure_date,
-        purpose: formData.purpose,
-        special_requests: formData.special_requests || undefined,
+        purpose: 'Business',
+        special_requests: undefined,
       })
       setSuccess(true)
       setTimeout(() => navigate('/reciprocal-clubs'), 2000)
@@ -100,8 +98,8 @@ export const LOIRequest: React.FC = () => {
           {/* Dates */}
           <div className="bg-card-white rounded-xl shadow-lg p-4 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-secondary-text mb-2">
-                Arrival Date
+              <label className="block text-sm font-medium text-oxford-blue mb-2">
+                Arrival Date *
               </label>
               <input
                 type="date"
@@ -113,8 +111,8 @@ export const LOIRequest: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-secondary-text mb-2">
-                Departure Date
+              <label className="block text-sm font-medium text-oxford-blue mb-2">
+                Departure Date *
               </label>
               <input
                 type="date"
@@ -124,43 +122,6 @@ export const LOIRequest: React.FC = () => {
                 required
               />
             </div>
-          </div>
-
-          {/* Purpose */}
-          <div className="bg-card-white rounded-xl shadow-lg p-4">
-            <label className="block text-sm font-medium text-secondary-text mb-3">
-              Purpose of Visit
-            </label>
-            <div className="grid grid-cols-3 gap-2">
-              {['Business', 'Leisure', 'Both'].map((purpose) => (
-                <button
-                  key={purpose}
-                  type="button"
-                  onClick={() => setFormData({ ...formData, purpose })}
-                  className={`py-3 rounded-lg text-sm font-medium transition ${
-                    formData.purpose === purpose
-                      ? 'bg-oxford-blue text-white'
-                      : 'bg-gray-100 text-oxford-blue'
-                  }`}
-                >
-                  {purpose}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Special Requests */}
-          <div className="bg-card-white rounded-xl shadow-lg p-4">
-            <label className="block text-sm font-medium text-secondary-text mb-2">
-              Special Requests (Optional)
-            </label>
-            <textarea
-              value={formData.special_requests}
-              onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-oxford-blue focus:border-transparent"
-              rows={4}
-              placeholder="Dietary requirements, seating preferences, etc."
-            />
           </div>
 
           {/* Info */}
@@ -180,7 +141,7 @@ export const LOIRequest: React.FC = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-gradient-to-r from-oxford-blue to-oxford-blue/80 text-white py-4 rounded-lg font-semibold disabled:opacity-60"
+            className="w-full bg-gradient-to-r from-oxford-blue to-cambridge-blue text-white py-4 rounded-lg font-semibold hover:from-oxford-blue/90 hover:to-cambridge-blue/90 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? 'Submitting...' : 'Submit Request'}
           </button>
