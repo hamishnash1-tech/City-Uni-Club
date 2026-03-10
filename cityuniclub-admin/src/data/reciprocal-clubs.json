@@ -4510,6 +4510,16 @@
     "notes": ""
   },
   {
+    "id": "uk0",
+    "name": "Test Club",
+    "location": "LONDON",
+    "country": "United Kingdom",
+    "region": "LONDON",
+    "address": "42 Crutched Friars, London EC3N 2AP",
+    "email": "anand@cambridgembn.com",
+    "notes": "Test Club - added for testing"
+  },
+  {
     "id": "uk1",
     "name": "Buck's Club",
     "location": "LONDON",
