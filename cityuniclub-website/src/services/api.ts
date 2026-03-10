@@ -1,5 +1,7 @@
 import { EDGE_FUNCTIONS_URL } from './supabase'
 
+// Use Vercel backend API for LOI requests (supports custom session tokens)
+const API_BASE_URL = 'https://city-uni-club-frontend.vercel.app/api'
 const API_BASE = EDGE_FUNCTIONS_URL
 
 export interface Member {
@@ -108,11 +110,11 @@ export const api = {
       special_requests?: string
     }
   ): Promise<any> {
-    const response = await fetch(`${API_BASE}/loi-requests`, {
+    const response = await fetch(`${API_BASE_URL}/loi-requests`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        'X-Session-Token': token,
       },
       body: JSON.stringify(request),
     })

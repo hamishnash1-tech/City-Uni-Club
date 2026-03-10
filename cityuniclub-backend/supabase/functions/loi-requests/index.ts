@@ -3,22 +3,22 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-session-token',
 }
 
 async function authenticate(req: Request, supabaseClient: any) {
-  const authHeader = req.headers.get('Authorization')
+  // Use custom header instead of Authorization to avoid Supabase JWT validation
+  const sessionToken = req.headers.get('X-Session-Token')
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!sessionToken) {
     return null
   }
 
-  const token = authHeader.substring(7)
-
+  // Check if it's a session token (UUID format)
   const { data } = await supabaseClient
     .from('sessions')
     .select('member_id')
-    .eq('token', token)
+    .eq('token', sessionToken)
     .gt('expires_at', new Date().toISOString())
     .single()
 
@@ -36,10 +36,15 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
 
+    // Debug: Log headers
+    console.log('Headers:', Object.fromEntries(req.headers))
+
     const member_id = await authenticate(req, supabaseClient)
 
+    console.log('Member ID:', member_id)
+
     if (!member_id) {
-      throw new Error('Unauthorized')
+      throw new Error('Unauthorized - no valid session')
     }
 
     const { club_id, arrival_date, departure_date, purpose, special_requests } = await req.json()
