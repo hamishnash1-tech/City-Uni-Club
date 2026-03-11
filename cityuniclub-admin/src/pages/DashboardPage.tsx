@@ -37,9 +37,10 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchLoiRequests()
+    fetchDiningReservations()
 
-    // Set up realtime subscription for new LOI requests
-    const channel = supabase
+    // Set up realtime subscription for LOI requests
+    const loiChannel = supabase
       .channel('loi_requests_changes')
       .on(
         'postgres_changes',
@@ -49,16 +50,27 @@ export default function DashboardPage() {
           table: 'loi_requests'
         },
         (payload) => {
-          console.log('🔔 New LOI request received!', payload)
-          // Refresh the list when new request arrives
+          console.log('🔔 New LOI request!', payload)
           fetchLoiRequests()
-          // Show browser notification if supported
-          if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('New LOI Request', {
-              body: `New Letter of Introduction request submitted`,
-              icon: '/vite.svg'
-            })
-          }
+          showNotification('New LOI Request', 'A member submitted a Letter of Introduction request')
+        }
+      )
+      .subscribe()
+
+    // Set up realtime subscription for dining reservations
+    const diningChannel = supabase
+      .channel('dining_reservations_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'dining_reservations'
+        },
+        (payload) => {
+          console.log('🔔 New dining reservation!', payload)
+          fetchDiningReservations()
+          showNotification('New Dining Reservation', 'A member booked a dining reservation')
         }
       )
       .subscribe()
@@ -69,7 +81,8 @@ export default function DashboardPage() {
     }
 
     return () => {
-      supabase.removeChannel(channel)
+      supabase.removeChannel(loiChannel)
+      supabase.removeChannel(diningChannel)
     }
   }, [])
 
@@ -132,9 +145,37 @@ export default function DashboardPage() {
       .from('loi_requests')
       .update({ status: 'rejected' })
       .eq('id', id)
-    
+
     if (!error) {
       fetchLoiRequests()
+    }
+  }
+
+  const fetchDiningReservations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('dining_reservations')
+        .select(`
+          *,
+          members (full_name, email)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(10)
+
+      if (error) throw error
+      // Can add state management for dining reservations here
+      console.log('Dining reservations:', data)
+    } catch (error) {
+      console.error('Error fetching dining reservations:', error)
+    }
+  }
+
+  const showNotification = (title: string, body: string) => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, {
+        body,
+        icon: '/vite.svg'
+      })
     }
   }
 
