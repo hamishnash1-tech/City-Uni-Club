@@ -16,7 +16,10 @@ import {
   Button
 } from '@mui/material'
 import BusinessIcon from '@mui/icons-material/Business'
-import { supabase } from '../services/supabase'
+import { supabase, FUNCTIONS_URL } from '../services/supabase'
+import { useAuth } from '../context/AuthContext'
+
+const ADMIN_LOI_URL = `${FUNCTIONS_URL}/admin-loi`
 
 interface LOIRequest {
   id: string
@@ -31,6 +34,7 @@ interface LOIRequest {
 }
 
 export default function DashboardPage() {
+  const { sessionToken } = useAuth()
   const [loiRequests, setLoiRequests] = useState<LOIRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [newCount, setNewCount] = useState(0)
@@ -75,22 +79,13 @@ export default function DashboardPage() {
 
   const fetchLoiRequests = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      const res = await fetch(ADMIN_LOI_URL, {
+        headers: { 'Authorization': `Bearer ${sessionToken}` }
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
 
-      const { data, error } = await supabase
-        .from('loi_requests')
-        .select(`
-          *,
-          members (full_name, email),
-          reciprocal_clubs (name)
-        `)
-        .order('created_at', { ascending: false })
-        .limit(10)
-
-      if (error) throw error
-
-      const requests: LOIRequest[] = (data || []).map(req => ({
+      const requests: LOIRequest[] = (data.requests || []).slice(0, 10).map((req: any) => ({
         id: req.id,
         member_name: req.members?.full_name || 'Unknown',
         member_email: req.members?.email || '',
@@ -103,12 +98,10 @@ export default function DashboardPage() {
       }))
 
       setLoiRequests(requests)
-      
-      // Count new requests (last 7 days)
+
       const weekAgo = new Date()
       weekAgo.setDate(weekAgo.getDate() - 7)
-      const newRequests = requests.filter(r => new Date(r.created_at) > weekAgo)
-      setNewCount(newRequests.length)
+      setNewCount(requests.filter(r => new Date(r.created_at) > weekAgo).length)
     } catch (error) {
       console.error('Error fetching LOI requests:', error)
     } finally {
@@ -117,25 +110,21 @@ export default function DashboardPage() {
   }
 
   const handleApprove = async (id: string) => {
-    const { error } = await supabase
-      .from('loi_requests')
-      .update({ status: 'approved' })
-      .eq('id', id)
-    
-    if (!error) {
-      fetchLoiRequests()
-    }
+    await fetch(ADMIN_LOI_URL, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionToken}` },
+      body: JSON.stringify({ id, status: 'approved' })
+    })
+    fetchLoiRequests()
   }
 
   const handleReject = async (id: string) => {
-    const { error } = await supabase
-      .from('loi_requests')
-      .update({ status: 'rejected' })
-      .eq('id', id)
-    
-    if (!error) {
-      fetchLoiRequests()
-    }
+    await fetch(ADMIN_LOI_URL, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionToken}` },
+      body: JSON.stringify({ id, status: 'rejected' })
+    })
+    fetchLoiRequests()
   }
 
   return (

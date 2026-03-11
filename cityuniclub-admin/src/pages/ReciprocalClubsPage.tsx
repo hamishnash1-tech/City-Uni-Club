@@ -1,5 +1,7 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import reciprocalClubsData from '../data/reciprocal-clubs.json'
+import { useAuth } from '../context/AuthContext'
+import { FUNCTIONS_URL } from '../services/supabase'
 import {
   Box,
   Container,
@@ -62,48 +64,10 @@ interface LoiRequest {
   email_sent: boolean
 }
 
-// Mock LOI requests (members request these via the member app)
-const mockLoiRequests: LoiRequest[] = [
-  {
-    id: 'l1',
-    member_name: 'Stephen Rayner',
-    member_email: 'stephen@example.com',
-    club_name: "Buck's Club",
-    club_region: 'LONDON',
-    arrival_date: '2025-04-15',
-    departure_date: '2025-04-17',
-    purpose: 'Business meetings in London',
-    created_at: '2025-03-01',
-    email_sent: true
-  },
-  {
-    id: 'l2',
-    member_name: 'John Smith',
-    member_email: 'john@example.com',
-    club_name: 'The Melbourne Club',
-    club_region: 'AUSTRALIA',
-    arrival_date: '2025-05-10',
-    departure_date: '2025-05-20',
-    purpose: 'Family vacation',
-    created_at: '2025-03-05',
-    email_sent: true
-  },
-  {
-    id: 'l3',
-    member_name: 'Jane Doe',
-    member_email: 'jane@example.com',
-    club_name: 'The National Club',
-    club_region: 'CANADA',
-    arrival_date: '2025-06-01',
-    purpose: 'Conference attendance',
-    created_at: '2025-03-06',
-    email_sent: true
-  }
-]
-
 export default function ReciprocalClubsPage() {
+  const { sessionToken } = useAuth()
   const [clubs, setClubs] = useState<ReciprocalClub[]>(reciprocalClubsData)
-  const [requests] = useState<LoiRequest[]>(mockLoiRequests)
+  const [requests, setRequests] = useState<LoiRequest[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [regionFilter, setRegionFilter] = useState<string>('all')
   const [openHistoryDialog, setOpenHistoryDialog] = useState(false)
@@ -113,6 +77,26 @@ export default function ReciprocalClubsPage() {
   const [success, setSuccess] = useState('')
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(25)
+
+  useEffect(() => {
+    fetch(`${FUNCTIONS_URL}/admin-loi`, {
+      headers: { 'Authorization': `Bearer ${sessionToken}` }
+    })
+      .then(r => r.json())
+      .then(data => setRequests((data.requests || []).map((r: any) => ({
+        id: r.id,
+        member_name: r.members?.full_name || 'Unknown',
+        member_email: r.members?.email || '',
+        club_name: r.reciprocal_clubs?.name || '',
+        club_region: r.reciprocal_clubs?.region || '',
+        arrival_date: r.arrival_date,
+        departure_date: r.departure_date,
+        purpose: r.purpose,
+        created_at: r.created_at,
+        email_sent: r.status === 'sent'
+      }))))
+      .catch(console.error)
+  }, [sessionToken])
 
   // Get unique regions for filter
   const regions = useMemo(() => {
