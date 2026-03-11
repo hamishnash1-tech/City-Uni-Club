@@ -1,5 +1,7 @@
-import { EDGE_FUNCTIONS_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY } from './supabase'
+import { EDGE_FUNCTIONS_URL, SUPABASE_ANON_KEY } from './supabase'
 
+// Use new edge function with proper CORS
+const LOI_API_URL = 'https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/loi-api'
 const API_BASE = EDGE_FUNCTIONS_URL
 
 export interface Member {
@@ -108,8 +110,8 @@ export const api = {
       special_requests?: string
     }
   ): Promise<any> {
-    // Use Vercel API route instead of Supabase Edge Function (CORS issues)
-    const response = await fetch('/api/loi-requests', {
+    // Use deployed Vercel backend API (not Supabase Edge Function due to CORS)
+    const response = await fetch(LOI_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
