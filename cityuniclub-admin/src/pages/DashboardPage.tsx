@@ -72,6 +72,12 @@ export default function DashboardPage() {
 
   const getToken = () => sessionToken || localStorage.getItem('admin_token')
 
+  const showNotification = (title: string, body: string) => {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, { body, icon: '/vite.svg' })
+    }
+  }
+
   const fetchLoiRequests = async () => {
     try {
       const res = await fetch(ADMIN_LOI_URL, {
@@ -123,13 +129,19 @@ export default function DashboardPage() {
     fetchLoiRequests()
     fetchTodayStats()
 
-    const channel = supabase
+    const loiChannel = supabase
       .channel('loi_requests_changes')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'loi_requests' }, () => {
         fetchLoiRequests()
-        if ('Notification' in window && Notification.permission === 'granted') {
-          new Notification('New LOI Request', { body: 'New Letter of Introduction request submitted', icon: '/vite.svg' })
-        }
+        showNotification('New LOI Request', 'A member submitted a Letter of Introduction request')
+      })
+      .subscribe()
+
+    const diningChannel = supabase
+      .channel('dining_reservations_changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dining_reservations' }, () => {
+        fetchTodayStats()
+        showNotification('New Dining Reservation', 'A new dining reservation was submitted')
       })
       .subscribe()
 
@@ -137,7 +149,10 @@ export default function DashboardPage() {
       Notification.requestPermission()
     }
 
-    return () => { supabase.removeChannel(channel) }
+    return () => {
+      supabase.removeChannel(loiChannel)
+      supabase.removeChannel(diningChannel)
+    }
   }, [])
 
   const handleApprove = async (id: string) => {
@@ -181,7 +196,6 @@ export default function DashboardPage() {
 
       {/* Stat Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        {/* LOI Requests */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
@@ -200,7 +214,6 @@ export default function DashboardPage() {
           </Card>
         </Grid>
 
-        {/* Today Dining */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
@@ -220,7 +233,6 @@ export default function DashboardPage() {
           </Card>
         </Grid>
 
-        {/* Today Events */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
@@ -238,12 +250,9 @@ export default function DashboardPage() {
       </Grid>
 
       {/* Today's Activity */}
-      <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>
-        Today — {todayStr}
-      </Typography>
+      <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>Today — {todayStr}</Typography>
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        {/* Today's Dining */}
         <Grid size={{ xs: 12, md: 6 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
@@ -261,7 +270,7 @@ export default function DashboardPage() {
                     <TableHead>
                       <TableRow>
                         <TableCell>Time</TableCell>
-                        <TableCell>Member</TableCell>
+                        <TableCell>Name</TableCell>
                         <TableCell>Meal</TableCell>
                         <TableCell>Guests</TableCell>
                         <TableCell>Status</TableCell>
@@ -301,7 +310,6 @@ export default function DashboardPage() {
           </Card>
         </Grid>
 
-        {/* Today's Events */}
         <Grid size={{ xs: 12, md: 6 }}>
           <Card sx={{ height: '100%' }}>
             <CardContent>
@@ -322,9 +330,7 @@ export default function DashboardPage() {
                           <Typography variant="body1" fontWeight={500}>{event.title}</Typography>
                           <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
                             <Chip label={eventTypeLabel(event.event_type)} size="small" variant="outlined" />
-                            {event.price_per_person && (
-                              <Chip label={`£${event.price_per_person}`} size="small" variant="outlined" />
-                            )}
+                            {event.price_per_person && <Chip label={`£${event.price_per_person}`} size="small" variant="outlined" />}
                             {event.is_tba && <Chip label="TBA" size="small" color="warning" />}
                           </Box>
                         </Box>
