@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import {
   Box,
   Container,
@@ -21,7 +21,8 @@ import {
   Button,
   Chip,
   Divider,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material'
 import RestaurantIcon from '@mui/icons-material/Restaurant'
 import CoffeeIcon from '@mui/icons-material/Coffee'
@@ -31,38 +32,43 @@ import MailIcon from '@mui/icons-material/Mail'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import CloseIcon from '@mui/icons-material/Close'
 import PersonIcon from '@mui/icons-material/Person'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import CancelIcon from '@mui/icons-material/Cancel'
+import { useAuth } from '../context/AuthContext'
+import { FUNCTIONS_URL } from '../services/supabase'
 
 interface DiningReservation {
   id: string
   member_id: string | null
-  member_name?: string
-  member_email?: string
-  guest_name: string
-  guest_email?: string
-  guest_count: number
   reservation_date: string
   reservation_time: string
-  meal_type: 'breakfast' | 'lunch'
+  meal_type: 'Breakfast' | 'Lunch'
+  guest_count: number
   table_preference?: string
   special_requests?: string
-  status: 'pending' | 'confirmed' | 'cancelled'
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed' | 'no_show'
   created_at: string
+  guest_name?: string | null
+  guest_email?: string | null
+  members?: {
+    full_name: string
+    email: string
+    membership_number: string
+  } | null
 }
 
 // Club opening days (Tuesday=2, Wednesday=3, Thursday=4, Friday=5)
 const OPENING_DAYS = [2, 3, 4, 5]
 const OPENING_DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
-// Generate next 30 days of available dates
 const generateAvailableDates = () => {
   const dates = []
   const today = new Date()
-  
+
   for (let i = 0; i < 30; i++) {
     const date = new Date(today)
     date.setDate(today.getDate() + i)
-    
-    // Only include Tuesday-Friday
+
     if (OPENING_DAYS.includes(date.getDay())) {
       dates.push({
         date: date.toISOString().split('T')[0],
@@ -76,104 +82,93 @@ const generateAvailableDates = () => {
       })
     }
   }
-  
+
   return dates
 }
 
-// Mock reservations data
-const mockReservations: DiningReservation[] = [
-  {
-    id: 'r1',
-    member_id: 'stephen@example.com',
-    member_name: 'Stephen Rayner',
-    member_email: 'stephen@example.com',
-    guest_name: 'Stephen Rayner',
-    guest_email: 'stephen@example.com',
-    guest_count: 2,
-    reservation_date: new Date().toISOString().split('T')[0],
-    reservation_time: '12:30',
-    meal_type: 'lunch',
-    status: 'confirmed',
-    created_at: '2025-03-01',
-    special_requests: 'Window table preferred'
-  },
-  {
-    id: 'r2',
-    member_id: 'john@example.com',
-    member_name: 'John Smith',
-    member_email: 'john@example.com',
-    guest_name: 'John Smith',
-    guest_email: 'john@example.com',
-    guest_count: 1,
-    reservation_date: new Date().toISOString().split('T')[0],
-    reservation_time: '09:00',
-    meal_type: 'breakfast',
-    status: 'confirmed',
-    created_at: '2025-03-02'
-  },
-  {
-    id: 'r3',
-    member_id: null,
-    guest_name: 'Alice Johnson',
-    guest_email: 'alice.johnson@gmail.com',
-    guest_count: 4,
-    reservation_date: new Date().toISOString().split('T')[0],
-    reservation_time: '13:00',
-    meal_type: 'lunch',
-    status: 'pending',
-    created_at: '2025-03-03',
-    special_requests: 'Vegetarian options needed'
-  },
-  {
-    id: 'r4',
-    member_id: null,
-    guest_name: 'Bob Williams',
-    guest_email: 'bob.williams@yahoo.com',
-    guest_count: 2,
-    reservation_date: new Date().toISOString().split('T')[0],
-    reservation_time: '12:00',
-    meal_type: 'lunch',
-    status: 'confirmed',
-    created_at: '2025-03-04'
-  }
-]
-
 export default function DiningPage() {
-  const [reservations] = useState<DiningReservation[]>(mockReservations)
+  const { sessionToken } = useAuth()
+  const [reservations, setReservations] = useState<DiningReservation[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<string | null>(null)
   const [openDayDialog, setOpenDayDialog] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null)
+  const [statusMessage, setStatusMessage] = useState<string | null>(null)
 
   const availableDates = useMemo(() => generateAvailableDates(), [])
 
-  // Group reservations by date
+  const getAuthHeaders = () => ({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${sessionToken || localStorage.getItem('admin_token')}`
+  })
+
+  const fetchReservations = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const from = availableDates[0]?.date
+      const to = availableDates[availableDates.length - 1]?.date
+      const params = from && to ? `?from=${from}&to=${to}` : ''
+      const res = await fetch(`${FUNCTIONS_URL}/admin-dining${params}`, {
+        headers: getAuthHeaders()
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to fetch reservations')
+      }
+      const data = await res.json()
+      setReservations(data.reservations || [])
+    } catch (e: any) {
+      setError(e.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [availableDates, sessionToken])
+
+  useEffect(() => {
+    fetchReservations()
+  }, [fetchReservations])
+
+  const handleUpdateStatus = async (id: string, status: string) => {
+    try {
+      const res = await fetch(`${FUNCTIONS_URL}/admin-dining`, {
+        method: 'PATCH',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ id, status })
+      })
+      if (!res.ok) {
+        const err = await res.json()
+        throw new Error(err.error || 'Failed to update status')
+      }
+      setReservations(prev => prev.map(r => r.id === id ? { ...r, status: status as DiningReservation['status'] } : r))
+      setStatusMessage(`Reservation ${status}`)
+      setTimeout(() => setStatusMessage(null), 3000)
+    } catch (e: any) {
+      setError(e.message)
+    }
+  }
+
   const reservationsByDate = useMemo(() => {
     const grouped: Record<string, DiningReservation[]> = {}
-    
     reservations.forEach(res => {
-      if (!grouped[res.reservation_date]) {
-        grouped[res.reservation_date] = []
-      }
+      if (!grouped[res.reservation_date]) grouped[res.reservation_date] = []
       grouped[res.reservation_date].push(res)
     })
-    
     return grouped
   }, [reservations])
 
-  // Calculate stats for each date
   const dateStats = useMemo(() => {
     const stats: Record<string, { totalBookings: number; totalGuests: number; breakfast: number; lunch: number }> = {}
-    
     availableDates.forEach(({ date }) => {
       const dateReservations = reservationsByDate[date] || []
       stats[date] = {
         totalBookings: dateReservations.length,
         totalGuests: dateReservations.reduce((sum, r) => sum + r.guest_count, 0),
-        breakfast: dateReservations.filter(r => r.meal_type === 'breakfast').length,
-        lunch: dateReservations.filter(r => r.meal_type === 'lunch').length
+        breakfast: dateReservations.filter(r => r.meal_type === 'Breakfast').length,
+        lunch: dateReservations.filter(r => r.meal_type === 'Lunch').length
       }
     })
-    
     return stats
   }, [availableDates, reservationsByDate])
 
@@ -194,15 +189,21 @@ export default function DiningPage() {
   }
 
   const getMealTypeIcon = (type: string) => {
-    return type === 'breakfast' ? <CoffeeIcon fontSize="small" /> : <LunchDiningIcon fontSize="small" />
-  }
-
-  const getMealTypeLabel = (type: string) => {
-    return type === 'breakfast' ? 'Breakfast' : 'Lunch'
+    return type === 'Breakfast' ? <CoffeeIcon fontSize="small" /> : <LunchDiningIcon fontSize="small" />
   }
 
   const getMealTypeColor = (type: string) => {
-    return type === 'breakfast' ? 'default' : 'primary'
+    return type === 'Breakfast' ? 'default' : 'primary'
+  }
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'confirmed': return 'success'
+      case 'cancelled': return 'error'
+      case 'completed': return 'info'
+      case 'no_show': return 'error'
+      default: return 'warning'
+    }
   }
 
   const formatTime = (timeString: string) => {
@@ -215,14 +216,19 @@ export default function DiningPage() {
 
   const selectedDateReservations = selectedDate ? (reservationsByDate[selectedDate] || []) : []
   const selectedDateInfo = availableDates.find(d => d.date === selectedDate)
-  
-  // Separate members and non-members
   const memberReservations = selectedDateReservations.filter(r => r.member_id !== null)
   const nonMemberReservations = selectedDateReservations.filter(r => r.member_id === null)
 
+  if (loading) {
+    return (
+      <Container maxWidth="lg" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+        <CircularProgress />
+      </Container>
+    )
+  }
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      {/* Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" gutterBottom>
           Dining Reservations
@@ -232,12 +238,17 @@ export default function DiningPage() {
         </Typography>
       </Box>
 
-      {/* Available Dates Grid */}
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }} onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+
       <Grid container spacing={3}>
         {availableDates.map(({ date, dayName, fullDate, weekday }) => {
           const stats = dateStats[date]
           const hasBookings = stats.totalBookings > 0
-          
+
           return (
             <Grid size={{ xs: 12, sm: 6, md: 3 }} key={date}>
               <Card
@@ -332,22 +343,12 @@ export default function DiningPage() {
         })}
       </Grid>
 
-      {/* Day Detail Dialog */}
-      <Dialog
-        open={openDayDialog}
-        onClose={handleCloseDayDialog}
-        maxWidth="md"
-        fullWidth
-      >
+      <Dialog open={openDayDialog} onClose={handleCloseDayDialog} maxWidth="md" fullWidth>
         <DialogTitle>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box>
-              <Typography variant="h6">
-                {selectedDateInfo?.dayName}
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                {selectedDateInfo?.fullDate}
-              </Typography>
+              <Typography variant="h6">{selectedDateInfo?.dayName}</Typography>
+              <Typography variant="body2" color="textSecondary">{selectedDateInfo?.fullDate}</Typography>
             </Box>
             <IconButton onClick={handleCloseDayDialog}>
               <CloseIcon />
@@ -364,15 +365,12 @@ export default function DiningPage() {
             </Box>
           ) : (
             <Box>
-              {/* Member Bookings Section */}
+              {/* Member Bookings */}
               <Box sx={{ mb: 4 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                   <PersonIcon color="primary" />
-                  <Typography variant="h6">
-                    Member Bookings ({memberReservations.length})
-                  </Typography>
+                  <Typography variant="h6">Member Bookings ({memberReservations.length})</Typography>
                 </Box>
-                
                 {memberReservations.length === 0 ? (
                   <Typography variant="body2" color="textSecondary" sx={{ py: 2 }}>
                     No member bookings for this day
@@ -389,6 +387,7 @@ export default function DiningPage() {
                           <TableCell>Guests</TableCell>
                           <TableCell>Table</TableCell>
                           <TableCell>Status</TableCell>
+                          <TableCell>Actions</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -404,42 +403,54 @@ export default function DiningPage() {
                               </TableCell>
                               <TableCell>
                                 <Typography variant="body2" fontWeight={500}>
-                                  {reservation.member_name}
+                                  {reservation.members?.full_name || '—'}
                                 </Typography>
                               </TableCell>
                               <TableCell>
-                                {reservation.member_email ? (
-                                  <a href={`mailto:${reservation.member_email}`} style={{ textDecoration: 'none' }}>
+                                {reservation.members?.email ? (
+                                  <a href={`mailto:${reservation.members.email}`} style={{ textDecoration: 'none' }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                       <MailIcon fontSize="small" color="action" />
                                       <Typography variant="caption" color="textSecondary">
-                                        {reservation.member_email}
+                                        {reservation.members.email}
                                       </Typography>
                                     </Box>
                                   </a>
-                                ) : (
-                                  '-'
-                                )}
+                                ) : '—'}
                               </TableCell>
                               <TableCell>
                                 <Chip
-                                  label={getMealTypeLabel(reservation.meal_type)}
+                                  label={reservation.meal_type}
                                   size="small"
-                                  color={getMealTypeColor(reservation.meal_type)}
+                                  color={getMealTypeColor(reservation.meal_type) as any}
                                 />
                               </TableCell>
                               <TableCell>{reservation.guest_count}</TableCell>
                               <TableCell>
                                 <Typography variant="body2" sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  {reservation.table_preference || '-'}
+                                  {reservation.table_preference || '—'}
                                 </Typography>
                               </TableCell>
                               <TableCell>
                                 <Chip
                                   label={reservation.status}
                                   size="small"
-                                  color={reservation.status === 'confirmed' ? 'success' : 'warning'}
+                                  color={getStatusColor(reservation.status) as any}
                                 />
+                              </TableCell>
+                              <TableCell>
+                                <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                  {reservation.status === 'pending' && (
+                                    <IconButton size="small" color="success" onClick={() => handleUpdateStatus(reservation.id, 'confirmed')} title="Confirm">
+                                      <CheckCircleIcon fontSize="small" />
+                                    </IconButton>
+                                  )}
+                                  {(reservation.status === 'pending' || reservation.status === 'confirmed') && (
+                                    <IconButton size="small" color="error" onClick={() => handleUpdateStatus(reservation.id, 'cancelled')} title="Cancel">
+                                      <CancelIcon fontSize="small" />
+                                    </IconButton>
+                                  )}
+                                </Box>
                               </TableCell>
                             </TableRow>
                           ))}
@@ -449,15 +460,12 @@ export default function DiningPage() {
                 )}
               </Box>
 
-              {/* Non-Member Bookings Section */}
+              {/* Non-Member Bookings */}
               <Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                   <MailIcon color="secondary" />
-                  <Typography variant="h6">
-                    Non-Member Bookings ({nonMemberReservations.length})
-                  </Typography>
+                  <Typography variant="h6">Non-Member Bookings ({nonMemberReservations.length})</Typography>
                 </Box>
-                
                 {nonMemberReservations.length === 0 ? (
                   <Typography variant="body2" color="textSecondary" sx={{ py: 2 }}>
                     No non-member bookings for this day
@@ -469,12 +477,11 @@ export default function DiningPage() {
                         <TableRow>
                           <TableCell>Time</TableCell>
                           <TableCell>Guest</TableCell>
-                          <TableCell>Email</TableCell>
                           <TableCell>Meal</TableCell>
                           <TableCell>Guests</TableCell>
                           <TableCell>Special Requests</TableCell>
                           <TableCell>Status</TableCell>
-                          <TableCell>Copy Email</TableCell>
+                          <TableCell>Actions</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -489,54 +496,51 @@ export default function DiningPage() {
                                 </Box>
                               </TableCell>
                               <TableCell>
-                                <Typography variant="body2" fontWeight={500}>
-                                  {reservation.guest_name}
-                                </Typography>
-                              </TableCell>
-                              <TableCell>
-                                {reservation.guest_email ? (
-                                  <a href={`mailto:${reservation.guest_email}`} style={{ textDecoration: 'none' }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                      <MailIcon fontSize="small" color="action" />
-                                      <Typography variant="caption" color="textSecondary">
-                                        {reservation.guest_email}
-                                      </Typography>
-                                    </Box>
-                                  </a>
-                                ) : (
-                                  '-'
+                                <Typography variant="body2" fontWeight={500}>{reservation.guest_name || '—'}</Typography>
+                                {reservation.guest_email && (
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                    <a href={`mailto:${reservation.guest_email}`} style={{ textDecoration: 'none' }}>
+                                      <Typography variant="caption" color="textSecondary">{reservation.guest_email}</Typography>
+                                    </a>
+                                    <IconButton size="small" onClick={() => handleCopyEmail(reservation.guest_email!)} title="Copy email">
+                                      <ContentCopyIcon sx={{ fontSize: 12 }} />
+                                    </IconButton>
+                                  </Box>
                                 )}
                               </TableCell>
                               <TableCell>
                                 <Chip
-                                  label={getMealTypeLabel(reservation.meal_type)}
+                                  label={reservation.meal_type}
                                   size="small"
-                                  color={getMealTypeColor(reservation.meal_type)}
+                                  color={getMealTypeColor(reservation.meal_type) as any}
                                 />
                               </TableCell>
                               <TableCell>{reservation.guest_count}</TableCell>
                               <TableCell>
                                 <Typography variant="body2" sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  {reservation.special_requests || '-'}
+                                  {reservation.special_requests || '—'}
                                 </Typography>
                               </TableCell>
                               <TableCell>
                                 <Chip
                                   label={reservation.status}
                                   size="small"
-                                  color={reservation.status === 'confirmed' ? 'success' : 'warning'}
+                                  color={getStatusColor(reservation.status) as any}
                                 />
                               </TableCell>
                               <TableCell>
-                                {reservation.guest_email && (
-                                  <IconButton
-                                    size="small"
-                                    onClick={() => handleCopyEmail(reservation.guest_email!)}
-                                    title="Copy email address"
-                                  >
-                                    <ContentCopyIcon fontSize="small" />
-                                  </IconButton>
-                                )}
+                                <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                  {reservation.status === 'pending' && (
+                                    <IconButton size="small" color="success" onClick={() => handleUpdateStatus(reservation.id, 'confirmed')} title="Confirm">
+                                      <CheckCircleIcon fontSize="small" />
+                                    </IconButton>
+                                  )}
+                                  {(reservation.status === 'pending' || reservation.status === 'confirmed') && (
+                                    <IconButton size="small" color="error" onClick={() => handleUpdateStatus(reservation.id, 'cancelled')} title="Cancel">
+                                      <CancelIcon fontSize="small" />
+                                    </IconButton>
+                                  )}
+                                </Box>
                               </TableCell>
                             </TableRow>
                           ))}
@@ -553,19 +557,15 @@ export default function DiningPage() {
         </DialogActions>
       </Dialog>
 
-      {/* Toast notification for copied email */}
       {copiedEmail && (
-        <Alert
-          severity="success"
-          sx={{
-            position: 'fixed',
-            bottom: 24,
-            right: 24,
-            zIndex: 9999
-          }}
-          onClose={() => setCopiedEmail(null)}
-        >
+        <Alert severity="success" sx={{ position: 'fixed', bottom: 24, right: 24, zIndex: 9999 }} onClose={() => setCopiedEmail(null)}>
           Email copied to clipboard!
+        </Alert>
+      )}
+
+      {statusMessage && (
+        <Alert severity="success" sx={{ position: 'fixed', bottom: copiedEmail ? 80 : 24, right: 24, zIndex: 9999 }} onClose={() => setStatusMessage(null)}>
+          {statusMessage}
         </Alert>
       )}
     </Container>

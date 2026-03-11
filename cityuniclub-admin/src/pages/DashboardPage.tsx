@@ -13,13 +13,18 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Button
+  Button,
+  Divider
 } from '@mui/material'
 import BusinessIcon from '@mui/icons-material/Business'
+import RestaurantIcon from '@mui/icons-material/Restaurant'
+import EventIcon from '@mui/icons-material/Event'
+import PeopleIcon from '@mui/icons-material/People'
 import { supabase, FUNCTIONS_URL } from '../services/supabase'
 import { useAuth } from '../context/AuthContext'
 
 const ADMIN_LOI_URL = `${FUNCTIONS_URL}/admin-loi`
+const ADMIN_DASHBOARD_URL = `${FUNCTIONS_URL}/admin-dashboard`
 
 interface LOIRequest {
   id: string
@@ -33,54 +38,44 @@ interface LOIRequest {
   created_at: string
 }
 
+interface DiningReservation {
+  id: string
+  meal_type: 'Breakfast' | 'Lunch'
+  guest_count: number
+  reservation_time: string
+  status: string
+  guest_name?: string | null
+  guest_email?: string | null
+  members?: { full_name: string; email: string } | null
+}
+
+interface TodayEvent {
+  id: string
+  title: string
+  event_type: string
+  price_per_person: number | null
+  is_tba: boolean
+  booking_count: number
+  total_guests: number
+}
+
 export default function DashboardPage() {
   const { sessionToken } = useAuth()
+
   const [loiRequests, setLoiRequests] = useState<LOIRequest[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loiLoading, setLoiLoading] = useState(true)
   const [newCount, setNewCount] = useState(0)
 
-  useEffect(() => {
-    fetchLoiRequests()
+  const [todayDining, setTodayDining] = useState<DiningReservation[]>([])
+  const [todayEvents, setTodayEvents] = useState<TodayEvent[]>([])
+  const [todayLoading, setTodayLoading] = useState(true)
 
-    // Set up realtime subscription for new LOI requests
-    const channel = supabase
-      .channel('loi_requests_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'loi_requests'
-        },
-        (payload) => {
-          console.log('🔔 New LOI request received!', payload)
-          // Refresh the list when new request arrives
-          fetchLoiRequests()
-          // Show browser notification if supported
-          if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('New LOI Request', {
-              body: `New Letter of Introduction request submitted`,
-              icon: '/vite.svg'
-            })
-          }
-        }
-      )
-      .subscribe()
-
-    // Request notification permission
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission()
-    }
-
-    return () => {
-      supabase.removeChannel(channel)
-    }
-  }, [])
+  const getToken = () => sessionToken || localStorage.getItem('admin_token')
 
   const fetchLoiRequests = async () => {
     try {
       const res = await fetch(ADMIN_LOI_URL, {
-        headers: { 'Authorization': `Bearer ${sessionToken}` }
+        headers: { 'Authorization': `Bearer ${getToken()}` }
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
@@ -98,21 +93,57 @@ export default function DashboardPage() {
       }))
 
       setLoiRequests(requests)
-
       const weekAgo = new Date()
       weekAgo.setDate(weekAgo.getDate() - 7)
       setNewCount(requests.filter(r => new Date(r.created_at) > weekAgo).length)
     } catch (error) {
       console.error('Error fetching LOI requests:', error)
     } finally {
-      setLoading(false)
+      setLoiLoading(false)
     }
   }
+
+  const fetchTodayStats = async () => {
+    try {
+      const res = await fetch(ADMIN_DASHBOARD_URL, {
+        headers: { 'Authorization': `Bearer ${getToken()}` }
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      setTodayDining(data.dining || [])
+      setTodayEvents(data.events || [])
+    } catch (error) {
+      console.error('Error fetching today stats:', error)
+    } finally {
+      setTodayLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchLoiRequests()
+    fetchTodayStats()
+
+    const channel = supabase
+      .channel('loi_requests_changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'loi_requests' }, () => {
+        fetchLoiRequests()
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('New LOI Request', { body: 'New Letter of Introduction request submitted', icon: '/vite.svg' })
+        }
+      })
+      .subscribe()
+
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+
+    return () => { supabase.removeChannel(channel) }
+  }, [])
 
   const handleApprove = async (id: string) => {
     await fetch(ADMIN_LOI_URL, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionToken}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: JSON.stringify({ id, status: 'approved' })
     })
     fetchLoiRequests()
@@ -121,51 +152,192 @@ export default function DashboardPage() {
   const handleReject = async (id: string) => {
     await fetch(ADMIN_LOI_URL, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${sessionToken}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: JSON.stringify({ id, status: 'rejected' })
     })
     fetchLoiRequests()
   }
 
+  const todayStr = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+  const totalDiningGuests = todayDining.reduce((sum, r) => sum + r.guest_count, 0)
+  const breakfastCount = todayDining.filter(r => r.meal_type === 'Breakfast').length
+  const lunchCount = todayDining.filter(r => r.meal_type === 'Lunch').length
+
+  const formatTime = (t: string) => {
+    const [h, m] = t.split(':')
+    const hour = parseInt(h)
+    return `${hour > 12 ? hour - 12 : hour}:${m} ${hour >= 12 ? 'PM' : 'AM'}`
+  }
+
+  const eventTypeLabel = (type: string) => {
+    const map: Record<string, string> = { lunch: 'Lunch', dinner: 'Dinner', lunch_dinner: 'Lunch & Dinner', meeting: 'Meeting', special: 'Special' }
+    return map[type] || type
+  }
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Dashboard
-      </Typography>
-      <Typography variant="body2" color="textSecondary" sx={{ mb: 4 }}>
-        Overview of club activity
-      </Typography>
+      <Typography variant="h4" gutterBottom>Dashboard</Typography>
+      <Typography variant="body2" color="textSecondary" sx={{ mb: 4 }}>Overview of club activity</Typography>
 
-      <Grid container spacing={3}>
-        {/* LOI Requests Card */}
+      {/* Stat Cards */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        {/* LOI Requests */}
         <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-          <Card
-            sx={{
-              height: '100%',
-              position: 'relative'
-            }}
-          >
+          <Card sx={{ height: '100%' }}>
             <CardContent>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                 <BusinessIcon color="primary" sx={{ fontSize: 32 }} />
                 <Typography variant="h6">LOI Requests</Typography>
               </Box>
-
-              <Typography variant="h3" sx={{ mb: 1 }}>
-                {loading ? '-' : loiRequests.length}
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                Total requests
-              </Typography>
-
+              <Typography variant="h3" sx={{ mb: 1 }}>{loiLoading ? '—' : loiRequests.length}</Typography>
+              <Typography variant="body2" color="textSecondary">Total requests</Typography>
               {newCount > 0 && (
                 <Box sx={{ mt: 2 }}>
-                  <Chip
-                    label={`${newCount} new`}
-                    color="error"
-                    size="small"
-                    sx={{ fontWeight: 'bold' }}
-                  />
+                  <Chip label={`${newCount} new this week`} color="error" size="small" sx={{ fontWeight: 'bold' }} />
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Today Dining */}
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <RestaurantIcon color="primary" sx={{ fontSize: 32 }} />
+                <Typography variant="h6">Dining Today</Typography>
+              </Box>
+              <Typography variant="h3" sx={{ mb: 1 }}>{todayLoading ? '—' : todayDining.length}</Typography>
+              <Typography variant="body2" color="textSecondary">{totalDiningGuests} guests total</Typography>
+              {!todayLoading && todayDining.length > 0 && (
+                <Box sx={{ mt: 1, display: 'flex', gap: 1 }}>
+                  {breakfastCount > 0 && <Chip label={`${breakfastCount} breakfast`} size="small" variant="outlined" />}
+                  {lunchCount > 0 && <Chip label={`${lunchCount} lunch`} size="small" color="primary" variant="outlined" />}
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Today Events */}
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <EventIcon color="primary" sx={{ fontSize: 32 }} />
+                <Typography variant="h6">Events Today</Typography>
+              </Box>
+              <Typography variant="h3" sx={{ mb: 1 }}>{todayLoading ? '—' : todayEvents.length}</Typography>
+              <Typography variant="body2" color="textSecondary">
+                {todayEvents.reduce((s, e) => s + e.total_guests, 0)} guests booked
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Today's Activity */}
+      <Typography variant="h5" gutterBottom sx={{ mb: 2 }}>
+        Today — {todayStr}
+      </Typography>
+
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        {/* Today's Dining */}
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <RestaurantIcon fontSize="small" color="action" />
+                <Typography variant="h6">Dining Reservations</Typography>
+              </Box>
+              {todayLoading ? (
+                <Typography color="textSecondary">Loading...</Typography>
+              ) : todayDining.length === 0 ? (
+                <Typography color="textSecondary" variant="body2">No dining reservations today</Typography>
+              ) : (
+                <TableContainer>
+                  <Table size="small">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Time</TableCell>
+                        <TableCell>Member</TableCell>
+                        <TableCell>Meal</TableCell>
+                        <TableCell>Guests</TableCell>
+                        <TableCell>Status</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {todayDining.map(r => (
+                        <TableRow key={r.id} hover>
+                          <TableCell>{formatTime(r.reservation_time)}</TableCell>
+                          <TableCell>
+                            <Typography variant="body2">{r.members?.full_name || r.guest_name || '—'}</Typography>
+                            <Typography variant="caption" color="textSecondary">{r.members?.email || r.guest_email || ''}</Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Chip label={r.meal_type} size="small" color={r.meal_type === 'Lunch' ? 'primary' : 'default'} />
+                          </TableCell>
+                          <TableCell>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <PeopleIcon fontSize="small" color="action" />
+                              {r.guest_count}
+                            </Box>
+                          </TableCell>
+                          <TableCell>
+                            <Chip
+                              label={r.status}
+                              size="small"
+                              color={r.status === 'confirmed' ? 'success' : r.status === 'cancelled' ? 'error' : 'warning'}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Today's Events */}
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                <EventIcon fontSize="small" color="action" />
+                <Typography variant="h6">Events</Typography>
+              </Box>
+              {todayLoading ? (
+                <Typography color="textSecondary">Loading...</Typography>
+              ) : todayEvents.length === 0 ? (
+                <Typography color="textSecondary" variant="body2">No events today</Typography>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {todayEvents.map(event => (
+                    <Box key={event.id}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <Box sx={{ flex: 1, mr: 1 }}>
+                          <Typography variant="body1" fontWeight={500}>{event.title}</Typography>
+                          <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+                            <Chip label={eventTypeLabel(event.event_type)} size="small" variant="outlined" />
+                            {event.price_per_person && (
+                              <Chip label={`£${event.price_per_person}`} size="small" variant="outlined" />
+                            )}
+                            {event.is_tba && <Chip label="TBA" size="small" color="warning" />}
+                          </Box>
+                        </Box>
+                        <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
+                          <Typography variant="h6" color="primary">{event.booking_count}</Typography>
+                          <Typography variant="caption" color="textSecondary">bookings</Typography>
+                          <br />
+                          <Typography variant="caption" color="textSecondary">{event.total_guests} guests</Typography>
+                        </Box>
+                      </Box>
+                      <Divider sx={{ mt: 2 }} />
+                    </Box>
+                  ))}
                 </Box>
               )}
             </CardContent>
@@ -173,14 +345,11 @@ export default function DashboardPage() {
         </Grid>
       </Grid>
 
-      {/* LOI Requests Table */}
-      <Card sx={{ mt: 4 }}>
+      {/* Recent LOI Requests */}
+      <Card>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Recent LOI Requests
-          </Typography>
-          
-          {loading ? (
+          <Typography variant="h6" gutterBottom>Recent LOI Requests</Typography>
+          {loiLoading ? (
             <Typography color="textSecondary">Loading...</Typography>
           ) : loiRequests.length === 0 ? (
             <Typography color="textSecondary">No LOI requests yet</Typography>
@@ -202,9 +371,7 @@ export default function DashboardPage() {
                     <TableRow key={req.id}>
                       <TableCell>
                         <Typography variant="body2">{req.member_name}</Typography>
-                        <Typography variant="caption" color="textSecondary">
-                          {req.member_email}
-                        </Typography>
+                        <Typography variant="caption" color="textSecondary">{req.member_email}</Typography>
                       </TableCell>
                       <TableCell>{req.club_name}</TableCell>
                       <TableCell>{req.arrival_date}</TableCell>
@@ -213,30 +380,14 @@ export default function DashboardPage() {
                         <Chip
                           label={req.status}
                           size="small"
-                          color={
-                            req.status === 'approved' ? 'success' :
-                            req.status === 'rejected' ? 'error' :
-                            'warning'
-                          }
+                          color={req.status === 'approved' ? 'success' : req.status === 'rejected' ? 'error' : 'warning'}
                         />
                       </TableCell>
                       <TableCell>
                         {req.status === 'pending' && (
                           <Box sx={{ display: 'flex', gap: 1 }}>
-                            <Button
-                              size="small"
-                              color="success"
-                              onClick={() => handleApprove(req.id)}
-                            >
-                              Approve
-                            </Button>
-                            <Button
-                              size="small"
-                              color="error"
-                              onClick={() => handleReject(req.id)}
-                            >
-                              Reject
-                            </Button>
+                            <Button size="small" color="success" onClick={() => handleApprove(req.id)}>Approve</Button>
+                            <Button size="small" color="error" onClick={() => handleReject(req.id)}>Reject</Button>
                           </Box>
                         )}
                       </TableCell>

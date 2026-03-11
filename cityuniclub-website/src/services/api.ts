@@ -100,6 +100,40 @@ export const api = {
     return data.clubs || []
   },
 
+  async createDiningReservation(
+    token: string | null,
+    reservation: {
+      reservation_date: string
+      reservation_time: string
+      meal_type: 'Breakfast' | 'Lunch'
+      guest_count: number
+      table_preference?: string
+      special_requests?: string
+      guest_name?: string
+      guest_email?: string
+    }
+  ): Promise<any> {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+      'apikey': SUPABASE_ANON_KEY,
+    }
+    if (token) headers['x-session-token'] = token
+
+    const response = await fetch(`${API_BASE}/dining`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(reservation),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to create reservation')
+    }
+
+    return response.json()
+  },
+
   async createLoiRequest(
     token: string,
     request: {
