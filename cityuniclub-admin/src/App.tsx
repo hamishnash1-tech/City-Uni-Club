@@ -9,6 +9,7 @@ import MembersPage from './pages/MembersPage'
 import DiningPage from './pages/DiningPage'
 import ReciprocalClubsPage from './pages/ReciprocalClubsPage'
 import NewsPage from './pages/NewsPage'
+import LoiPage from './pages/LoiPage'
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -40,6 +41,7 @@ function AppRoutes() {
         <Route path="dining" element={<DiningPage />} />
         <Route path="clubs" element={<ReciprocalClubsPage />} />
         <Route path="news" element={<NewsPage />} />
+        <Route path="loi" element={<LoiPage />} />
       </Route>
     </Routes>
   )

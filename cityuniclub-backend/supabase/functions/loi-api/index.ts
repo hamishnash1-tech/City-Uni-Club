@@ -10,7 +10,7 @@ serve(async (req: Request) => {
   }
 
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders, status: 204 })
+    return new Response('ok', { headers: corsHeaders })
   }
 
   if (req.method !== 'POST') {
@@ -49,7 +49,9 @@ serve(async (req: Request) => {
       })
     }
 
-    const { club_id, arrival_date, departure_date, purpose } = await req.json()
+    const body = await req.json()
+    const { club_id, arrival_date, departure_date, purpose } = body
+    console.log('LOI request body:', JSON.stringify({ club_id, arrival_date, departure_date, purpose }))
 
     if (!club_id || !arrival_date || !departure_date) {
       return new Response(JSON.stringify({ error: 'Missing required fields' }), {
@@ -59,7 +61,7 @@ serve(async (req: Request) => {
     }
 
     // Create LOI request
-    const { data: request } = await supabase
+    const { data: request, error: insertError } = await supabase
       .from('loi_requests')
       .insert({
         member_id: session.member_id,
@@ -71,6 +73,9 @@ serve(async (req: Request) => {
       })
       .select()
       .single()
+
+    if (insertError) throw insertError
+    console.log('LOI request created, id:', request.id, 'member_id:', session.member_id)
 
     return new Response(JSON.stringify({ request, message: 'Success' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

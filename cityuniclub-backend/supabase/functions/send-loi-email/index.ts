@@ -12,22 +12,12 @@ serve(async (req) => {
   }
 
   try {
-    const { clubName, clubLocation, memberName, memberEmail, arrivalDate, departureDate, purpose } = await req.json()
+    const { clubName, clubLocation, clubEmail, memberName, memberEmail, arrivalDate, departureDate, purpose } = await req.json()
 
     // Validate required fields
-    if (!clubName || !memberName || !memberEmail || !arrivalDate) {
+    if (!clubName || !memberName || !memberEmail || !arrivalDate || !clubEmail) {
       throw new Error('Missing required fields')
     }
-
-    // Get club email (you'll need to maintain a mapping or fetch from database)
-    const clubEmails: Record<string, string> = {
-      // Add club emails here or fetch from database
-      "Buck's Club": 'info@bucksclub.co.uk',
-      'Oxford and Cambridge Club': 'admin@oxfordandcambridgeclub.co.uk',
-      // ... add more as needed
-    }
-
-    const clubEmail = clubEmails[clubName] || 'reservations@club.com' // Fallback
 
     // Send email via Resend
     const resendApiKey = Deno.env.get('RESEND_API_KEY')

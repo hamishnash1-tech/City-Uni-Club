@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { createClient } from '@supabase/supabase-js'
 import {
   Container,
   Box,
@@ -10,11 +9,7 @@ import {
   Typography,
   Alert
 } from '@mui/material'
-
-// Initialize Supabase client
-const supabaseUrl = 'https://myfoyoyjtkqthjjvabmn.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Zm95b3lqdGtxdGhqanZhYm1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDI5NDAsImV4cCI6MjA4Nzc3ODk0MH0._OhoEKRYAZ0C7oon9e_WSj7p47pJlWQmqBgx2CtBtdg'
-const supabase = createClient(supabaseUrl, supabaseAnonKey)
+import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -22,6 +17,7 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,31 +25,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      // Sign in with Supabase Auth
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
-
-      if (signInError) {
-        throw new Error(signInError.message)
-      }
-
-      // Check if user has admin role
-      const userRole = data.user.user_metadata?.role || 'user'
-      
-      if (userRole !== 'admin') {
-        await supabase.auth.signOut()
-        throw new Error('Access denied: Admin access required')
-      }
-
-      // Store admin session
-      localStorage.setItem('admin_session', JSON.stringify({
-        email: data.user.email,
-        role: userRole,
-        loggedIn: new Date().toISOString()
-      }))
-
+      await login(email, password)
       navigate('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
@@ -127,17 +99,6 @@ export default function LoginPage() {
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
             
-            <Paper variant="outlined" sx={{ p: 2, mt: 2, bgcolor: 'background.default' }}>
-              <Typography variant="caption" fontWeight={500} gutterBottom>
-                Demo Credentials:
-              </Typography>
-              <Typography variant="caption" display="block">
-                Email: admin@cityuniversityclub.co.uk
-              </Typography>
-              <Typography variant="caption" display="block">
-                Password: admin123
-              </Typography>
-            </Paper>
           </Box>
         </Paper>
       </Box>
