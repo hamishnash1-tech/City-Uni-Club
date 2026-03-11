@@ -5,7 +5,7 @@ serve(async (req: Request) => {
   // CORS - allow everything
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, x-session-token',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, apikey, x-session-token',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
   }
 
