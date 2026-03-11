@@ -17,10 +17,12 @@ interface AuthState {
   error: string | null
 }
 
+const storedMember = localStorage.getItem('authMember')
+
 const initialState: AuthState = {
-  isAuthenticated: false,
+  isAuthenticated: !!localStorage.getItem('authToken') && !!storedMember,
   token: localStorage.getItem('authToken'),
-  member: null,
+  member: storedMember ? JSON.parse(storedMember) : null,
   isLoading: false,
   error: null,
 }
@@ -40,6 +42,7 @@ export const authSlice = createSlice({
       state.isLoading = false
       state.error = null
       localStorage.setItem('authToken', action.payload.token)
+      localStorage.setItem('authMember', JSON.stringify(action.payload.member))
     },
     loginFailure: (state, action: PayloadAction<string>) => {
       state.isLoading = false
@@ -50,6 +53,7 @@ export const authSlice = createSlice({
       state.token = null
       state.member = null
       localStorage.removeItem('authToken')
+      localStorage.removeItem('authMember')
     },
   },
 })

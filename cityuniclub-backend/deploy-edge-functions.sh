@@ -31,11 +31,14 @@ echo "📦 Deploying functions..."
 echo ""
 
 functions=(
+  admin-dashboard
+  admin-dining
   admin-login
   admin-logout
   admin-loi
   change-password
   clubs
+  dining
   events
   login
   logout
