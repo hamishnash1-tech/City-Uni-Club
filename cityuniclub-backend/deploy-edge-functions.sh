@@ -30,63 +30,31 @@ echo ""
 echo "📦 Deploying functions..."
 echo ""
 
-echo "Deploying: login..."
-npx supabase functions deploy login --no-verify-jwt
-echo "✓ login deployed"
-echo ""
+functions=(
+  admin-login
+  admin-logout
+  admin-loi
+  change-password
+  clubs
+  events
+  login
+  logout
+  loi-api
+  loi-requests
+  news
+  send-loi-email
+)
 
-echo "Deploying: logout..."
-npx supabase functions deploy logout --no-verify-jwt
-echo "✓ logout deployed"
-echo ""
-
-echo "Deploying: events..."
-npx supabase functions deploy events --no-verify-jwt
-echo "✓ events deployed"
-echo ""
-
-echo "Deploying: events/book..."
-npx supabase functions deploy events-book --function-name events/book --no-verify-jwt
-echo "✓ events/book deployed"
-echo ""
-
-echo "Deploying: news..."
-npx supabase functions deploy news --no-verify-jwt
-echo "✓ news deployed"
-echo ""
-
-echo "Deploying: clubs..."
-npx supabase functions deploy clubs --no-verify-jwt
-echo "✓ clubs deployed"
-echo ""
-
-echo "Deploying: loi-requests..."
-npx supabase functions deploy loi-requests --no-verify-jwt
-echo "✓ loi-requests deployed"
-echo ""
+for fn in "${functions[@]}"; do
+  echo "Deploying: $fn..."
+  npx supabase functions deploy "$fn" --no-verify-jwt
+  echo "✓ $fn deployed"
+  echo ""
+done
 
 echo "======================================="
 echo "✅ All functions deployed!"
 echo ""
-echo "📍 Function URLs:"
-echo ""
-echo "   https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/login"
-echo "   https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/logout"
-echo "   https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/events"
-echo "   https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/events/book"
-echo "   https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/news"
-echo "   https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/clubs"
-echo "   https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/loi-requests"
-echo ""
-echo "📱 Update iOS App:"
-echo ""
-echo "   Open: CityUniClub app/CityUniClub app/Services/APIConfiguration.swift"
-echo "   Change baseURL to:"
-echo "   https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1"
-echo ""
-echo "📡 Test Your API:"
-echo ""
-echo "   curl https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/events"
-echo "   curl https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/news"
+echo "📍 Base URL: https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1"
 echo ""
 echo "======================================="

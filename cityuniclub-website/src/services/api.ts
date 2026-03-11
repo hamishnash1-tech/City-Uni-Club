@@ -115,6 +115,8 @@ export const api = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'apikey': SUPABASE_ANON_KEY,
         'x-session-token': token,
       },
       body: JSON.stringify(request),

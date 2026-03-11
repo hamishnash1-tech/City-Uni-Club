@@ -11,3 +11,5 @@ export const supabase = createClient(
   supabaseUrl || 'https://myfoyoyjtkqthjjvabmn.supabase.co',
   supabaseAnonKey || ''
 )
+
+export const FUNCTIONS_URL = `${supabaseUrl || 'https://myfoyoyjtkqthjjvabmn.supabase.co'}/functions/v1`

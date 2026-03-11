@@ -1,5 +1,9 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import membersData from '../data/members.json'
+import { useAuth } from '../context/AuthContext'
+import { FUNCTIONS_URL } from '../services/supabase'
+
+const ADMIN_LOI_URL = `${FUNCTIONS_URL}/admin-loi`
 import {
   Box,
   Container,
@@ -51,13 +55,13 @@ interface LoiRequest {
   club_name: string
   club_location: string
   club_region: string
+  club_email: string
   arrival_date: string
   departure_date?: string
   purpose: string
   status: 'pending' | 'approved' | 'rejected' | 'sent'
   special_requests?: string
   created_at: string
-  email_sent?: boolean
 }
 
 // Reciprocal clubs data - sample clubs with emails
@@ -76,43 +80,9 @@ const reciprocalClubs = [
   { id: '12', name: 'Singapore Cricket Club', location: 'Singapore', country: 'Singapore', region: 'Asia', email: 'info@singaporecricket.com' },
 ]
 
-// Mock LOI requests
-const mockLoiRequests: LoiRequest[] = [
-  {
-    id: 'l1',
-    member_id: 'stephen@example.com',
-    member_name: 'Stephen Rayner',
-    member_email: 'stephen@example.com',
-    club_id: '1',
-    club_name: "Buck's Club",
-    club_location: 'London',
-    club_region: 'United Kingdom',
-    arrival_date: '2025-04-15',
-    departure_date: '2025-04-17',
-    purpose: 'Business meetings in London',
-    status: 'sent',
-    created_at: '2025-03-01',
-    email_sent: true
-  },
-  {
-    id: 'l2',
-    member_id: 'john@example.com',
-    member_name: 'John Smith',
-    member_email: 'john@example.com',
-    club_id: '4',
-    club_name: 'The Melbourne Club',
-    club_location: 'Melbourne',
-    club_region: 'Australia',
-    arrival_date: '2025-05-10',
-    departure_date: '2025-05-20',
-    purpose: 'Family vacation',
-    status: 'pending',
-    created_at: '2025-03-05'
-  }
-]
-
 export default function LoiPage() {
-  const [requests, setRequests] = useState<LoiRequest[]>(mockLoiRequests)
+  const { sessionToken } = useAuth()
+  const [requests, setRequests] = useState<LoiRequest[]>([])
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
   const [openDialog, setOpenDialog] = useState(false)
@@ -120,7 +90,45 @@ export default function LoiPage() {
   const [success, setSuccess] = useState('')
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
-  
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchRequests()
+  }, [])
+
+  const getAuthHeaders = () => ({
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${sessionToken || localStorage.getItem('admin_token')}`
+  })
+
+  const fetchRequests = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch(ADMIN_LOI_URL, { headers: getAuthHeaders() })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Failed to fetch')
+      setRequests((data.requests || []).map((r: any) => ({
+        id: r.id,
+        member_id: r.member_id,
+        member_name: r.members?.full_name || 'Unknown',
+        member_email: r.members?.email || '',
+        club_id: r.club_id,
+        club_name: r.reciprocal_clubs?.name || 'Unknown',
+        club_location: r.reciprocal_clubs?.location || '',
+        club_region: r.reciprocal_clubs?.region || '',
+        club_email: r.reciprocal_clubs?.contact_email || '',
+        arrival_date: r.arrival_date,
+        departure_date: r.departure_date,
+        purpose: r.purpose,
+        status: r.status,
+        created_at: r.created_at,
+      })))
+    } catch (err: any) {
+      setError(err.message)
+    }
+    setLoading(false)
+  }
+
   // Form state
   const [formData, setFormData] = useState({
     member_id: '',
@@ -231,26 +239,7 @@ export default function LoiPage() {
         throw new Error(responseData.error || 'Failed to send email')
       }
 
-      // Add to local state
-      const newRequest: LoiRequest = {
-        id: `l${Date.now()}`,
-        member_id: selectedMember.id,
-        member_name: selectedMember.name,
-        member_email: selectedMember.email,
-        club_id: selectedClub.id,
-        club_name: selectedClub.name,
-        club_location: selectedClub.location,
-        club_region: selectedClub.region,
-        arrival_date: formData.arrival_date,
-        departure_date: formData.departure_date || undefined,
-        purpose: formData.purpose,
-        special_requests: formData.special_requests || undefined,
-        status: 'sent',
-        created_at: new Date().toISOString(),
-        email_sent: true
-      }
-
-      setRequests([newRequest, ...requests])
+      await fetchRequests()
       setSuccess('LOI request sent successfully!')
       handleCloseDialog()
     } catch (err: any) {
@@ -261,44 +250,55 @@ export default function LoiPage() {
     }
   }
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this request?')) return
-    setRequests(requests.filter(r => r.id !== id))
-    setSuccess('Request deleted')
+    const res = await fetch(`${ADMIN_LOI_URL}?id=${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      setError(data.error || 'Failed to delete')
+    } else {
+      setRequests(requests.filter(r => r.id !== id))
+      setSuccess('Request deleted')
+    }
   }
 
-  const handleResend = async (request: LoiRequest) => {
+  const handleApprove = async (id: string) => {
+    const res = await fetch(ADMIN_LOI_URL, {
+      method: 'PATCH',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ id, status: 'approved' })
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      setError(data.error || 'Failed to approve')
+    } else {
+      setRequests(requests.map(r => r.id === id ? { ...r, status: 'approved' } : r))
+      setSuccess('Request approved')
+    }
+  }
+
+  const handleSendEmail = async (request: LoiRequest) => {
     setError('')
     setSuccess('')
     setSending(true)
 
     try {
-      const response = await fetch('https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/send-loi-email', {
+      const response = await fetch(`${FUNCTIONS_URL}/send-loi-email`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          clubName: request.club_name,
-          clubLocation: request.club_location,
-          memberName: request.member_name,
-          memberEmail: request.member_email,
-          arrivalDate: request.arrival_date,
-          departureDate: request.departure_date,
-          purpose: request.purpose
-        })
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ id: request.id })
       })
 
       const responseData = await response.json()
+      if (!response.ok) throw new Error(responseData.error || 'Failed to send email')
 
-      if (!response.ok) {
-        throw new Error(responseData.error || 'Failed to resend email')
-      }
-
-      setRequests(requests.map(r => r.id === request.id ? { ...r, email_sent: true } : r))
-      setSuccess('Email resent successfully!')
+      setRequests(requests.map(r => r.id === request.id ? { ...r, status: 'sent' } : r))
+      setSuccess('LOI email sent successfully!')
     } catch (err: any) {
-      setError(err.message || 'Failed to resend email')
+      setError(err.message || 'Failed to send email')
     } finally {
       setSending(false)
     }
@@ -471,14 +471,19 @@ export default function LoiPage() {
               <TableCell>Arrival</TableCell>
               <TableCell>Departure</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell>Email Sent</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredRequests.length === 0 ? (
+            {loading ? (
               <TableRow>
-                <TableCell colSpan={9} align="center">
+                <TableCell colSpan={8} align="center">
+                  <Typography color="textSecondary" sx={{ py: 4 }}>Loading...</Typography>
+                </TableCell>
+              </TableRow>
+            ) : filteredRequests.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} align="center">
                   <Typography color="textSecondary" sx={{ py: 4 }}>
                     No LOI requests found
                   </Typography>
@@ -521,21 +526,28 @@ export default function LoiPage() {
                     />
                   </TableCell>
                   <TableCell>
-                    {request.email_sent ? (
-                      <Chip label="Sent" size="small" color="success" icon={<CheckCircleIcon />} />
-                    ) : (
-                      <Chip label="Not sent" size="small" color="default" />
+                    {request.status === 'pending' && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        color="success"
+                        onClick={() => handleApprove(request.id)}
+                        sx={{ mr: 1 }}
+                      >
+                        Approve
+                      </Button>
                     )}
-                  </TableCell>
-                  <TableCell>
-                    <IconButton 
-                      size="small" 
-                      color="info"
-                      onClick={() => handleResend(request)}
-                      disabled={sending}
-                    >
-                      <SendIcon fontSize="small" />
-                    </IconButton>
+                    {(request.status === 'approved' || request.status === 'sent') && (
+                      <IconButton
+                        size="small"
+                        color="info"
+                        onClick={() => handleSendEmail(request)}
+                        disabled={sending}
+                        title="Send LOI email"
+                      >
+                        <SendIcon fontSize="small" />
+                      </IconButton>
+                    )}
                     <IconButton size="small" color="error" onClick={() => handleDelete(request.id)}>
                       <DeleteIcon fontSize="small" />
                     </IconButton>

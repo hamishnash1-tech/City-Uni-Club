@@ -22,6 +22,7 @@ import EventIcon from '@mui/icons-material/Event'
 import RestaurantIcon from '@mui/icons-material/Restaurant'
 import BusinessIcon from '@mui/icons-material/Business'
 import NewReleasesIcon from '@mui/icons-material/NewReleases'
+import MailIcon from '@mui/icons-material/Mail'
 import LogoutIcon from '@mui/icons-material/Logout'
 
 const drawerWidth = 240
@@ -47,6 +48,7 @@ export default function AdminLayout() {
     { text: 'Events', icon: <EventIcon />, path: '/events' },
     { text: 'Dining', icon: <RestaurantIcon />, path: '/dining' },
     { text: 'Reciprocal Clubs', icon: <BusinessIcon />, path: '/clubs' },
+    { text: 'LOI Requests', icon: <MailIcon />, path: '/loi' },
     { text: 'News', icon: <NewReleasesIcon />, path: '/news' }
   ]
 
