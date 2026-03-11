@@ -96,15 +96,15 @@ export default function LoiPage() {
     fetchRequests()
   }, [])
 
-  const authHeaders = {
+  const getAuthHeaders = () => ({
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${sessionToken}`
-  }
+    'Authorization': `Bearer ${sessionToken || localStorage.getItem('admin_token')}`
+  })
 
   const fetchRequests = async () => {
     setLoading(true)
     try {
-      const res = await fetch(ADMIN_LOI_URL, { headers: authHeaders })
+      const res = await fetch(ADMIN_LOI_URL, { headers: getAuthHeaders() })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to fetch')
       setRequests((data.requests || []).map((r: any) => ({
@@ -254,7 +254,7 @@ export default function LoiPage() {
     if (!confirm('Are you sure you want to delete this request?')) return
     const res = await fetch(`${ADMIN_LOI_URL}?id=${id}`, {
       method: 'DELETE',
-      headers: authHeaders
+      headers: getAuthHeaders()
     })
     const data = await res.json()
     if (!res.ok) {
@@ -268,7 +268,7 @@ export default function LoiPage() {
   const handleApprove = async (id: string) => {
     const res = await fetch(ADMIN_LOI_URL, {
       method: 'PATCH',
-      headers: authHeaders,
+      headers: getAuthHeaders(),
       body: JSON.stringify({ id, status: 'approved' })
     })
     const data = await res.json()
@@ -286,29 +286,15 @@ export default function LoiPage() {
     setSending(true)
 
     try {
-      const response = await fetch('https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1/send-loi-email', {
+      const response = await fetch(`${FUNCTIONS_URL}/send-loi-email`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          clubName: request.club_name,
-          clubLocation: request.club_location,
-          clubEmail: request.club_email,
-          memberName: request.member_name,
-          memberEmail: request.member_email,
-          arrivalDate: request.arrival_date,
-          departureDate: request.departure_date,
-          purpose: request.purpose
-        })
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ id: request.id })
       })
 
       const responseData = await response.json()
       if (!response.ok) throw new Error(responseData.error || 'Failed to send email')
 
-      await fetch(ADMIN_LOI_URL, {
-        method: 'PATCH',
-        headers: authHeaders,
-        body: JSON.stringify({ id: request.id, status: 'sent' })
-      })
       setRequests(requests.map(r => r.id === request.id ? { ...r, status: 'sent' } : r))
       setSuccess('LOI email sent successfully!')
     } catch (err: any) {

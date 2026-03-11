@@ -7,7 +7,7 @@ interface AuthContextType {
   sessionToken: string | null
   loading: boolean
   login: (email: string, password: string) => Promise<void>
-  logout: () => Promise<void>
+  logout: () => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -48,8 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  const logout = async () => {
-    await supabase.functions.invoke('admin-logout')
+  const logout = () => {
     setUser(null)
     setSessionToken(null)
     localStorage.removeItem('admin_session')
