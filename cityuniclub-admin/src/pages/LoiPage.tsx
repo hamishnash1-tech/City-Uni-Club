@@ -22,6 +22,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   Grid,
   Card,
   CardContent,
@@ -35,7 +36,9 @@ import {
   Stepper,
   Step,
   StepLabel,
-  StepContent
+  StepContent,
+  Divider,
+  CircularProgress,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import AddIcon from '@mui/icons-material/Add'
@@ -45,6 +48,16 @@ import MailIcon from '@mui/icons-material/Mail'
 import SendIcon from '@mui/icons-material/Send'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import PendingIcon from '@mui/icons-material/Pending'
+import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import EmailIcon from '@mui/icons-material/Email'
+
+interface EmailEntry {
+  id: string
+  sent_to: string
+  cc: string | null
+  sent_at: string
+  resend_email_id: string | null
+}
 
 interface LoiRequest {
   id: string
@@ -91,6 +104,9 @@ export default function LoiPage() {
   const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [detailRequest, setDetailRequest] = useState<LoiRequest | null>(null)
+  const [emailHistory, setEmailHistory] = useState<EmailEntry[]>([])
+  const [loadingDetail, setLoadingDetail] = useState(false)
 
   useEffect(() => {
     fetchRequests()
@@ -127,6 +143,18 @@ export default function LoiPage() {
       setError(err.message)
     }
     setLoading(false)
+  }
+
+  const handleOpenDetail = async (request: LoiRequest) => {
+    setDetailRequest(request)
+    setEmailHistory([])
+    setLoadingDetail(true)
+    try {
+      const res = await fetch(`${ADMIN_LOI_URL}?id=${request.id}`, { headers: getAuthHeaders() })
+      const data = await res.json()
+      if (res.ok) setEmailHistory(data.emails || [])
+    } catch {}
+    setLoadingDetail(false)
   }
 
   // Form state
@@ -274,9 +302,13 @@ export default function LoiPage() {
     const data = await res.json()
     if (!res.ok) {
       setError(data.error || 'Failed to approve')
-    } else {
-      setRequests(requests.map(r => r.id === id ? { ...r, status: 'approved' } : r))
-      setSuccess('Request approved')
+      return
+    }
+    setRequests(requests.map(r => r.id === id ? { ...r, status: 'approved' } : r))
+
+    const request = requests.find(r => r.id === id)
+    if (request) {
+      await handleSendEmail({ ...request, status: 'approved' })
     }
   }
 
@@ -526,6 +558,9 @@ export default function LoiPage() {
                     />
                   </TableCell>
                   <TableCell>
+                    <IconButton size="small" onClick={() => handleOpenDetail(request)} title="View details">
+                      <OpenInNewIcon fontSize="small" />
+                    </IconButton>
                     {request.status === 'pending' && (
                       <Button
                         size="small"
@@ -558,6 +593,103 @@ export default function LoiPage() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* LOI Detail Dialog */}
+      <Dialog open={!!detailRequest} onClose={() => setDetailRequest(null)} maxWidth="sm" fullWidth>
+        {detailRequest && (
+          <>
+            <DialogTitle>
+              LOI Request — {detailRequest.member_name}
+            </DialogTitle>
+            <DialogContent dividers>
+              {/* Request details */}
+              <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid size={{ xs: 6 }}>
+                  <Typography variant="caption" color="textSecondary">Member</Typography>
+                  <Typography variant="body2" fontWeight={500}>{detailRequest.member_name}</Typography>
+                  <Typography variant="caption" color="textSecondary">{detailRequest.member_email}</Typography>
+                </Grid>
+                <Grid size={{ xs: 6 }}>
+                  <Typography variant="caption" color="textSecondary">Club</Typography>
+                  <Typography variant="body2" fontWeight={500}>{detailRequest.club_name}</Typography>
+                  <Typography variant="caption" color="textSecondary">{detailRequest.club_location}</Typography>
+                </Grid>
+                <Grid size={{ xs: 6 }}>
+                  <Typography variant="caption" color="textSecondary">Arrival</Typography>
+                  <Typography variant="body2">{formatDate(detailRequest.arrival_date)}</Typography>
+                </Grid>
+                <Grid size={{ xs: 6 }}>
+                  <Typography variant="caption" color="textSecondary">Departure</Typography>
+                  <Typography variant="body2">{detailRequest.departure_date ? formatDate(detailRequest.departure_date) : '—'}</Typography>
+                </Grid>
+                <Grid size={{ xs: 6 }}>
+                  <Typography variant="caption" color="textSecondary">Status</Typography>
+                  <Box sx={{ mt: 0.5 }}>
+                    <Chip icon={getStatusIcon(detailRequest.status)} label={detailRequest.status} size="small" color={getStatusColor(detailRequest.status)} />
+                  </Box>
+                </Grid>
+                <Grid size={{ xs: 6 }}>
+                  <Typography variant="caption" color="textSecondary">Submitted</Typography>
+                  <Typography variant="body2">{formatDate(detailRequest.created_at)}</Typography>
+                </Grid>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant="caption" color="textSecondary">Purpose</Typography>
+                  <Typography variant="body2">{detailRequest.purpose}</Typography>
+                </Grid>
+              </Grid>
+
+              <Divider sx={{ mb: 2 }} />
+
+              {/* Email timeline */}
+              <Typography variant="subtitle2" gutterBottom>Email History</Typography>
+
+              {loadingDetail ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
+                  <CircularProgress size={24} />
+                </Box>
+              ) : emailHistory.length === 0 ? (
+                <Typography variant="body2" color="textSecondary" sx={{ py: 1 }}>
+                  No emails sent yet.
+                </Typography>
+              ) : (
+                <Box sx={{ position: 'relative', pl: 3 }}>
+                  {/* vertical line */}
+                  <Box sx={{ position: 'absolute', left: 9, top: 8, bottom: 8, width: 2, bgcolor: 'divider' }} />
+                  {emailHistory.map((entry, i) => (
+                    <Box key={entry.id} sx={{ position: 'relative', mb: i < emailHistory.length - 1 ? 3 : 0 }}>
+                      {/* dot */}
+                      <Box sx={{
+                        position: 'absolute', left: -19, top: 4,
+                        width: 16, height: 16, borderRadius: '50%',
+                        bgcolor: 'info.main', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                      }}>
+                        <EmailIcon sx={{ fontSize: 10, color: 'white' }} />
+                      </Box>
+                      <Typography variant="caption" color="textSecondary">
+                        {new Date(entry.sent_at).toLocaleString('en-GB', {
+                          day: 'numeric', month: 'short', year: 'numeric',
+                          hour: '2-digit', minute: '2-digit'
+                        })}
+                      </Typography>
+                      <Typography variant="body2">
+                        Sent to <strong>{entry.sent_to}</strong>
+                      </Typography>
+                      {entry.cc && (
+                        <Typography variant="caption" color="textSecondary">
+                          CC: {entry.cc}
+                        </Typography>
+                      )}
+                    </Box>
+                  ))}
+                </Box>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => setDetailRequest(null)}>Close</Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
 
       {/* New LOI Request Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
