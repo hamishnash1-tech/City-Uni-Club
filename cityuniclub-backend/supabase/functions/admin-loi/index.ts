@@ -40,6 +40,35 @@ serve(async (req) => {
     const url = new URL(req.url)
 
     if (req.method === 'GET') {
+      const id = url.searchParams.get('id')
+
+      if (id) {
+        const { data: request, error: reqError } = await supabase
+          .from('loi_requests')
+          .select(`
+            id, member_id, club_id, arrival_date, departure_date, purpose, status, created_at,
+            members (full_name, email),
+            reciprocal_clubs (name, location, country, region, contact_email)
+          `)
+          .eq('id', id)
+          .single()
+
+        if (reqError) throw reqError
+
+        const { data: emails, error: emailsError } = await supabase
+          .from('loi_emails_sent')
+          .select('id, sent_to, cc, sent_at, resend_email_id')
+          .eq('loi_request_id', id)
+          .order('sent_at', { ascending: true })
+
+        if (emailsError) throw emailsError
+
+        return new Response(JSON.stringify({ request, emails }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200
+        })
+      }
+
       const { data, error } = await supabase
         .from('loi_requests')
         .select(`
