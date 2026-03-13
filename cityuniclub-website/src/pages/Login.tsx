@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { loginStart, loginSuccess, loginFailure } from '../slices/authSlice'
 import { api } from '../services/api'
 import { RootState } from '../store'
@@ -83,9 +83,14 @@ export const Login: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-cambridge-blue mb-2">
-              Password
-            </label>
+            <div className="flex justify-between items-center mb-2">
+              <label className="block text-sm font-medium text-cambridge-blue">
+                Password
+              </label>
+              <Link to="/forgot-password" className="text-xs text-cambridge-blue/70 hover:text-cambridge-blue hover:underline">
+                Forgot password?
+              </Link>
+            </div>
             <input
               type="password"
               value={formData.password}

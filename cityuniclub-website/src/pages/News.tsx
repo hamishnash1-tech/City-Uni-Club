@@ -28,43 +28,43 @@ export const News: React.FC = () => {
   return (
     <div className="min-h-screen bg-oxford-blue pb-20">
       {/* Header */}
-      <div className="bg-card-white sticky top-0 z-10 pt-12 pb-4 px-4 shadow">
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-oxford-blue">Club News</h1>
-        </div>
+      <div className="bg-oxford-blue sticky top-10 z-10 pb-4 pt-6 px-4 border-b border-white/10">
+        <h1 className="text-2xl font-semibold text-white text-center">Club News</h1>
       </div>
 
-      {/* News List */}
-      <div className="p-4 space-y-4">
-        {news.map((item) => (
-          <div key={item.id} className="bg-card-white rounded-xl shadow-lg p-4">
-            {/* Category Badge */}
-            <div className="flex items-center justify-between mb-3">
-              <span className="bg-cambridge-blue text-white text-xs px-3 py-1 rounded-full font-medium">
-                {item.category}
-              </span>
-              <span className="text-xs text-secondary-text">{formatDate(item.published_date)}</span>
+      {/* News Grid */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {news.map((item) => (
+            <div key={item.id} className="bg-card-white rounded-xl shadow-lg p-4 flex flex-col">
+              {/* Category Badge */}
+              <div className="flex items-center justify-between mb-3">
+                <span className="bg-cambridge-blue text-white text-xs px-3 py-1 rounded-full font-medium">
+                  {item.category}
+                </span>
+                <span className="text-xs text-secondary-text">{formatDate(item.published_date)}</span>
+              </div>
+
+              {/* Title */}
+              <h3 className="text-lg font-serif text-oxford-blue font-semibold mb-2">
+                {item.title}
+              </h3>
+
+              {/* Content */}
+              <p className="text-secondary-text text-sm mb-3 line-clamp-3 flex-1">
+                {item.content}
+              </p>
+
+              {/* Read More */}
+              <button className="text-oxford-blue text-sm font-semibold flex items-center space-x-1 mt-auto">
+                <span>Read More</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
             </div>
-
-            {/* Title */}
-            <h3 className="text-lg font-serif text-oxford-blue font-semibold mb-2">
-              {item.title}
-            </h3>
-
-            {/* Content */}
-            <p className="text-secondary-text text-sm mb-3 line-clamp-3">
-              {item.content}
-            </p>
-
-            {/* Read More */}
-            <button className="text-oxford-blue text-sm font-semibold flex items-center space-x-1">
-              <span>Read More</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   )
