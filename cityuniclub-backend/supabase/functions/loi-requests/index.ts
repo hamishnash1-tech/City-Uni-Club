@@ -116,18 +116,8 @@ serve(async (req: Request) => {
       })
       .select(`
         *,
-        reciprocal_clubs (
-          id,
-          name,
-          location,
-          country,
-          contact_email
-        ),
-        members (
-          full_name,
-          email,
-          membership_number
-        )
+        reciprocal_clubs (id, name, location, country, contact_email),
+        members (full_name, email, membership_number)
       `)
       .single()
 
@@ -138,70 +128,20 @@ serve(async (req: Request) => {
       )
     }
 
-    // Send email to club (if RESEND_API_KEY is configured)
-    const resendApiKey = Deno.env.get('RESEND_API_KEY')
-    let email_sent = false
-    
-    if (resendApiKey && club.contact_email) {
-      try {
-        await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${resendApiKey}`,
-          },
-          body: JSON.stringify({
-            from: 'City University Club <loi@cityuniversityclub.co.uk>',
-            to: [club.contact_email],
-            cc: ['secretary@cityuniversityclub.co.uk'],
-            subject: `Letter of Introduction Request - ${member.full_name}`,
-            html: `
-              <html>
-                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                  <h2 style="color: #002147;">Letter of Introduction Request</h2>
-                  <p>Dear Secretary,</p>
-                  <p>A Letter of Introduction request has been submitted.</p>
-                  <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid #002147; margin: 20px 0;">
-                    <h3 style="margin-top: 0; color: #002147;">Member Details</h3>
-                    <p><strong>Name:</strong> ${member.full_name}<br>
-                    <strong>Email:</strong> ${member.email}<br>
-                    <strong>Membership Number:</strong> ${member.membership_number}</p>
-                  </div>
-                  <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid #A3C1AD; margin: 20px 0;">
-                    <h3 style="margin-top: 0; color: #002147;">Visit Details</h3>
-                    <p><strong>Club:</strong> ${club.name}<br>
-                    <strong>Location:</strong> ${club.location}, ${club.country}<br>
-                    <strong>Arrival Date:</strong> ${arrival_date}<br>
-                    <strong>Departure Date:</strong> ${departure_date}<br>
-                    <strong>Purpose:</strong> ${purpose || 'Business/Leisure'}</p>
-                  </div>
-                  <p>Please review this request in the admin dashboard.</p>
-                  <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
-                  <p style="color: #666; font-size: 12px;">
-                    <strong>City University Club</strong><br>
-                    42 Crutched Friars, London EC3N 2AP
-                  </p>
-                </body>
-              </html>
-            `,
-          }),
-        })
-        email_sent = true
-      } catch (emailError) {
-        console.error('Failed to send email:', emailError)
-      }
+    if (club.contact_email) {
+      await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-loi-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+        },
+        body: JSON.stringify({ id: request.id }),
+      })
     }
 
     return new Response(
-      JSON.stringify({ 
-        request, 
-        message: 'LOI request submitted successfully',
-        email_sent
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 201
-      }
+      JSON.stringify({ request, message: 'LOI request submitted successfully' }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 201 }
     )
   } catch (error: any) {
     return new Response(

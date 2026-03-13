@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { PDFDocument, StandardFonts, rgb } from 'https://esm.sh/pdf-lib@1.17.1'
+import { SITE_URL, CLUB_NAME, CLUB_EMAIL, CLUB_PHONE, FROM_EMAIL } from '../_shared/constants.ts'
 
 
 const SIGNATURE_JPG = Uint8Array.from(atob('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'), c => c.charCodeAt(0))
@@ -78,9 +79,9 @@ async function generateLoiPdf(
   }
 
   // Header contact details (centered)
-  drawCentered('secretary@cityuniversityclub.co.uk')
-  drawCentered('www.cityuniversityclub.co.uk')
-  drawCentered('0207 167 6682')
+  drawCentered(CLUB_EMAIL)
+  drawCentered(SITE_URL.replace('https://', ''))
+  drawCentered(CLUB_PHONE)
   y -= lineH * 1.5
 
   // Recipient
@@ -134,12 +135,15 @@ serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '')
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-    if (authError || !user || user.user_metadata?.role !== 'admin') {
-      return new Response(JSON.stringify({ error: 'Admin access required' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 403
-      })
+    const isServiceRole = token === Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    if (!isServiceRole) {
+      const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+      if (authError || !user || user.user_metadata?.role !== 'admin') {
+        return new Response(JSON.stringify({ error: 'Admin access required' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 403
+        })
+      }
     }
 
     const { id } = await req.json()
@@ -188,9 +192,9 @@ serve(async (req) => {
           <p style="margin-bottom: 0;">Many thanks and kind regards,</p>
           <p style="margin: 0;"><strong>Lauren Wade</strong></p>
           <p style="margin: 0;">Admin Assistant</p>
-          <p style="margin: 0;">City University Club</p>
-          <p style="margin: 0;"><a href="mailto:admin@cityuniversityclub.co.uk" style="color: #000;">admin@cityuniversityclub.co.uk</a></p>
-          <p style="margin: 0;">Tel: 0207 167 6682</p>
+          <p style="margin: 0;">${CLUB_NAME}</p>
+          <p style="margin: 0;"><a href="mailto:${CLUB_EMAIL}" style="color: #000;">${CLUB_EMAIL}</a></p>
+          <p style="margin: 0;">Tel: ${CLUB_PHONE}</p>
         </body>
       </html>
     `
@@ -202,9 +206,9 @@ serve(async (req) => {
         'Authorization': `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: 'City University Club <loi@admin.cityuniversityclub.co.uk>',
+        from: FROM_EMAIL,
         to: [clubEmail],
-        cc: ['secretary@cityuniversityclub.co.uk'],
+        cc: [CLUB_EMAIL],
         subject: `Letter of Introduction — ${memberName}`,
         html: emailBody,
         attachments: [
@@ -222,7 +226,7 @@ serve(async (req) => {
     await supabase.rpc('record_loi_email_sent', {
       p_loi_request_id: id,
       p_sent_to: clubEmail,
-      p_cc: 'secretary@cityuniversityclub.co.uk',
+      p_cc: CLUB_EMAIL,
       p_resend_email_id: responseData.id ?? null,
     })
 

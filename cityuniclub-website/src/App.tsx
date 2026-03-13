@@ -1,15 +1,18 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, Link } from 'react-router-dom'
 import { RootState } from './store'
 import { logout } from './slices/authSlice'
 import { Login } from './pages/Login'
+import { ForgotPassword } from './pages/ForgotPassword'
+import { ResetPassword } from './pages/ResetPassword'
 import { Home } from './pages/Home'
 import { Events } from './pages/Events'
 import { News } from './pages/News'
 import { Dining } from './pages/Dining'
 import { ReciprocalClubs } from './pages/ReciprocalClubs'
 import { LOIRequest } from './pages/LOIRequest'
+import { Profile } from './pages/Profile'
 
 // Bottom Tab Bar
 const TabBar: React.FC = () => {
@@ -58,21 +61,29 @@ const TopBanner: React.FC = () => {
   const auth = useSelector((state: RootState) => state.auth)
   const dispatch = useDispatch()
 
-  if (!auth.isAuthenticated || !auth.member) return null
-
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-oxford-blue/95 backdrop-blur-sm border-b border-white/10 px-4 py-2">
       <div className="flex items-center justify-between max-w-lg mx-auto">
-        <span className="text-white/60 text-xs">City University Club</span>
-        <div className="flex items-center gap-3">
-          <span className="text-white text-sm font-medium">{auth.member.full_name}</span>
-          <button
-            onClick={() => dispatch(logout())}
-            className="text-white/50 hover:text-white text-xs transition"
-          >
-            Sign out
-          </button>
-        </div>
+        <Link to="/home" className="flex items-center gap-2">
+          <img src="/assets/cuc-logo.avif" alt="CUC" className="w-7 h-7 object-contain rounded-full" />
+          <span className="text-white/80 text-xs font-medium">City University Club</span>
+        </Link>
+        {auth.isAuthenticated && auth.member && (
+          <div className="flex items-center gap-3">
+            <Link to="/profile" className="flex items-center gap-1.5 text-white hover:text-white/80 transition">
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
+              </svg>
+              <span className="text-sm font-medium">{auth.member.full_name}</span>
+            </Link>
+            <button
+              onClick={() => dispatch(logout())}
+              className="text-white/50 hover:text-white text-xs transition"
+            >
+              Sign out
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -80,11 +91,8 @@ const TopBanner: React.FC = () => {
 
 // Main Layout with Tabs
 const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const auth = useSelector((state: RootState) => state.auth)
-  const isAuthenticated = auth.isAuthenticated
-
   return (
-    <div className={`pb-20 ${isAuthenticated ? 'pt-9' : ''}`}>
+    <div className="pb-20 pt-10">
       <TopBanner />
       {children}
       <TabBar />
@@ -98,6 +106,8 @@ const App: React.FC = () => {
     <Routes>
       <Route path="/" element={<Navigate to="/home" replace />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       
       <Route path="/home" element={
         <MainLayout><Home /></MainLayout>
@@ -121,6 +131,10 @@ const App: React.FC = () => {
         </ProtectedRoute>
       } />
       
+      <Route path="/profile" element={
+        <MainLayout><Profile /></MainLayout>
+      } />
+
       <Route path="/loi-request" element={
         <ProtectedRoute>
           <MainLayout><LOIRequest /></MainLayout>

@@ -95,10 +95,10 @@ export const Dining: React.FC = () => {
   return (
     <div className="min-h-screen bg-oxford-blue pb-20">
       {/* Header */}
-      <div className="bg-oxford-blue sticky top-0 z-20 pt-12 pb-4 px-4 border-b border-white/10">
-        <h1 className="text-2xl font-semibold text-white text-center">Dining</h1>
+      <div className="bg-oxford-blue sticky top-10 z-20 pb-4 pt-6 px-4 border-b border-white/10">
+        <h1 className="text-2xl font-semibold text-white text-center mb-4">Dining</h1>
 
-        <div className="flex mt-4 bg-white/10 rounded-lg p-1">
+        <div className="flex max-w-md mx-auto bg-white/10 rounded-lg p-1">
           <button
             onClick={() => setActiveTab('book')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
@@ -130,9 +130,9 @@ export const Dining: React.FC = () => {
         </div>
       )}
 
-      <div className="p-4 max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {activeTab === 'book' ? (
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto">
             {/* Opening Hours */}
             <div className="bg-card-white rounded-xl shadow-lg p-4">
               <h2 className="text-lg font-serif text-oxford-blue font-semibold mb-3">Opening Hours</h2>
@@ -329,7 +329,7 @@ export const Dining: React.FC = () => {
                   <h2 className="text-xl font-serif font-bold">Starters</h2>
                 </div>
               </div>
-              <div className="grid md:grid-cols-2 gap-6 p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6">
                 {starters.map((item, index) => (
                   <div key={index} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
                     <div className="h-48 bg-gray-200 overflow-hidden">
@@ -352,7 +352,7 @@ export const Dining: React.FC = () => {
                   <h2 className="text-xl font-serif font-bold">Main Courses</h2>
                 </div>
               </div>
-              <div className="grid md:grid-cols-2 gap-6 p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6">
                 {mains.map((item, index) => (
                   <div key={index} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
                     <div className="h-48 bg-gray-200 overflow-hidden">
@@ -375,7 +375,7 @@ export const Dining: React.FC = () => {
                   <h2 className="text-xl font-serif font-bold">Desserts</h2>
                 </div>
               </div>
-              <div className="grid md:grid-cols-2 gap-6 p-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6">
                 {puddings.map((item, index) => (
                   <div key={index} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
                     <div className="h-48 bg-gray-200 overflow-hidden">

@@ -136,7 +136,7 @@ export const Events: React.FC = () => {
   return (
     <div className="min-h-screen bg-oxford-blue pb-20">
       {/* Header */}
-      <div className="bg-oxford-blue sticky top-0 z-10 pt-12 pb-4 px-4">
+      <div className="bg-oxford-blue sticky top-10 z-10 pb-4 pt-6 px-4 border-b border-white/10">
         <h1 className="text-2xl font-semibold text-white text-center">Club Events</h1>
       </div>
 
@@ -153,7 +153,8 @@ export const Events: React.FC = () => {
       )}
 
       {/* Events List */}
-      <div className="p-4 space-y-4">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {events.map((event) => (
           <div key={event.id} className="bg-card-white rounded-2xl shadow-lg overflow-hidden">
             {/* Event Type Badge */}
@@ -218,6 +219,7 @@ export const Events: React.FC = () => {
             </div>
           </div>
         ))}
+        </div>
       </div>
 
       {/* Booking Modal */}

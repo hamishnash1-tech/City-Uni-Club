@@ -29,6 +29,11 @@ serve(async (req) => {
     }
 
     const supabase = createClient(supabaseUrl, supabaseAnonKey)
+    const supabaseAdmin = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '')
+
+    const forwardedFor = req.headers.get('x-forwarded-for')
+    const ipAddress = forwardedFor ? forwardedFor.split(',')[0].trim() : null
+    const userAgent = req.headers.get('user-agent')
 
     // Sign in with Supabase Auth
     const { data: sessionData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -37,17 +42,29 @@ serve(async (req) => {
     })
 
     if (signInError) {
+      await supabaseAdmin.from('audit_logs').insert({
+        table_name: 'auth', operation: 'INSERT',
+        new_data: { app: 'admin', email, ip_address: ipAddress, user_agent: userAgent, success: false }
+      })
       throw new Error('Invalid email or password')
     }
 
     // Check if user has admin role
     const userRole = sessionData.user.user_metadata?.role || 'user'
-    
+
     if (userRole !== 'admin') {
-      // Sign out non-admin users
       await supabase.auth.signOut()
+      await supabaseAdmin.from('audit_logs').insert({
+        table_name: 'auth', operation: 'INSERT', record_id: sessionData.user.id,
+        new_data: { app: 'admin', email, ip_address: ipAddress, user_agent: userAgent, success: false }
+      })
       throw new Error('Access denied: Admin access required')
     }
+
+    await supabaseAdmin.from('audit_logs').insert({
+      table_name: 'auth', operation: 'INSERT', record_id: sessionData.user.id,
+      new_data: { app: 'admin', email, ip_address: ipAddress, user_agent: userAgent, success: true }
+    })
 
     const adminUser = {
       id: sessionData.user.id,
