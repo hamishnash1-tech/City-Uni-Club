@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import type { User } from '../types'
-import { supabase } from '../services/supabase'
+import { supabase, FUNCTIONS_URL } from '../services/supabase'
 
 interface AuthContextType {
   user: User | null
@@ -33,11 +33,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = async (email: string, password: string) => {
-    const { data, error } = await supabase.functions.invoke('admin-login', {
-      body: { email, password }
+    const res = await fetch(`${FUNCTIONS_URL}/admin-login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
     })
-
-    if (error) throw error
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Login failed')
     if (!data?.user) throw new Error('Login failed')
 
     setUser(data.user)
