@@ -1,15 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://myfoyoyjtkqthjjvabmn.supabase.co'
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Zm95b3lqdGtxdGhqanZhYm1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDI5NDAsImV4cCI6MjA4Nzc3ODk0MH0._OhoEKRYAZ0C7oon9e_WSj7p47pJlWQmqBgx2CtBtdg'
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase credentials not configured. Create .env file from .env.example')
-}
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-export const supabase = createClient(
-  supabaseUrl || 'https://myfoyoyjtkqthjjvabmn.supabase.co',
-  supabaseAnonKey || ''
-)
-
-export const FUNCTIONS_URL = `${supabaseUrl || 'https://myfoyoyjtkqthjjvabmn.supabase.co'}/functions/v1`
+export const FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`

@@ -69,7 +69,7 @@ serve(async (req) => {
         'Authorization': `Bearer ${resendApiKey}`,
       },
       body: JSON.stringify({
-        from: 'City University Club <loi@cityuniversityclub.co.uk>',
+        from: 'City University Club <loi@admin.cityuniversityclub.co.uk>',
         to: [clubEmail],
         cc: ['secretary@cityuniversityclub.co.uk'],
         subject: `Letter of Introduction Request - ${memberName}`,
