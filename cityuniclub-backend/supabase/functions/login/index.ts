@@ -59,8 +59,15 @@ serve(async (req: Request) => {
       throw new Error('Invalid email or password')
     }
 
+    const forwardedFor = req.headers.get('x-forwarded-for')
+    const ipAddress = forwardedFor ? forwardedFor.split(',')[0].trim() : null
+    const userAgent = req.headers.get('user-agent')
+
     // Verify password (plain text comparison)
     if (password !== member.password_hash) {
+      await supabaseClient.from('user_logins').insert({
+        app: 'main', member_id: member.id, email, ip_address: ipAddress, user_agent: userAgent, success: false
+      })
       throw new Error('Invalid email or password')
     }
 
@@ -69,16 +76,12 @@ serve(async (req: Request) => {
     const expiresAt = new Date()
     expiresAt.setDate(expiresAt.getDate() + 30)
 
-    // Get single IP address
-    const forwardedFor = req.headers.get('x-forwarded-for')
-    const ipAddress = forwardedFor ? forwardedFor.split(',')[0].trim() : null
-
     const { data: sessionData, error: sessionError } = await supabaseClient
       .from('sessions')
       .insert({
         member_id: member.id,
         token: token,
-        device_info: req.headers.get('user-agent'),
+        device_info: userAgent,
         ip_address: ipAddress,
         expires_at: expiresAt.toISOString()
       })
@@ -88,6 +91,10 @@ serve(async (req: Request) => {
     if (sessionError) {
       throw sessionError
     }
+
+    await supabaseClient.from('user_logins').insert({
+      app: 'main', member_id: member.id, email, ip_address: ipAddress, user_agent: userAgent, success: true
+    })
 
     return new Response(
       JSON.stringify({
