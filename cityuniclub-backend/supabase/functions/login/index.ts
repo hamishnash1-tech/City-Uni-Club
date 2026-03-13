@@ -65,8 +65,9 @@ serve(async (req: Request) => {
 
     // Verify password (plain text comparison)
     if (password !== member.password_hash) {
-      await supabaseClient.from('user_logins').insert({
-        app: 'main', member_id: member.id, email, ip_address: ipAddress, user_agent: userAgent, success: false
+      await supabaseClient.from('audit_logs').insert({
+        table_name: 'auth', operation: 'INSERT', record_id: member.id,
+        new_data: { app: 'main', email, ip_address: ipAddress, user_agent: userAgent, success: false }
       })
       throw new Error('Invalid email or password')
     }
@@ -92,8 +93,9 @@ serve(async (req: Request) => {
       throw sessionError
     }
 
-    await supabaseClient.from('user_logins').insert({
-      app: 'main', member_id: member.id, email, ip_address: ipAddress, user_agent: userAgent, success: true
+    await supabaseClient.from('audit_logs').insert({
+      table_name: 'auth', operation: 'INSERT', record_id: member.id,
+      new_data: { app: 'main', email, ip_address: ipAddress, user_agent: userAgent, success: true }
     })
 
     return new Response(

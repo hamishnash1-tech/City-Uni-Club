@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { FROM_EMAIL } from '../_shared/constants.ts'
 
 serve(async (req: Request) => {
   // CORS headers - allow all origins
@@ -120,7 +121,7 @@ serve(async (req: Request) => {
             'Authorization': `Bearer ${resendKey}`,
           },
           body: JSON.stringify({
-            from: 'City University Club <dining@cityuniversityclub.co.uk>',
+            from: FROM_EMAIL,
             to: ['secretary@cityuniversityclub.co.uk'],
             subject: `Dining Reservation - ${member.full_name}`,
             html: `

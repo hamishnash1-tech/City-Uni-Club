@@ -42,8 +42,9 @@ serve(async (req) => {
     })
 
     if (signInError) {
-      await supabaseAdmin.from('user_logins').insert({
-        app: 'admin', email, ip_address: ipAddress, user_agent: userAgent, success: false
+      await supabaseAdmin.from('audit_logs').insert({
+        table_name: 'auth', operation: 'INSERT',
+        new_data: { app: 'admin', email, ip_address: ipAddress, user_agent: userAgent, success: false }
       })
       throw new Error('Invalid email or password')
     }
@@ -53,14 +54,16 @@ serve(async (req) => {
 
     if (userRole !== 'admin') {
       await supabase.auth.signOut()
-      await supabaseAdmin.from('user_logins').insert({
-        app: 'admin', user_id: sessionData.user.id, email, ip_address: ipAddress, user_agent: userAgent, success: false
+      await supabaseAdmin.from('audit_logs').insert({
+        table_name: 'auth', operation: 'INSERT', record_id: sessionData.user.id,
+        new_data: { app: 'admin', email, ip_address: ipAddress, user_agent: userAgent, success: false }
       })
       throw new Error('Access denied: Admin access required')
     }
 
-    await supabaseAdmin.from('user_logins').insert({
-      app: 'admin', user_id: sessionData.user.id, email, ip_address: ipAddress, user_agent: userAgent, success: true
+    await supabaseAdmin.from('audit_logs').insert({
+      table_name: 'auth', operation: 'INSERT', record_id: sessionData.user.id,
+      new_data: { app: 'admin', email, ip_address: ipAddress, user_agent: userAgent, success: true }
     })
 
     const adminUser = {
