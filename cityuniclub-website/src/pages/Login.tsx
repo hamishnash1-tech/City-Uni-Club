@@ -20,14 +20,12 @@ export const Login: React.FC = () => {
     console.log('Login attempt:', { email: formData.email, password: formData.password })
     dispatch(loginStart())
 
-    // Simple validation
     if (!formData.email || !formData.password) {
       dispatch(loginFailure('Please enter both email and password'))
       return
     }
 
     try {
-      // Call real API
       console.log('Calling login API...')
       const response = await api.login(formData.email, formData.password)
       console.log('Login successful:', response)
@@ -38,7 +36,6 @@ export const Login: React.FC = () => {
       }))
 
       console.log('Navigating to home...')
-      // Navigate to home
       navigate('/home')
     } catch (err: any) {
       console.error('Login error:', err)
@@ -47,14 +44,14 @@ export const Login: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-oxford-blue flex items-center justify-center p-4">
+    <div className="bg-navy-gradient flex items-center justify-center p-4 py-12">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-12">
-          <div className="w-24 h-24 mx-auto mb-4 bg-white/10 rounded-full flex items-center justify-center overflow-hidden">
-            <img 
-              src="/assets/cuc-logo.avif" 
-              alt="CUC Logo" 
+          <div className="w-24 h-24 mx-auto mb-5 border border-cambridge/35 bg-white/5 rounded-full flex items-center justify-center overflow-hidden">
+            <img
+              src="/assets/cuc-logo.avif"
+              alt="CUC Logo"
               className="w-20 h-20 object-contain"
               onError={(e) => {
                 console.log('Logo failed to load')
@@ -62,21 +59,21 @@ export const Login: React.FC = () => {
               }}
             />
           </div>
-          <h1 className="text-3xl font-light text-white mb-2">Welcome</h1>
-          <p className="text-cambridge-blue font-serif">City University Club</p>
+          <h1 className="font-serif text-4xl font-light text-ivory tracking-wide mb-2">Welcome</h1>
+          <p className="label-caps text-cambridge-light/65">City University Club</p>
         </div>
 
         {/* Login Form */}
-        <div className="space-y-6">
+        <div className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-cambridge-blue mb-2">
+            <label className="label-caps text-cambridge-light/65 block mb-2">
               Membership Email
             </label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-4 py-3 bg-white/10 border border-cambridge-blue/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cambridge-blue"
+              className="club-input-dark"
               placeholder="your.email@example.com"
               required
             />
@@ -84,10 +81,10 @@ export const Login: React.FC = () => {
 
           <div>
             <div className="flex justify-between items-center mb-2">
-              <label className="block text-sm font-medium text-cambridge-blue">
+              <label className="label-caps text-cambridge-light/65">
                 Password
               </label>
-              <Link to="/forgot-password" className="text-xs text-cambridge-blue/70 hover:text-cambridge-blue hover:underline">
+              <Link to="/forgot-password" className="text-xs text-cambridge/60 hover:text-cambridge-light transition">
                 Forgot password?
               </Link>
             </div>
@@ -95,15 +92,15 @@ export const Login: React.FC = () => {
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-3 bg-white/10 border border-cambridge-blue/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cambridge-blue"
-              placeholder="password123"
+              className="club-input-dark"
+              placeholder="••••••••"
               required
             />
           </div>
 
           {error && (
-            <div className="bg-red-500/20 text-red-300 p-3 rounded-lg text-sm border border-red-500/30">
-              ❌ {error}
+            <div className="bg-red-900/20 text-red-200/80 p-3 text-sm border border-red-400/20 rounded">
+              {error}
             </div>
           )}
 
@@ -111,17 +108,14 @@ export const Login: React.FC = () => {
             type="submit"
             disabled={isLoading}
             onClick={handleSubmit}
-            className="w-full bg-gradient-to-r from-cambridge-blue to-cambridge-blue/80 text-white py-4 rounded-lg font-semibold disabled:opacity-60 hover:from-cambridge-blue/90 hover:to-cambridge-blue/70 transition"
+            className="btn-primary mt-2"
           >
-            {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
 
-          <div className="text-center text-sm text-gray-400 bg-white/5 p-4 rounded-lg">
-            <p className="mb-2">🔑 Login with your membership credentials</p>
-            <p className="text-xs">
-              Use the email address registered with your City University Club membership
-            </p>
-          </div>
+          <p className="text-center text-xs text-ivory/50 pt-1">
+            Use the email address registered with your City University Club membership
+          </p>
         </div>
       </div>
     </div>

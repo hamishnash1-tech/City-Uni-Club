@@ -12,6 +12,8 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  background-color: #071A33;
 }
 
 #root {
@@ -29,4 +31,144 @@ body {
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+@layer components {
+  /* Uppercase tracked label — tabs, section markers, form labels */
+  .label-caps {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  /* Decorative gold rule — between menu sections, never for UI */
+  .gold-rule {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(201, 169, 110, 0.45), transparent);
+    border: none;
+    margin: 1.25rem 0;
+  }
+
+  /* Card surface — ivory background, refined border and shadow */
+  .club-card {
+    background-color: #FAF7F2;
+    border: 1px solid #DDD5C8;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 4px rgba(10, 35, 66, 0.06), 0 4px 16px rgba(10, 35, 66, 0.08);
+  }
+
+  /* Form input — ivory bg, cambridge teal focus ring */
+  .club-input {
+    background-color: #FAF7F2;
+    border: 1px solid #DDD5C8;
+    border-radius: 0.25rem;
+    padding: 0.75rem 1rem;
+    color: #1C2B3A;
+    width: 100%;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .club-input::placeholder {
+    color: #718096;
+  }
+
+  .club-input:focus {
+    outline: none;
+    border-color: #5A8FA8;
+    box-shadow: 0 0 0 3px rgba(122, 175, 196, 0.28);
+  }
+
+  /* Dark background input — for login, auth screens */
+  .club-input-dark {
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 0.25rem;
+    padding: 0.75rem 1rem;
+    color: #FAF7F2;
+    width: 100%;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  .club-input-dark::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+  }
+
+  .club-input-dark:focus {
+    outline: none;
+    border-color: rgba(122, 175, 196, 0.6);
+    box-shadow: 0 0 0 3px rgba(122, 175, 196, 0.20);
+  }
+
+  /* Primary button — oxford-blue bg, ivory text */
+  .btn-primary {
+    background-color: #0A2342;
+    color: #FAF7F2;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    padding: 0.875rem 1.5rem;
+    border-radius: 0.375rem;
+    border: none;
+    transition: background-color 0.15s;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+
+  .btn-primary:hover {
+    background-color: #0D2B52;
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Outline button — for CTAs on dark backgrounds */
+  .btn-outline {
+    border: 1px solid rgba(250, 247, 242, 0.7);
+    color: #FAF7F2;
+    background: transparent;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.875rem 2rem;
+    border-radius: 0.375rem;
+    transition: background-color 0.15s, border-color 0.15s;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .btn-outline:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color: rgba(250, 247, 242, 0.9);
+  }
+
+  /* Outline button for light backgrounds (ivory cards) */
+  .btn-outline-navy {
+    border: 1px solid #0A2342;
+    color: #0A2342;
+    background: transparent;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.625rem 1rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.15s;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .btn-outline-navy:hover {
+    background-color: rgba(10, 35, 66, 0.06);
+  }
 }
