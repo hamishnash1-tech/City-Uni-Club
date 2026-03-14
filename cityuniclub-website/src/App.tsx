@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { Routes, Route, Navigate, Link } from 'react-router-dom'
+import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { RootState } from './store'
 import { logout } from './slices/authSlice'
 import { Login } from './pages/Login'
@@ -13,72 +13,135 @@ import { Dining } from './pages/Dining'
 import { ReciprocalClubs } from './pages/ReciprocalClubs'
 import { LOIRequest } from './pages/LOIRequest'
 import { Profile } from './pages/Profile'
+import { TermsAndConditions } from './pages/TermsAndConditions'
+import { PrivacyPolicy } from './pages/PrivacyPolicy'
+import { IconHome, IconDining, IconEvents, IconNews, IconClubs, IconUser } from './icons'
 
-// Bottom Tab Bar
+const tabs = [
+  { id: 'home',   label: 'Home',   path: '/home',             icon: <IconHome className="w-4 h-4" /> },
+  { id: 'dining', label: 'Dining', path: '/dining',           icon: <IconDining className="w-4 h-4" /> },
+  { id: 'events', label: 'Events', path: '/events',           icon: <IconEvents className="w-4 h-4" /> },
+  { id: 'news',   label: 'News',   path: '/news',             icon: <IconNews className="w-4 h-4" /> },
+  { id: 'clubs',  label: 'Clubs',  path: '/reciprocal-clubs', icon: <IconClubs className="w-4 h-4" /> },
+]
+
+// Mobile tab bar
 const TabBar: React.FC = () => {
-  const auth = useSelector((state: RootState) => state.auth)
-  const isAuthenticated = auth.isAuthenticated
-
-  const tabs = [
-    { id: 'home', icon: '🏠', label: 'Home', path: '/home' },
-    { id: 'dining', icon: '🍽️', label: 'Dining', path: '/dining' },
-    { id: 'events', icon: '📅', label: 'Events', path: '/events' },
-    { id: 'news', icon: '📰', label: 'News', path: '/news' },
-    { id: 'clubs', icon: '🌍', label: 'Clubs', path: '/reciprocal-clubs' },
-  ]
-
+  const { pathname } = useLocation()
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 safe-area-bottom">
-      <div className="flex justify-around items-center max-w-lg mx-auto">
-        {tabs.map((tab) => (
-          <a
-            key={tab.id}
-            href={tab.path}
-            className={`flex flex-col items-center p-2 rounded-lg transition ${
-              isAuthenticated ? 'text-oxford-blue' : 'text-gray-400'
-            }`}
-          >
-            <span className="text-2xl mb-1">{tab.icon}</span>
-            <span className="text-xs font-medium">{tab.label}</span>
-          </a>
-        ))}
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-navy-deep border-t border-cambridge/15 px-2 safe-area-bottom">
+      <div className="flex justify-around items-stretch">
+        {tabs.map((tab) => {
+          const isActive = pathname === tab.path
+          return (
+            <Link
+              key={tab.id}
+              to={tab.path}
+              className={`flex flex-col items-center pt-2 pb-3 px-3 flex-1 transition-colors duration-200 ${
+                isActive ? 'text-cambridge' : 'text-ivory/35 hover:text-cambridge'
+              }`}
+            >
+              {tab.icon}
+              <span className="font-cormorant text-sm tracking-wide mt-1">{tab.label}</span>
+            </Link>
+          )
+        })}
       </div>
     </div>
   )
 }
 
-// Protected Route (optional - can make public)
-const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const auth = useSelector((state: RootState) => state.auth)
-  const isAuthenticated = auth.isAuthenticated
-  // For now, allow access without login
-  return <>{children}</>
-  // return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />
+// Desktop nav — used inside TopBanner
+const DesktopNav: React.FC = () => {
+  const { pathname } = useLocation()
+  const activeIndex = tabs.findIndex(t => t.path === pathname)
+  const [indicatorIndex, setIndicatorIndex] = useState(activeIndex >= 0 ? activeIndex : 0)
+
+  useEffect(() => {
+    if (activeIndex >= 0) setIndicatorIndex(activeIndex)
+  }, [activeIndex])
+
+  const pct = 100 / tabs.length
+
+  return (
+    <nav className="hidden md:flex items-center relative">
+      {/* Sliding underline indicator */}
+      <div
+        className="absolute bottom-0 h-0.5 bg-cambridge rounded-full"
+        style={{
+          width: `${pct}%`,
+          left: `${indicatorIndex * pct}%`,
+          transition: 'left 0.3s cubic-bezier(0.34, 1.15, 0.64, 1)',
+        }}
+      />
+      {tabs.map((tab) => {
+        const isActive = pathname === tab.path
+        return (
+          <Link
+            key={tab.id}
+            to={tab.path}
+            className={`flex items-center gap-2 px-5 py-2 transition-colors duration-200 ${
+              isActive ? 'text-cambridge' : 'text-ivory/40 hover:text-cambridge'
+            }`}
+          >
+            {tab.icon}
+            <span className="font-cormorant text-lg font-semibold tracking-wide">{tab.label}</span>
+          </Link>
+        )
+      })}
+    </nav>
+  )
 }
 
-// Top Banner
-const TopBanner: React.FC = () => {
+// Mobile slide-in menu
+const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, onClose }) => {
+  const { pathname } = useLocation()
   const auth = useSelector((state: RootState) => state.auth)
   const dispatch = useDispatch()
 
+  useEffect(() => { onClose() }, [pathname])
+
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-oxford-blue/95 backdrop-blur-sm border-b border-white/10 px-4 py-2">
-      <div className="flex items-center justify-between max-w-lg mx-auto">
-        <Link to="/home" className="flex items-center gap-2">
-          <img src="/assets/cuc-logo.avif" alt="CUC" className="w-7 h-7 object-contain rounded-full" />
-          <span className="text-white/80 text-xs font-medium">City University Club</span>
-        </Link>
+    <div className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+      <div
+        className={`absolute inset-0 bg-navy-deep/80 backdrop-blur-sm transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0'}`}
+        onClick={onClose}
+      />
+      <div
+        className="absolute left-0 top-0 bottom-0 w-64 bg-navy-deep border-r border-cambridge/20 flex flex-col pt-14 pb-8 px-5"
+        style={{
+          transform: open ? 'translateX(0)' : 'translateX(-100%)',
+          transition: 'transform 0.3s ease-out',
+        }}
+      >
+        <nav className="flex-1 space-y-1 mt-4">
+          {tabs.map((tab) => {
+            const isActive = pathname === tab.path
+            return (
+              <Link
+                key={tab.id}
+                to={tab.path}
+                className={`flex items-center gap-3 px-3 py-3 rounded-sm transition ${
+                  isActive
+                    ? 'text-cambridge bg-cambridge/10'
+                    : 'text-ivory/60 hover:text-cambridge'
+                }`}
+              >
+                {tab.icon}
+                <span className="font-cormorant text-base tracking-wide">{tab.label}</span>
+              </Link>
+            )
+          })}
+        </nav>
         {auth.isAuthenticated && auth.member && (
-          <div className="flex items-center gap-3">
-            <Link to="/profile" className="flex items-center gap-1.5 text-white hover:text-white/80 transition">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>
-              </svg>
-              <span className="text-sm font-medium">{auth.member.full_name}</span>
+          <div className="border-t border-cambridge/20 pt-4 pb-2 px-3 rounded-sm bg-cambridge/10 space-y-3">
+            <Link to="/profile" className="flex items-center gap-2 text-ivory/60 hover:text-ivory transition">
+              <IconUser className="w-4 h-4" />
+              <span className="text-sm font-light">{auth.member.full_name}</span>
             </Link>
             <button
-              onClick={() => dispatch(logout())}
-              className="text-white/50 hover:text-white text-xs transition"
+              onClick={() => { dispatch(logout()); onClose() }}
+              className="label-caps text-cambridge-light/50 hover:text-cambridge-light transition"
             >
               Sign out
             </button>
@@ -89,58 +152,128 @@ const TopBanner: React.FC = () => {
   )
 }
 
-// Main Layout with Tabs
-const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+// Top Banner
+const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean }> = ({ onMenuToggle, menuOpen }) => {
+  const auth = useSelector((state: RootState) => state.auth)
+  const dispatch = useDispatch()
+
   return (
-    <div className="pb-20 pt-10">
-      <TopBanner />
-      {children}
-      <TabBar />
+    <div className="fixed top-0 left-0 right-0 z-50 bg-oxford-blue/95 backdrop-blur-sm border-b border-white/10 px-4 py-2">
+      <div className="flex items-center gap-4">
+        {/* Mobile hamburger */}
+        <button
+          onClick={onMenuToggle}
+          className="md:hidden text-ivory/70 hover:text-ivory transition p-1 flex-shrink-0"
+          aria-label="Menu"
+        >
+          <div style={{ position: 'relative', width: '20px', height: '20px' }}>
+            {[
+              { closed: 'translateY(-5.5px)', opened: 'rotate(45deg)' },
+              { closed: 'translateY(0)',       opened: null },
+              { closed: 'translateY(5.5px)',  opened: 'rotate(-45deg)' },
+            ].map((bar, i) => (
+              <span key={i} style={{
+                position: 'absolute',
+                left: '1px',
+                top: 'calc(50% - 0.75px)',
+                width: '18px',
+                height: '1.5px',
+                borderRadius: '1px',
+                background: 'currentColor',
+                transformOrigin: 'center',
+                ...(bar.opened
+                  ? { transform: menuOpen ? bar.opened : bar.closed, transition: 'transform 0.3s ease-out' }
+                  : { opacity: menuOpen ? 0 : 1, transition: 'opacity 0.15s ease-out' }),
+              }} />
+            ))}
+          </div>
+        </button>
+
+        {/* Logo + name */}
+        <Link to="/home" className="flex items-center gap-2 flex-shrink-0">
+          <div className="w-7 h-7 bg-cambridge/45 rounded-full flex items-center justify-center overflow-hidden">
+            <img src="/assets/cuc-logo-square.png" alt="CUC" className="w-6 h-6 object-contain" />
+          </div>
+          <span className="block md:hidden lg:block font-cormorant text-sm tracking-widest uppercase text-cambridge-light/70">City University Club</span>
+        </Link>
+
+        {/* Desktop nav — centre */}
+        <div className="flex-1 flex justify-center">
+          <DesktopNav />
+        </div>
+
+        {/* Desktop right — user or login */}
+        <div className="hidden md:flex items-center gap-3 flex-shrink-0">
+          {auth.isAuthenticated && auth.member ? (
+            <Link to="/profile" className="flex items-center gap-1.5 text-ivory/80 hover:text-ivory transition">
+              <IconUser className="w-4 h-4" />
+              <span className="text-sm font-light tracking-wide text-ivory/80">{auth.member.full_name}</span>
+            </Link>
+          ) : (
+            <Link to="/login" className="label-caps text-cambridge-light/60 hover:text-cambridge-light transition">
+              Sign In
+            </Link>
+          )}
+        </div>
+      </div>
     </div>
   )
 }
 
-// App Component
-const App: React.FC = () => {
-  return (
-    <Routes>
-      <Route path="/" element={<Navigate to="/home" replace />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
-      
-      <Route path="/home" element={
-        <MainLayout><Home /></MainLayout>
-      } />
-      
-      <Route path="/dining" element={
-        <MainLayout><Dining /></MainLayout>
-      } />
-      
-      <Route path="/events" element={
-        <MainLayout><Events /></MainLayout>
-      } />
-      
-      <Route path="/news" element={
-        <MainLayout><News /></MainLayout>
-      } />
-      
-      <Route path="/reciprocal-clubs" element={
-        <ProtectedRoute>
-          <MainLayout><ReciprocalClubs /></MainLayout>
-        </ProtectedRoute>
-      } />
-      
-      <Route path="/profile" element={
-        <MainLayout><Profile /></MainLayout>
-      } />
+// Scroll to top on route change
+const ScrollToTop: React.FC = () => {
+  const { pathname } = useLocation()
+  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  return null
+}
 
-      <Route path="/loi-request" element={
-        <ProtectedRoute>
-          <MainLayout><LOIRequest /></MainLayout>
-        </ProtectedRoute>
-      } />
-    </Routes>
+// Protected Route
+const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated } = useSelector((state: RootState) => state.auth)
+  if (!isAuthenticated) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
+
+// App Component — persistent shell wraps all routes so TabBar never remounts
+const App: React.FC = () => {
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  return (
+    <>
+      <ScrollToTop />
+      <TopBanner onMenuToggle={() => setMenuOpen(o => !o)} menuOpen={menuOpen} />
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      <div className="pt-10 md:pt-12 min-h-screen flex flex-col">
+        <div className="flex-1">
+        <Routes>
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/dining" element={<Dining />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/reciprocal-clubs" element={<ReciprocalClubs />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/loi-request" element={<ProtectedRoute><LOIRequest /></ProtectedRoute>} />
+          <Route path="/terms" element={<TermsAndConditions />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+        </Routes>
+        </div>
+        <footer className="border-t border-cambridge/10 mt-8 pb-8 pt-5 px-4 text-center space-y-1.5">
+          <p className="font-cormorant text-sm tracking-widest text-ivory/60">
+            &copy; {new Date().getFullYear()} City University Club · All rights reserved
+          </p>
+          <div className="flex justify-center gap-4 font-cormorant text-sm tracking-wide text-ivory/50">
+            <Link to="/terms" className="hover:text-cambridge transition">Terms & Conditions</Link>
+            <span>·</span>
+            <Link to="/privacy" className="hover:text-cambridge transition">Privacy Policy</Link>
+          </div>
+        </footer>
+      </div>
+      {/* TabBar removed */}
+    </>
   )
 }
 

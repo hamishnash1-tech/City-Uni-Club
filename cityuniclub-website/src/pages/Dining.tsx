@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { IconDining } from '../icons'
 import { useSelector } from 'react-redux'
 import { RootState } from '../store'
 import { api } from '../services/api'
@@ -93,212 +94,219 @@ export const Dining: React.FC = () => {
   const puddings = menuItems.filter(item => item.category === 'Puddings')
 
   return (
-    <div className="min-h-screen bg-oxford-blue pb-20">
+    <div className="bg-navy-deep">
       {/* Header */}
-      <div className="bg-oxford-blue sticky top-10 z-20 pb-4 pt-6 px-4 border-b border-white/10">
-        <h1 className="text-2xl font-semibold text-white text-center mb-4">Dining</h1>
+      <div className="bg-cambridge/15 pt-7 pb-5 px-4 border-b border-cambridge/20">
+        <div className="flex items-center justify-center gap-2 mb-4 text-ivory">
+          <IconDining />
+          <h1 className="font-serif text-2xl font-normal text-ivory">Dining</h1>
+        </div>
 
-        <div className="flex max-w-md mx-auto bg-white/10 rounded-lg p-1">
+        <div className="relative flex max-w-md mx-auto border border-cambridge/20 rounded-sm p-1">
+          <div
+            className="absolute top-1 bottom-1 bg-cambridge/25 rounded-sm transition-transform duration-300 ease-out"
+            style={{ left: '4px', width: 'calc(50% - 4px)', transform: activeTab === 'book' ? 'translateX(0)' : 'translateX(100%)' }}
+          />
           <button
             onClick={() => setActiveTab('book')}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
-              activeTab === 'book' ? 'bg-cambridge-blue text-white' : 'text-white/70 hover:text-white'
+            className={`relative flex-1 py-2 px-4 text-sm transition-colors duration-200 rounded-sm ${
+              activeTab === 'book' ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
             }`}
           >
-            📅 Book a Table
+            <span className="label-caps">Book a Table</span>
           </button>
           <button
             onClick={() => setActiveTab('menu')}
-            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition ${
-              activeTab === 'menu' ? 'bg-cambridge-blue text-white' : 'text-white/70 hover:text-white'
+            className={`relative flex-1 py-2 px-4 text-sm transition-colors duration-200 rounded-sm ${
+              activeTab === 'menu' ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
             }`}
           >
-            📖 View Menu
+            <span className="label-caps">View Menu</span>
           </button>
         </div>
       </div>
 
       {/* Success Message */}
       {showSuccess && (
-        <div className="fixed top-40 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        <div className="fixed top-40 left-1/2 transform -translate-x-1/2 bg-oxford-blue border border-cambridge/30 text-ivory px-6 py-3 rounded shadow-modal z-50">
           <div className="flex items-center space-x-2">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-cambridge" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            <span>Reservation submitted! We'll confirm shortly.</span>
+            <span className="text-sm">Reservation submitted. We'll confirm shortly.</span>
           </div>
         </div>
       )}
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {activeTab === 'book' ? (
-          <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl mx-auto">
+          <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto">
             {/* Opening Hours */}
-            <div className="bg-card-white rounded-xl shadow-lg p-4">
-              <h2 className="text-lg font-serif text-oxford-blue font-semibold mb-3">Opening Hours</h2>
-              <div className="space-y-2 text-sm text-secondary-text">
+            <div className="club-card p-5">
+              <h2 className="font-serif text-oxford-blue text-base font-normal mb-3">Opening Hours</h2>
+              <div className="space-y-2 text-sm text-ink-mid">
                 <div className="flex justify-between">
                   <span>Breakfast</span>
-                  <span>8:00 AM - 11:00 AM</span>
+                  <span>8:00 – 11:00</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Lunch</span>
-                  <span>12:00 PM - 2:30 PM</span>
+                  <span>12:00 – 14:30</span>
                 </div>
-                <div className="pt-1 text-xs text-gray-400">Open Tuesday – Friday</div>
+                <div className="pt-1">
+                  <span className="label-caps text-ink-light">Tuesday – Friday</span>
+                </div>
               </div>
             </div>
 
             {/* Member info or guest fields */}
             {member ? (
-              <div className="bg-card-white rounded-xl shadow-lg p-4">
-                <h3 className="font-serif text-oxford-blue font-semibold mb-2">Booking for</h3>
-                <p className="text-sm text-oxford-blue font-medium">{member.full_name}</p>
-                <p className="text-xs text-secondary-text">{member.email}</p>
+              <div className="club-card p-5">
+                <h3 className="label-caps text-ink-light mb-3">Booking for</h3>
+                <p className="font-serif text-oxford-blue">{member.full_name}</p>
+                <p className="text-xs text-ink-light mt-1">{member.email}</p>
               </div>
             ) : (
-              <div className="bg-card-white rounded-xl shadow-lg p-4 space-y-4">
-                <h3 className="font-serif text-oxford-blue font-semibold">Your Details</h3>
+              <div className="club-card p-5 space-y-4">
+                <h3 className="font-serif text-oxford-blue font-normal">Your Details</h3>
                 <div>
-                  <label className="block text-sm font-medium text-oxford-blue mb-2">Full Name *</label>
+                  <label className="label-caps text-ink-light block mb-2">Full Name *</label>
                   <input
                     type="text"
                     value={formData.guest_name}
                     onChange={(e) => setFormData({ ...formData, guest_name: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-oxford-blue focus:border-transparent"
+                    className="club-input"
                     placeholder="John Smith"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-oxford-blue mb-2">Email Address *</label>
+                  <label className="label-caps text-ink-light block mb-2">Email Address *</label>
                   <input
                     type="email"
                     value={formData.guest_email}
                     onChange={(e) => setFormData({ ...formData, guest_email: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-oxford-blue focus:border-transparent"
+                    className="club-input"
                     placeholder="john@example.com"
                     required
                   />
                 </div>
-                <p className="text-xs text-secondary-text">
+                <p className="text-xs text-ink-light">
                   Not a member? Your reservation will be pending until confirmed by the club.
                 </p>
               </div>
             )}
 
             {/* Meal Type */}
-            <div className="bg-card-white rounded-xl shadow-lg p-4">
-              <label className="block text-sm font-medium text-oxford-blue mb-3">Select Meal Type</label>
+            <div className="club-card p-5">
+              <label className="label-caps text-ink-light block mb-3">Select Meal</label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, meal_type: 'Breakfast', time: '' })}
-                  className={`p-4 rounded-lg border-2 transition ${
+                  className={`p-4 rounded border-2 transition text-left ${
                     formData.meal_type === 'Breakfast'
-                      ? 'border-oxford-blue bg-oxford-blue text-white'
-                      : 'border-gray-300 hover:border-oxford-blue'
+                      ? 'border-cambridge-muted bg-cambridge-subtle text-oxford-blue'
+                      : 'border-ivory-border hover:border-cambridge/40'
                   }`}
                 >
-                  <div className="text-2xl mb-1">☀️</div>
-                  <div className="font-semibold">Breakfast</div>
-                  <div className="text-sm">8:00 - 11:00</div>
+                  <div className="font-serif text-oxford-blue font-normal mb-0.5">Breakfast</div>
+                  <div className="label-caps text-ink-light">8:00 – 11:00</div>
                 </button>
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, meal_type: 'Lunch', time: '' })}
-                  className={`p-4 rounded-lg border-2 transition ${
+                  className={`p-4 rounded border-2 transition text-left ${
                     formData.meal_type === 'Lunch'
-                      ? 'border-oxford-blue bg-oxford-blue text-white'
-                      : 'border-gray-300 hover:border-oxford-blue'
+                      ? 'border-cambridge-muted bg-cambridge-subtle text-oxford-blue'
+                      : 'border-ivory-border hover:border-cambridge/40'
                   }`}
                 >
-                  <div className="text-2xl mb-1">🍽️</div>
-                  <div className="font-semibold">Lunch</div>
-                  <div className="text-sm">12:00 - 14:30</div>
+                  <div className="font-serif text-oxford-blue font-normal mb-0.5">Lunch</div>
+                  <div className="label-caps text-ink-light">12:00 – 14:30</div>
                 </button>
               </div>
             </div>
 
-            {/* Date & Time */}
+            {/* Date & Guests */}
             <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-card-white rounded-xl shadow-lg p-4">
-                <label className="block text-sm font-medium text-oxford-blue mb-3">Select Date</label>
+              <div className="club-card p-5">
+                <label className="label-caps text-ink-light block mb-3">Select Date</label>
                 <input
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value, time: '' })}
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-oxford-blue focus:border-transparent"
+                  className="club-input"
                   required
                 />
               </div>
 
-              {formData.date && (
-                <div className="bg-card-white rounded-xl shadow-lg p-4">
-                  <label className="block text-sm font-medium text-oxford-blue mb-3">Select Time</label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {times.map((time) => (
-                      <button
-                        key={time}
-                        type="button"
-                        onClick={() => setFormData({ ...formData, time })}
-                        className={`py-2 rounded-lg text-xs font-medium transition ${
-                          formData.time === time
-                            ? 'bg-oxford-blue text-white'
-                            : 'bg-gray-100 text-oxford-blue hover:bg-gray-200'
-                        }`}
-                      >
-                        {time}
-                      </button>
-                    ))}
-                  </div>
+              <div className="club-card p-5">
+                <label className="label-caps text-ink-light block mb-3">Number of Guests</label>
+                <div className="flex items-center space-x-5">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, guest_count: Math.max(1, formData.guest_count - 1) })}
+                    className="w-10 h-10 rounded border border-ivory-border hover:border-cambridge/50 flex items-center justify-center text-xl text-ink transition"
+                  >
+                    −
+                  </button>
+                  <span className="font-serif text-2xl text-oxford-blue w-10 text-center">
+                    {formData.guest_count}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, guest_count: Math.min(20, formData.guest_count + 1) })}
+                    className="w-10 h-10 rounded border border-ivory-border hover:border-cambridge/50 flex items-center justify-center text-xl text-ink transition"
+                  >
+                    +
+                  </button>
                 </div>
-              )}
-            </div>
-
-            {/* Guest Count */}
-            <div className="bg-card-white rounded-xl shadow-lg p-4">
-              <label className="block text-sm font-medium text-oxford-blue mb-3">Number of Guests</label>
-              <div className="flex items-center space-x-4">
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, guest_count: Math.max(1, formData.guest_count - 1) })}
-                  className="w-10 h-10 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-xl font-bold"
-                >
-                  -
-                </button>
-                <span className="text-2xl font-bold text-oxford-blue w-12 text-center">
-                  {formData.guest_count}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, guest_count: Math.min(20, formData.guest_count + 1) })}
-                  className="w-10 h-10 rounded-full bg-oxford-blue text-white hover:bg-oxford-blue/90 flex items-center justify-center text-xl font-bold"
-                >
-                  +
-                </button>
               </div>
             </div>
 
+            {/* Time */}
+            {formData.date && (
+              <div className="club-card p-5">
+                <label className="label-caps text-ink-light block mb-3">Select Time</label>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {times.map((time) => (
+                    <button
+                      key={time}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, time })}
+                      className={`py-2 rounded text-xs font-medium transition ${
+                        formData.time === time
+                          ? 'bg-oxford-blue text-ivory'
+                          : 'bg-ivory-cream text-ink hover:bg-cambridge-subtle'
+                      }`}
+                    >
+                      {time}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Special Requests */}
-            <div className="bg-card-white rounded-xl shadow-lg p-4 space-y-4">
+            <div className="club-card p-5 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-oxford-blue mb-2">Table Preference</label>
+                <label className="label-caps text-ink-light block mb-2">Table Preference</label>
                 <input
                   type="text"
                   value={formData.table_preference}
                   onChange={(e) => setFormData({ ...formData, table_preference: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-oxford-blue focus:border-transparent"
+                  className="club-input"
                   placeholder="Window seat, quiet corner, etc."
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-oxford-blue mb-2">Special Requests</label>
+                <label className="label-caps text-ink-light block mb-2">Special Requests</label>
                 <textarea
                   value={formData.special_requests}
                   onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-oxford-blue focus:border-transparent"
+                  className="club-input"
                   rows={3}
                   placeholder="Dietary requirements, allergies, etc."
                 />
@@ -306,7 +314,7 @@ export const Dining: React.FC = () => {
             </div>
 
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div className="text-red-300/80 text-sm border-l-2 border-red-400/60 pl-3 py-1">
                 {error}
               </div>
             )}
@@ -314,30 +322,29 @@ export const Dining: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting || !formData.date || !formData.time}
-              className="w-full bg-gradient-to-r from-oxford-blue to-oxford-blue/80 text-white py-4 rounded-lg font-semibold disabled:opacity-60"
+              className="btn-primary"
             >
               {isSubmitting ? 'Submitting...' : 'Request Reservation'}
             </button>
           </form>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-10">
             {/* Starters */}
-            <div className="bg-card-white rounded-2xl shadow-lg overflow-hidden">
-              <div className="bg-green-600 text-white px-6 py-4">
-                <div className="flex items-center space-x-3">
-                  <span className="text-3xl">🥗</span>
-                  <h2 className="text-xl font-serif font-bold">Starters</h2>
-                </div>
+            <div className="club-card overflow-hidden">
+              <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
+                <p className="label-caps text-cambridge-light/60 mb-1">First Course</p>
+                <h2 className="font-serif text-ivory text-xl font-normal">Starters</h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6">
+              <div className="gold-rule mx-6"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6 pt-2">
                 {starters.map((item, index) => (
-                  <div key={index} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
-                    <div className="h-48 bg-gray-200 overflow-hidden">
+                  <div key={index} className="border border-cambridge/20 rounded-sm overflow-hidden hover:shadow-card transition">
+                    <div className="h-48 overflow-hidden">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="p-4">
-                      <h3 className="text-lg font-serif text-oxford-blue font-semibold mb-2">{item.name}</h3>
-                      <p className="text-sm text-secondary-text italic">{item.description}</p>
+                      <h3 className="font-serif text-oxford-blue font-normal mb-1">{item.name}</h3>
+                      <p className="text-sm text-ink-mid italic">{item.description}</p>
                     </div>
                   </div>
                 ))}
@@ -345,22 +352,21 @@ export const Dining: React.FC = () => {
             </div>
 
             {/* Mains */}
-            <div className="bg-card-white rounded-2xl shadow-lg overflow-hidden">
-              <div className="bg-red-600 text-white px-6 py-4">
-                <div className="flex items-center space-x-3">
-                  <span className="text-3xl">🍖</span>
-                  <h2 className="text-xl font-serif font-bold">Main Courses</h2>
-                </div>
+            <div className="club-card overflow-hidden">
+              <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
+                <p className="label-caps text-cambridge-light/60 mb-1">Second Course</p>
+                <h2 className="font-serif text-ivory text-xl font-normal">Main Courses</h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6">
+              <div className="gold-rule mx-6"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6 pt-2">
                 {mains.map((item, index) => (
-                  <div key={index} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
-                    <div className="h-48 bg-gray-200 overflow-hidden">
+                  <div key={index} className="border border-cambridge/20 rounded-sm overflow-hidden hover:shadow-card transition">
+                    <div className="h-48 overflow-hidden">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="p-4">
-                      <h3 className="text-lg font-serif text-oxford-blue font-semibold mb-2">{item.name}</h3>
-                      <p className="text-sm text-secondary-text italic">{item.description}</p>
+                      <h3 className="font-serif text-oxford-blue font-normal mb-1">{item.name}</h3>
+                      <p className="text-sm text-ink-mid italic">{item.description}</p>
                     </div>
                   </div>
                 ))}
@@ -368,22 +374,21 @@ export const Dining: React.FC = () => {
             </div>
 
             {/* Puddings */}
-            <div className="bg-card-white rounded-2xl shadow-lg overflow-hidden">
-              <div className="bg-pink-600 text-white px-6 py-4">
-                <div className="flex items-center space-x-3">
-                  <span className="text-3xl">🍰</span>
-                  <h2 className="text-xl font-serif font-bold">Desserts</h2>
-                </div>
+            <div className="club-card overflow-hidden">
+              <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
+                <p className="label-caps text-cambridge-light/60 mb-1">Third Course</p>
+                <h2 className="font-serif text-ivory text-xl font-normal">Desserts</h2>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6">
+              <div className="gold-rule mx-6"></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6 pt-2">
                 {puddings.map((item, index) => (
-                  <div key={index} className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition">
-                    <div className="h-48 bg-gray-200 overflow-hidden">
+                  <div key={index} className="border border-cambridge/20 rounded-sm overflow-hidden hover:shadow-card transition">
+                    <div className="h-48 overflow-hidden">
                       <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="p-4">
-                      <h3 className="text-lg font-serif text-oxford-blue font-semibold mb-2">{item.name}</h3>
-                      <p className="text-sm text-secondary-text italic">{item.description}</p>
+                      <h3 className="font-serif text-oxford-blue font-normal mb-1">{item.name}</h3>
+                      <p className="text-sm text-ink-mid italic">{item.description}</p>
                     </div>
                   </div>
                 ))}

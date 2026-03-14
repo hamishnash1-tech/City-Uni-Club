@@ -49,6 +49,7 @@ export interface ReciprocalClub {
   region: string
   country: string
   note?: string
+  logo_path?: string | null
 }
 
 export const api = {
@@ -88,14 +89,71 @@ export const api = {
     return data.news || []
   },
 
-  async getReciprocalClubs(token: string, region?: string): Promise<ReciprocalClub[]> {
-    let url = `${API_BASE}/clubs`
-    if (region && region !== 'All') url += `?region=${region}`
+  async getClubRegionCounts(token: string): Promise<Record<string, number>> {
+    const response = await fetch(`${API_BASE}/clubs`, {
+      headers: { 'Authorization': `Bearer ${token}`, 'apikey': SUPABASE_ANON_KEY },
+    })
+    if (!response.ok) throw new Error('Failed to fetch club regions')
+    const data = await response.json()
+    return data.regions || {}
+  },
 
+  async getClubCountryCounts(token: string, regions: string[]): Promise<{ country: string; count: number }[]> {
+    const url = `${API_BASE}/clubs?regions=${encodeURIComponent(regions.join(','))}`
     const response = await fetch(url, {
-      headers: { 'Authorization': `Bearer ${token}` },
+      headers: { 'Authorization': `Bearer ${token}`, 'apikey': SUPABASE_ANON_KEY },
+    })
+    if (!response.ok) throw new Error('Failed to fetch club countries')
+    const data = await response.json()
+    return data.countries || []
+  },
+
+  async getClubsByCountry(token: string, regions: string[], country: string): Promise<ReciprocalClub[]> {
+    const url = `${API_BASE}/clubs?regions=${encodeURIComponent(regions.join(','))}&country=${encodeURIComponent(country)}&all_clubs=true`
+    const response = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}`, 'apikey': SUPABASE_ANON_KEY },
     })
     if (!response.ok) throw new Error('Failed to fetch clubs')
+    const data = await response.json()
+    return data.clubs || []
+  },
+
+  async getClubCityCounts(token: string, regions: string[], country: string): Promise<{ city: string; count: number }[]> {
+    const url = `${API_BASE}/clubs?regions=${encodeURIComponent(regions.join(','))}&country=${encodeURIComponent(country)}`
+    const response = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}`, 'apikey': SUPABASE_ANON_KEY },
+    })
+    if (!response.ok) throw new Error('Failed to fetch club cities')
+    const data = await response.json()
+    return data.cities || []
+  },
+
+  async getClubsByCity(token: string, regions: string[], country: string, city: string): Promise<ReciprocalClub[]> {
+    const url = `${API_BASE}/clubs?regions=${encodeURIComponent(regions.join(','))}&country=${encodeURIComponent(country)}&city=${encodeURIComponent(city)}`
+    const response = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}`, 'apikey': SUPABASE_ANON_KEY },
+    })
+    if (!response.ok) throw new Error('Failed to fetch clubs by city')
+    const data = await response.json()
+    return data.clubs || []
+  },
+
+  async getClubsExcludingCity(token: string, regions: string[], country: string, excludeCity: string): Promise<ReciprocalClub[]> {
+    const url = `${API_BASE}/clubs?regions=${encodeURIComponent(regions.join(','))}&country=${encodeURIComponent(country)}&exclude_city=${encodeURIComponent(excludeCity)}`
+    const response = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}`, 'apikey': SUPABASE_ANON_KEY },
+    })
+    if (!response.ok) throw new Error('Failed to fetch clubs')
+    const data = await response.json()
+    return data.clubs || []
+  },
+
+  async searchClubs(token: string, query: string): Promise<ReciprocalClub[]> {
+    const url = `${API_BASE}/clubs?search=${encodeURIComponent(query)}`
+    const response = await fetch(url, {
+      headers: { 'Authorization': `Bearer ${token}`, 'apikey': SUPABASE_ANON_KEY },
+    })
+    if (!response.ok) throw new Error('Failed to search clubs')
     const data = await response.json()
     return data.clubs || []
   },
