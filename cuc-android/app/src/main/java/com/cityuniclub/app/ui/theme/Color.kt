@@ -20,3 +20,8 @@ val AddressGray = Color(0xFF737373)
 
 // Background Overlay (35% Oxford Blue)
 val BackgroundOverlay = Color(0x59002147)
+
+// Extended palette
+val LightCambridge = Color(0xFFDEEBE1)
+val ClubGold = Color(0xFFC9A84C)
+val ErrorRed = Color(0xFFB00020)

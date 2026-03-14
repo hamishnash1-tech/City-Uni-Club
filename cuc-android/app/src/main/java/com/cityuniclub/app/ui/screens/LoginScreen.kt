@@ -25,15 +25,11 @@ import androidx.compose.ui.unit.sp
 import com.cityuniclub.app.ui.theme.OxfordBlue
 import com.cityuniclub.app.ui.theme.CambridgeBlue
 import com.cityuniclub.app.ui.theme.SecondaryText
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit
+    onLogin: (email: String, password: String, onResult: (Boolean, String?) -> Unit) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -172,10 +168,9 @@ fun LoginScreen(
                 onClick = {
                     isLoading = true
                     error = null
-                    CoroutineScope(Dispatchers.Main).launch {
-                        delay(1500)
+                    onLogin(email, password) { success, errMsg ->
                         isLoading = false
-                        onLoginSuccess()
+                        if (!success) error = errMsg ?: "Login failed. Please try again."
                     }
                 },
                 enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),

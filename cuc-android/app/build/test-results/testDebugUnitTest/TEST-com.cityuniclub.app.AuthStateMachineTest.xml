@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.cityuniclub.app.AuthStateMachineTest" tests="13" skipped="0" failures="0" errors="0" timestamp="2026-03-14T17:59:06" hostname="Anands-MacBook-Pro-2.local" time="0.034">
+  <properties/>
+  <testcase name="FakeSessionManager clearSession resets call count tracking" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.018"/>
+  <testcase name="failed restore triggers clearSession" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.002"/>
+  <testcase name="login success sets authenticated state" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.011"/>
+  <testcase name="logout without prior login still clears session" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.001"/>
+  <testcase name="restore with saved session returns access token and member" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.0"/>
+  <testcase name="restored session can be replaced by a fresh login" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.0"/>
+  <testcase name="FakeSessionManager saveSession stores values" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.001"/>
+  <testcase name="logout clears state and session" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.0"/>
+  <testcase name="login failure leaves unauthenticated" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.0"/>
+  <testcase name="FakeSessionManager tryRestore increments counter" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.0"/>
+  <testcase name="restore throws when token is expired" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.0"/>
+  <testcase name="login success saves session" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.0"/>
+  <testcase name="restore with no saved session returns null" classname="com.cityuniclub.app.AuthStateMachineTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

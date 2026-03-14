@@ -23,11 +23,10 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun SplashScreen(
-    onAuthCheckComplete: (Boolean) -> Unit
+    onAuthCheckComplete: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var showLogo by remember { mutableStateOf(false) }
-    var isAuthenticated by remember { mutableStateOf(false) }
     
     val scale = remember { Animatable(0.5f) }
     val alpha = remember { Animatable(0f) }
@@ -51,7 +50,7 @@ fun SplashScreen(
         
         showLogo = true
         delay(2000)
-        onAuthCheckComplete(isAuthenticated)
+        onAuthCheckComplete()
     }
     
     Box(

@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.cityuniclub.app-mergeDebugResources-49:/values-v16/values-v16.xml",
+            "map": [
+                {
+                    "source": "/Users/anandsrivastava/.gradle/caches/8.11.1/transforms/fdaee2fd5b28411bf6248d75081a48f8/transformed/core-1.12.0/res/values-v16/values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "65",
+                        "endOffsets": "116"
+                    }
+                }
+            ]
+        }
+    ]
+}
