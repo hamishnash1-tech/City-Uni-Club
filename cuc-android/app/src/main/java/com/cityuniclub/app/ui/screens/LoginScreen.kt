@@ -1,8 +1,9 @@
 package com.cityuniclub.app.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -12,8 +13,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -22,18 +24,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cityuniclub.app.R
 import com.cityuniclub.app.ui.theme.OxfordBlue
 import com.cityuniclub.app.ui.theme.CambridgeBlue
 import com.cityuniclub.app.ui.theme.SecondaryText
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    onLoginSuccess: () -> Unit
+    onLogin: (email: String, password: String, onResult: (Boolean, String?) -> Unit) -> Unit
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -41,11 +40,20 @@ fun LoginScreen(
     var isLoading by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(OxfordBlue)
-    ) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(R.drawable.cuc_photo),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Brush.verticalGradient(
+                    colors = listOf(OxfordBlue.copy(alpha = 0.7f), OxfordBlue.copy(alpha = 0.85f))
+                ))
+        )
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
@@ -54,28 +62,13 @@ fun LoginScreen(
         ) {
             Spacer(modifier = Modifier.height(80.dp))
             
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .background(
-                        Brush.linearGradient(
-                            colors = listOf(
-                                CambridgeBlue.copy(alpha = 0.4f),
-                                OxfordBlue.copy(alpha = 0.4f)
-                            )
-                        ),
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "CUC",
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            }
-            
+            Image(
+                painter = painterResource(R.drawable.cuc_logo_real),
+                contentDescription = "City University Club",
+                modifier = Modifier.size(100.dp),
+                contentScale = ContentScale.Fit
+            )
+
             Spacer(modifier = Modifier.height(24.dp))
             
             Text(
@@ -172,10 +165,9 @@ fun LoginScreen(
                 onClick = {
                     isLoading = true
                     error = null
-                    CoroutineScope(Dispatchers.Main).launch {
-                        delay(1500)
+                    onLogin(email, password) { success, errMsg ->
                         isLoading = false
-                        onLoginSuccess()
+                        if (!success) error = errMsg ?: "Login failed. Please try again."
                     }
                 },
                 enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),

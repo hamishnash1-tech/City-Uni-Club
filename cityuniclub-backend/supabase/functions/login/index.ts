@@ -35,7 +35,7 @@ serve(async (req: Request) => {
       throw new Error('Method not allowed')
     }
 
-    const { email, password } = await req.json()
+    const { email, password, session_type } = await req.json()
 
     if (!email || !password) {
       throw new Error('Email and password required')
@@ -75,7 +75,11 @@ serve(async (req: Request) => {
     // Create session
     const token = crypto.randomUUID()
     const expiresAt = new Date()
-    expiresAt.setDate(expiresAt.getDate() + 30)
+    if (session_type === 'supersession') {
+      expiresAt.setMonth(expiresAt.getMonth() + 6)
+    } else {
+      expiresAt.setDate(expiresAt.getDate() + 30)
+    }
 
     const { data: sessionData, error: sessionError } = await supabaseClient
       .from('sessions')

@@ -1,0 +1,20 @@
+# Build outputs
+build/
+app/build/
+
+# Gradle
+.gradle/
+local.properties
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Keystore (never commit)
+*.keystore
+*.jks
+
+# OS
+.DS_Store
