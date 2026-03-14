@@ -21,23 +21,24 @@ import com.cityuniclub.app.ui.theme.CambridgeBlue
 import com.cityuniclub.app.ui.theme.OxfordBlue
 
 @Composable
-fun HomeScreen(member: Member) {
-    val memberFirstName = member.firstName.ifBlank { member.fullName.split(" ").firstOrNull() ?: "Member" }
-    val memberFullName = member.fullName.ifBlank { "Member" }
-    val memberUntil = member.membershipType.ifBlank { "Active" }
+fun HomeScreen(member: Member, displayName: String) {
+    val memberFirstName = displayName.ifBlank { member.firstName.ifBlank { member.fullName.split(" ").firstOrNull() ?: "Member" } }.split(" ").firstOrNull() ?: "Member"
+    val memberFullName = displayName.ifBlank { member.fullName.ifBlank { "Member" } }
+    val memberUntil = "March ${java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) + 1}"
 
     Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(R.drawable.cuc_photo),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    Brush.linearGradient(
-                        colors = listOf(
-                            OxfordBlue.copy(alpha = 0.5f),
-                            OxfordBlue.copy(alpha = 0.3f)
-                        )
-                    )
-                )
+                .background(Brush.verticalGradient(
+                    colors = listOf(OxfordBlue.copy(alpha = 0.55f), OxfordBlue.copy(alpha = 0.75f))
+                ))
         )
 
         Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp)) {
@@ -47,7 +48,7 @@ fun HomeScreen(member: Member) {
                 modifier = Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 20.dp)
             ) {
                 Image(
-                    painter = painterResource(R.drawable.cuc_logo),
+                    painter = painterResource(R.drawable.cuc_logo_real),
                     contentDescription = "City University Club",
                     modifier = Modifier.size(80.dp),
                     contentScale = ContentScale.Fit

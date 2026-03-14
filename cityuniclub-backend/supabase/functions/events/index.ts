@@ -21,7 +21,8 @@ serve(async (req: Request) => {
       .from('events')
       .select('*')
       .eq('is_active', true)
-      .order('event_date', { ascending: true })
+      .order('is_tba', { ascending: true })
+      .order('event_date', { ascending: true, nullsFirst: false })
 
     if (error) {
       throw error

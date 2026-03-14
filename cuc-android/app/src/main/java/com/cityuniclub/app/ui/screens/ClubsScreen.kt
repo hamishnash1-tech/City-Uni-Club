@@ -34,7 +34,7 @@ private sealed class ClubNavState {
     object Regions : ClubNavState()
     data class Countries(val regions: List<String>) : ClubNavState()
     data class Cities(val regions: List<String>, val country: String) : ClubNavState()
-    data class ClubList(val regions: List<String>, val country: String, val city: String?) : ClubNavState()
+    data class ClubList(val regions: List<String>, val country: String, val city: String?, val excludeCity: String? = null) : ClubNavState()
 }
 
 private val regionGroups = linkedMapOf(
@@ -71,7 +71,7 @@ fun ClubsScreen(token: String) {
                             navState = when (val s = navState) {
                                 is ClubNavState.Countries -> ClubNavState.Regions
                                 is ClubNavState.Cities -> ClubNavState.Countries(s.regions)
-                                is ClubNavState.ClubList -> if (s.city != null)
+                                is ClubNavState.ClubList -> if (s.city != null || s.excludeCity != null)
                                     ClubNavState.Cities(s.regions, s.country)
                                 else
                                     ClubNavState.Countries(s.regions)
@@ -90,7 +90,11 @@ fun ClubsScreen(token: String) {
                             if (totalCount != null) "Reciprocal Clubs ($totalCount)" else "Reciprocal Clubs"
                         is ClubNavState.Countries -> s.regions.joinToString(" & ")
                         is ClubNavState.Cities -> s.country
-                        is ClubNavState.ClubList -> s.city ?: s.country
+                        is ClubNavState.ClubList -> when {
+                            s.excludeCity != null -> "Rest of England"
+                            s.city != null -> s.city
+                            else -> s.country
+                        }
                     },
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Light,
@@ -158,9 +162,10 @@ fun ClubsScreen(token: String) {
                 is ClubNavState.Countries -> CountriesPanel(token, s.regions,
                     onCountrySelected = { country -> navState = ClubNavState.Cities(s.regions, country) })
                 is ClubNavState.Cities -> CitiesPanel(token, s.regions, s.country,
-                    onCitySelected = { city -> navState = ClubNavState.ClubList(s.regions, s.country, city) })
+                    onCitySelected = { city -> navState = ClubNavState.ClubList(s.regions, s.country, city) },
+                    onRestOfEnglandSelected = { navState = ClubNavState.ClubList(s.regions, s.country, null, excludeCity = "London") })
                 is ClubNavState.ClubList -> ClubListPanel(
-                    token, s.regions, s.country, s.city, onLoiClick = { loiClub = it })
+                    token, s.regions, s.country, s.city, s.excludeCity, onLoiClick = { loiClub = it })
             }
         }
     }
@@ -241,7 +246,11 @@ private fun CountriesPanel(token: String, regions: List<String>, onCountrySelect
 }
 
 @Composable
-private fun CitiesPanel(token: String, regions: List<String>, country: String, onCitySelected: (String?) -> Unit) {
+private fun CitiesPanel(
+    token: String, regions: List<String>, country: String,
+    onCitySelected: (String?) -> Unit,
+    onRestOfEnglandSelected: () -> Unit
+) {
     var cities by remember { mutableStateOf<List<com.cityuniclub.app.network.CityCount>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -257,39 +266,69 @@ private fun CitiesPanel(token: String, regions: List<String>, country: String, o
     }
 
     LoadingOrError(isLoading, error) {
-        LazyColumn(
-            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 4.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            if (cities.size == 1) {
-                item { LaunchedEffect(Unit) { onCitySelected(null) } }
-            } else {
-                items(cities) { c ->
-                    DrillDownCard(
-                        title = if (c.count > 0) "${c.city} (${c.count})" else c.city,
-                        onClick = { onCitySelected(c.city) }
-                    )
+        if (country == "England" && cities.isNotEmpty()) {
+            val londonCount = cities.find { it.city == "London" }?.count ?: 0
+            val restCount = cities.filter { it.city != "London" }.sumOf { it.count }
+            LazyColumn(
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                if (londonCount > 0) {
+                    item {
+                        DrillDownCard(
+                            title = "London ($londonCount)",
+                            onClick = { onCitySelected("London") }
+                        )
+                    }
                 }
+                if (restCount > 0) {
+                    item {
+                        DrillDownCard(
+                            title = "Rest of England ($restCount)",
+                            onClick = onRestOfEnglandSelected
+                        )
+                    }
+                }
+                item { Spacer(Modifier.height(16.dp)) }
             }
-            item { Spacer(Modifier.height(16.dp)) }
+        } else {
+            LazyColumn(
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                if (cities.size == 1) {
+                    item { LaunchedEffect(Unit) { onCitySelected(null) } }
+                } else {
+                    items(cities) { c ->
+                        DrillDownCard(
+                            title = if (c.count > 0) "${c.city} (${c.count})" else c.city,
+                            onClick = { onCitySelected(c.city) }
+                        )
+                    }
+                }
+                item { Spacer(Modifier.height(16.dp)) }
+            }
         }
     }
 }
 
 @Composable
 private fun ClubListPanel(
-    token: String, regions: List<String>, country: String, city: String?,
+    token: String, regions: List<String>, country: String, city: String?, excludeCity: String?,
     onLoiClick: (ReciprocalClub) -> Unit
 ) {
     var clubs by remember { mutableStateOf<List<ReciprocalClub>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(city) {
+    LaunchedEffect(city, excludeCity) {
         try {
             clubs = withContext(Dispatchers.IO) {
-                if (city != null) ApiService.getClubsByCity(token, regions, country, city)
-                else ApiService.getClubsByCountry(token, regions, country)
+                when {
+                    city != null -> ApiService.getClubsByCity(token, regions, country, city)
+                    excludeCity != null -> ApiService.getClubsExcludingCity(token, regions, country, excludeCity)
+                    else -> ApiService.getClubsByCountry(token, regions, country)
+                }
             }
         } catch (e: Exception) {
             error = e.message
@@ -385,10 +424,44 @@ private fun ClubCard(club: ReciprocalClub, onLoiClick: () -> Unit) {
 @Composable
 private fun LoiDialog(club: ReciprocalClub, token: String, onDismiss: () -> Unit) {
     val scope = rememberCoroutineScope()
-    var message by remember { mutableStateOf("") }
     var isSubmitting by remember { mutableStateOf(false) }
     var submitted by remember { mutableStateOf(false) }
     var errorMsg by remember { mutableStateOf<String?>(null) }
+
+    var visitFromMs by remember { mutableStateOf<Long?>(null) }
+    var visitToMs by remember { mutableStateOf<Long?>(null) }
+    var showFromPicker by remember { mutableStateOf(false) }
+    var showToPicker by remember { mutableStateOf(false) }
+
+    val displayFmt = java.text.SimpleDateFormat("d MMM yyyy", java.util.Locale.UK)
+    val isoFmt = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.UK)
+    fun Long.fmtDate() = displayFmt.format(java.util.Date(this))
+
+    if (showFromPicker) {
+        val state = rememberDatePickerState(initialSelectedDateMillis = visitFromMs)
+        DatePickerDialog(
+            onDismissRequest = { showFromPicker = false },
+            confirmButton = {
+                TextButton(onClick = { visitFromMs = state.selectedDateMillis; showFromPicker = false }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = { TextButton(onClick = { showFromPicker = false }) { Text("Cancel") } }
+        ) { DatePicker(state = state) }
+    }
+
+    if (showToPicker) {
+        val state = rememberDatePickerState(initialSelectedDateMillis = visitToMs)
+        DatePickerDialog(
+            onDismissRequest = { showToPicker = false },
+            confirmButton = {
+                TextButton(onClick = { visitToMs = state.selectedDateMillis; showToPicker = false }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = { TextButton(onClick = { showToPicker = false }) { Text("Cancel") } }
+        ) { DatePicker(state = state) }
+    }
 
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -396,9 +469,7 @@ private fun LoiDialog(club: ReciprocalClub, token: String, onDismiss: () -> Unit
             colors = CardDefaults.cardColors(containerColor = CardWhite),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Column(
-                modifier = Modifier.padding(24.dp).verticalScroll(rememberScrollState())
-            ) {
+            Column(modifier = Modifier.padding(24.dp).verticalScroll(rememberScrollState())) {
                 Text("Letter of Introduction", fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = OxfordBlue)
                 Spacer(Modifier.height(4.dp))
                 Text(club.name, fontSize = 14.sp, color = SecondaryText)
@@ -423,20 +494,49 @@ private fun LoiDialog(club: ReciprocalClub, token: String, onDismiss: () -> Unit
                     Text("An introduction request will be sent on your behalf to ${club.name}.",
                         fontSize = 13.sp, color = Color(0xFF4A4A4A), lineHeight = 18.sp)
                     Spacer(Modifier.height(16.dp))
+
                     OutlinedTextField(
-                        value = message, onValueChange = { message = it },
-                        label = { Text("Personal Message (optional)") },
-                        minLines = 3, maxLines = 6,
-                        modifier = Modifier.fillMaxWidth(),
+                        value = visitFromMs?.fmtDate() ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Visit From") },
+                        placeholder = { Text("Select date") },
+                        trailingIcon = {
+                            IconButton(onClick = { showFromPicker = true }) {
+                                Icon(Icons.Default.DateRange, null, tint = OxfordBlue)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth().clickable { showFromPicker = true },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = OxfordBlue.copy(alpha = 0.4f),
                             unfocusedBorderColor = Color(0xFFCCCCCC),
                             focusedTextColor = OxfordBlue,
-                            unfocusedTextColor = OxfordBlue,
-                            cursorColor = OxfordBlue
+                            unfocusedTextColor = OxfordBlue
                         ),
                         shape = RoundedCornerShape(10.dp)
                     )
+                    Spacer(Modifier.height(12.dp))
+                    OutlinedTextField(
+                        value = visitToMs?.fmtDate() ?: "",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Visit To") },
+                        placeholder = { Text("Select date") },
+                        trailingIcon = {
+                            IconButton(onClick = { showToPicker = true }) {
+                                Icon(Icons.Default.DateRange, null, tint = OxfordBlue)
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth().clickable { showToPicker = true },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = OxfordBlue.copy(alpha = 0.4f),
+                            unfocusedBorderColor = Color(0xFFCCCCCC),
+                            focusedTextColor = OxfordBlue,
+                            unfocusedTextColor = OxfordBlue
+                        ),
+                        shape = RoundedCornerShape(10.dp)
+                    )
+
                     errorMsg?.let {
                         Spacer(Modifier.height(8.dp))
                         Text(it, color = Color(0xFFEB5757), fontSize = 12.sp)
@@ -449,12 +549,17 @@ private fun LoiDialog(club: ReciprocalClub, token: String, onDismiss: () -> Unit
                         }
                         Button(
                             onClick = {
+                                if (visitFromMs == null || visitToMs == null) {
+                                    errorMsg = "Please select both visit dates."
+                                    return@Button
+                                }
                                 isSubmitting = true; errorMsg = null
                                 scope.launch {
                                     try {
                                         val request = mapOf<String, Any?>(
-                                            "club_id" to club.id, "club_name" to club.name,
-                                            "personal_message" to message.trim().ifBlank { null }
+                                            "club_id" to club.id,
+                                            "arrival_date" to isoFmt.format(java.util.Date(visitFromMs!!)),
+                                            "departure_date" to isoFmt.format(java.util.Date(visitToMs!!))
                                         )
                                         withContext(Dispatchers.IO) { ApiService.createLoiRequest(token, request) }
                                         submitted = true

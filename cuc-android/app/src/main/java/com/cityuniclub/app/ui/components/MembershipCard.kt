@@ -1,6 +1,7 @@
 package com.cityuniclub.app.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,10 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cityuniclub.app.R
 import com.cityuniclub.app.ui.theme.OxfordBlue
 import com.cityuniclub.app.ui.theme.CambridgeBlue
 import com.cityuniclub.app.ui.theme.CardWhite
@@ -52,22 +56,12 @@ fun MembershipCard(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.Top
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(58.dp, 72.dp)
-                            .background(
-                                Brush.linearGradient(
-                                    colors = listOf(
-                                        CambridgeBlue.copy(alpha = 0.3f),
-                                        OxfordBlue.copy(alpha = 0.3f)
-                                    )
-                                ),
-                                shape = RoundedCornerShape(8.dp)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("CUC", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = OxfordBlue)
-                    }
+                    Image(
+                        painter = painterResource(R.drawable.cuc_monogram),
+                        contentDescription = "CUC Logo",
+                        modifier = Modifier.size(58.dp),
+                        contentScale = ContentScale.Fit
+                    )
                     
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text("CITY UNIVERSITY CLUB", fontSize = 20.sp, fontWeight = FontWeight.Medium, color = OxfordBlue)

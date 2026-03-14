@@ -2,15 +2,12 @@ package com.cityuniclub.app
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Language
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -28,11 +25,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.cityuniclub.app.network.Member
-import com.cityuniclub.app.ui.screens.ClubsScreen
 import com.cityuniclub.app.ui.screens.DiningScreen
 import com.cityuniclub.app.ui.screens.EventsScreen
 import com.cityuniclub.app.ui.screens.HomeScreen
-import com.cityuniclub.app.ui.screens.ProfileScreen
+import com.cityuniclub.app.ui.screens.MoreScreen
 import com.cityuniclub.app.ui.theme.CambridgeBlue
 import com.cityuniclub.app.ui.theme.OxfordBlue
 
@@ -42,12 +38,11 @@ private val navItems = listOf(
     NavItem("home", "Home", Icons.Default.Home),
     NavItem("events", "Events", Icons.Default.CalendarMonth),
     NavItem("dining", "Dining", Icons.Default.Restaurant),
-    NavItem("clubs", "Clubs", Icons.Default.Language),
-    NavItem("profile", "Profile", Icons.Default.Person)
+    NavItem("more", "More", Icons.Default.MoreHoriz)
 )
 
 @Composable
-fun AppNavigation(member: Member, token: String, onLogout: () -> Unit) {
+fun AppNavigation(member: Member, token: String, displayName: String, onSetDisplayName: (String) -> Unit, onLogout: () -> Unit) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -66,9 +61,8 @@ fun AppNavigation(member: Member, token: String, onLogout: () -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(OxfordBlue)
-                        .horizontalScroll(rememberScrollState())
                         .padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(0.dp)
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     navItems.forEach { item ->
                         val selected = currentDestination?.hierarchy?.any { it.route == item.route } == true
@@ -94,19 +88,22 @@ fun AppNavigation(member: Member, token: String, onLogout: () -> Unit) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") {
-                HomeScreen(member = member)
+                HomeScreen(member = member, displayName = displayName)
             }
             composable("events") {
-                EventsScreen()
+                EventsScreen(member = member, token = token)
             }
             composable("dining") {
                 DiningScreen(token = token, member = member)
             }
-            composable("clubs") {
-                ClubsScreen(token = token)
-            }
-            composable("profile") {
-                ProfileScreen(member = member, onLogout = onLogout)
+            composable("more") {
+                MoreScreen(
+                    member = member,
+                    token = token,
+                    displayName = displayName,
+                    onSetDisplayName = onSetDisplayName,
+                    onLogout = onLogout
+                )
             }
         }
     }

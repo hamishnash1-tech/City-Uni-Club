@@ -115,26 +115,22 @@ object ApiService {
 
     // — Auth —
 
-    fun refreshAccessToken(refreshToken: String): Pair<String, String> {
-        val body = gson.toJson(mapOf("refresh_token" to refreshToken)).toRequestBody(JSON_TYPE)
-        val req = Request.Builder()
-            .url("$SUPABASE_BASE/auth/v1/token?grant_type=refresh_token")
-            .post(body)
-            .addHeader("Content-Type", "application/json")
+    fun checkStatus(token: String): Member {
+        val req = Request.Builder().url("$API_BASE/status")
             .addHeader("apikey", SUPABASE_ANON_KEY)
+            .addHeader("x-session-token", token)
             .build()
         val resp = client.newCall(req).execute()
-        val respBody = resp.body?.string() ?: ""
+        val body = resp.body?.string() ?: ""
         if (!resp.isSuccessful) throw Exception("Session expired")
-        val map = gson.fromJson(respBody, Map::class.java)
-        val newAccess = map["access_token"] as? String ?: throw Exception("No access token")
-        val newRefresh = map["refresh_token"] as? String ?: refreshToken
-        return Pair(newAccess, newRefresh)
+        val map = gson.fromJson(body, Map::class.java)
+        val memberMap = map["member"] ?: throw Exception("No member data")
+        return gson.fromJson(gson.toJson(memberMap), Member::class.java)
     }
 
     fun login(email: String, password: String): AuthResponse =
         gson.fromJson(
-            post("$API_BASE/login", mapOf("email" to email, "password" to password)),
+            post("$API_BASE/login", mapOf("email" to email, "password" to password, "session_type" to "supersession")),
             AuthResponse::class.java
         )
 
@@ -146,7 +142,19 @@ object ApiService {
     // — Events —
 
     fun getEvents(): List<ClubEvent> =
-        parseList(get("$API_BASE/events?upcoming=true"), "events", ClubEvent::class.java)
+        parseList(get("$API_BASE/events"), "events", ClubEvent::class.java)
+
+    fun bookEvent(token: String, eventId: String, memberEmail: String, guestCount: Int, mealOption: String?, specialRequests: String?): Map<*, *> {
+        val payload = mutableMapOf<String, Any?>(
+            "event_id" to eventId,
+            "member_email" to memberEmail,
+            "guest_count" to guestCount
+        )
+        if (mealOption != null) payload["meal_option"] = mealOption
+        if (!specialRequests.isNullOrBlank()) payload["special_requests"] = specialRequests
+        val headers = mapOf("x-session-token" to token)
+        return gson.fromJson(post("$API_BASE/events/book", payload, headers), Map::class.java)
+    }
 
     // — News —
 

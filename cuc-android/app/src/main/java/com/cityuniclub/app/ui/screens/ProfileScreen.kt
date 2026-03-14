@@ -4,15 +4,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cityuniclub.app.network.Member
@@ -21,7 +24,10 @@ import com.cityuniclub.app.ui.theme.OxfordBlue
 import com.cityuniclub.app.ui.theme.SecondaryText
 
 @Composable
-fun ProfileScreen(member: Member, onLogout: () -> Unit) {
+fun ProfileScreen(member: Member, displayName: String, onSetDisplayName: (String) -> Unit, onLogout: () -> Unit) {
+    val memberUntil = "March ${java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) + 1}"
+    var nameInput by remember(displayName) { mutableStateOf(displayName) }
+
     val initials = member.fullName
         .split(" ")
         .filter { it.isNotBlank() }
@@ -80,18 +86,43 @@ fun ProfileScreen(member: Member, onLogout: () -> Unit) {
             colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.05f)),
             shape = RoundedCornerShape(14.dp)
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                if (member.membershipNumber.isNotBlank()) {
-                    InfoRow(label = "Membership No.", value = member.membershipNumber)
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(0.5.dp)
-                            .background(Color.White.copy(alpha = 0.06f))
+            InfoRow(label = "Member Until", value = memberUntil)
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.05f)),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                Text("Name on Card", fontSize = 12.sp, color = SecondaryText)
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = nameInput,
+                    onValueChange = { nameInput = it },
+                    placeholder = { Text(member.fullName.ifBlank { "Your name" }, color = SecondaryText) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { onSetDisplayName(nameInput) }),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedBorderColor = CambridgeBlue,
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
+                        cursorColor = CambridgeBlue
                     )
-                }
-                if (member.membershipType.isNotBlank()) {
-                    InfoRow(label = "Membership Type", value = member.membershipType)
+                )
+                Spacer(Modifier.height(10.dp))
+                Button(
+                    onClick = { onSetDisplayName(nameInput) },
+                    modifier = Modifier.align(Alignment.End),
+                    colors = ButtonDefaults.buttonColors(containerColor = CambridgeBlue),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("Save", color = OxfordBlue, fontWeight = FontWeight.Medium)
                 }
             }
         }

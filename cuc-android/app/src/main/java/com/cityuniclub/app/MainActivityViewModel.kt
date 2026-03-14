@@ -21,11 +21,14 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         SessionManager(application)
     }.getOrElse {
         object : ISessionManager {
-            override fun saveSession(accessToken: String, refreshToken: String, member: Member) {}
+            override fun saveSession(token: String, member: Member) {}
+            override fun getToken(): String? = null
             override fun clearSession() {}
             override fun tryRestore(): Pair<String, Member>? = null
         }
     }
+
+    private val userPreferences = UserPreferences(application)
 
     private val _isAuthenticated = MutableStateFlow(false)
     val isAuthenticated: StateFlow<Boolean> = _isAuthenticated.asStateFlow()
@@ -35,6 +38,9 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
     private val _isRestoring = MutableStateFlow(true)
     val isRestoring: StateFlow<Boolean> = _isRestoring.asStateFlow()
+
+    private val _displayName = MutableStateFlow(userPreferences.getDisplayName())
+    val displayName: StateFlow<String> = _displayName.asStateFlow()
 
     var token: String? = null
         private set
@@ -65,12 +71,17 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
                 token = response.session.token
                 _member.value = response.member
                 _isAuthenticated.value = true
-                sessionManager.saveSession(response.session.token, response.session.refreshToken, response.member)
+                sessionManager.saveSession(response.session.token, response.member)
                 onResult(true, null)
             } catch (e: Exception) {
                 onResult(false, e.message ?: "Login failed")
             }
         }
+    }
+
+    fun setDisplayName(name: String) {
+        userPreferences.setDisplayName(name)
+        _displayName.value = name
     }
 
     fun logout() {
