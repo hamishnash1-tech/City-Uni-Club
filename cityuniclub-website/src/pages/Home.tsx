@@ -40,7 +40,7 @@ export const Home: React.FC = () => {
         {/* Info Cards */}
         <div className="grid md:grid-cols-3 gap-4 max-w-3xl w-full">
           {/* Dining Card */}
-          <a href="/dining" className="bg-ivory/90 backdrop-blur-sm border border-ivory-border shadow-card rounded-sm p-6 text-center hover:bg-ivory transition group">
+          <a href="/dining" className="bg-ivory/75 backdrop-blur-sm border border-ivory-border shadow-card rounded-sm p-6 text-center hover:bg-ivory transition group">
             <div className="flex justify-center mb-3 text-cambridge-muted group-hover:text-oxford-blue transition">
               <IconDining />
             </div>
@@ -49,7 +49,7 @@ export const Home: React.FC = () => {
           </a>
 
           {/* Events Card */}
-          <a href="/events" className="bg-ivory/90 backdrop-blur-sm border border-ivory-border shadow-card rounded-sm p-6 text-center hover:bg-ivory transition group">
+          <a href="/events" className="bg-ivory/75 backdrop-blur-sm border border-ivory-border shadow-card rounded-sm p-6 text-center hover:bg-ivory transition group">
             <div className="flex justify-center mb-3 text-cambridge-muted group-hover:text-oxford-blue transition">
               <IconEvents />
             </div>
@@ -58,7 +58,7 @@ export const Home: React.FC = () => {
           </a>
 
           {/* News Card */}
-          <a href="/news" className="bg-ivory/90 backdrop-blur-sm border border-ivory-border shadow-card rounded-sm p-6 text-center hover:bg-ivory transition group">
+          <a href="/news" className="bg-ivory/75 backdrop-blur-sm border border-ivory-border shadow-card rounded-sm p-6 text-center hover:bg-ivory transition group">
             <div className="flex justify-center mb-3 text-cambridge-muted group-hover:text-oxford-blue transition">
               <IconNews />
             </div>

@@ -10,7 +10,7 @@ import { Home } from './pages/Home'
 import { Events } from './pages/Events'
 import { News } from './pages/News'
 import { Dining } from './pages/Dining'
-import { ReciprocalClubs } from './pages/ReciprocalClubs'
+const ReciprocalClubs = React.lazy(() => import('./pages/ReciprocalClubs'))
 import { LOIRequest } from './pages/LOIRequest'
 import { Profile } from './pages/Profile'
 import { TermsAndConditions } from './pages/TermsAndConditions'
@@ -38,7 +38,7 @@ const TabBar: React.FC = () => {
               key={tab.id}
               to={tab.path}
               className={`flex flex-col items-center pt-2 pb-3 px-3 flex-1 transition-colors duration-200 ${
-                isActive ? 'text-cambridge' : 'text-ivory/35 hover:text-cambridge'
+                isActive ? 'text-cambridge' : 'text-ivory hover:text-cambridge'
               }`}
             >
               {tab.icon}
@@ -254,7 +254,11 @@ const App: React.FC = () => {
           <Route path="/dining" element={<Dining />} />
           <Route path="/events" element={<Events />} />
           <Route path="/news" element={<News />} />
-          <Route path="/reciprocal-clubs" element={<ReciprocalClubs />} />
+          <Route path="/reciprocal-clubs" element={
+            <React.Suspense fallback={<div className="flex justify-center py-20"><div className="w-6 h-6 border-2 border-cambridge/30 border-t-cambridge rounded-full animate-spin" /></div>}>
+              <ReciprocalClubs />
+            </React.Suspense>
+          } />
           <Route path="/profile" element={<Profile />} />
           <Route path="/loi-request" element={<ProtectedRoute><LOIRequest /></ProtectedRoute>} />
           <Route path="/terms" element={<TermsAndConditions />} />
