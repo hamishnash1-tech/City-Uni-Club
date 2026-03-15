@@ -14,8 +14,8 @@ struct MainTabView: View {
         // Set colors for tab bar items
         appearance.stackedLayoutAppearance.normal.iconColor = UIColor.gray
         appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor.gray]
-        appearance.stackedLayoutAppearance.selected.iconColor = UIColor(Color.oxfordBlue)
-        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(Color.oxfordBlue)]
+        appearance.stackedLayoutAppearance.selected.iconColor = UIColor(Color.cambridgeBlue)
+        appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(Color.cambridgeBlue)]
 
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
@@ -47,7 +47,6 @@ struct MainTabView: View {
                 }
                 .tag(3)
         }
-        .accentColor(Color.cambridgeBlue)
         .environmentObject(authManager)
     }
 }

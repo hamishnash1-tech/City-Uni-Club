@@ -10,12 +10,21 @@ import SwiftUI
 struct LOIRequestView: View {
     @Environment(\.dismiss) private var dismiss
     let club: ReciprocalClub
-    
+
     @State private var arrivalDate = Date()
     @State private var departureDate = Date().addingTimeInterval(86400 * 7)
     @State private var purpose = "Business"
     @State private var specialRequests = ""
     @State private var showingConfirmation = false
+    @State private var isSubmitting = false
+    @State private var errorMessage: String?
+
+    private let apiService = APIService.shared
+    private let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
     
     let purposes = ["Business", "Leisure", "Both"]
     
@@ -255,39 +264,76 @@ struct LOIRequestView: View {
     }
     
     private var submitButton: some View {
-        Button {
-            showingConfirmation = true
-        } label: {
-            HStack {
-                Image(systemName: "envelope.fill")
-                    .font(.system(size: 16))
-                Text("Request Letter of Introduction")
-                    .font(.system(size: 15, weight: .semibold))
+        VStack(spacing: 12) {
+            if let errorMessage {
+                Text(errorMessage)
+                    .font(.system(size: 13))
+                    .foregroundColor(.red)
+                    .multilineTextAlignment(.center)
             }
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.oxfordBlue,
-                                Color(red: 0.05, green: 0.2, blue: 0.35)
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
+
+            Button {
+                isSubmitting = true
+                errorMessage = nil
+                Task {
+                    do {
+                        try await apiService.createLoiRequest(
+                            clubId: club.id,
+                            arrivalDate: dateFormatter.string(from: arrivalDate),
+                            departureDate: dateFormatter.string(from: departureDate),
+                            purpose: purpose,
+                            specialRequests: specialRequests.isEmpty ? nil : specialRequests
                         )
-                    )
-                    .shadow(color: Color.oxfordBlue.opacity(0.4), radius: 8, x: 0, y: 4)
-            )
-        }
-        .alert("Request Submitted", isPresented: $showingConfirmation) {
-            Button("Done", role: .cancel) {
-                dismiss()
+                        await MainActor.run {
+                            isSubmitting = false
+                            showingConfirmation = true
+                        }
+                    } catch {
+                        await MainActor.run {
+                            isSubmitting = false
+                            errorMessage = "Request failed. Please try again."
+                        }
+                    }
+                }
+            } label: {
+                HStack {
+                    if isSubmitting {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .scaleEffect(0.8)
+                    } else {
+                        Image(systemName: "envelope.fill")
+                            .font(.system(size: 16))
+                        Text("Request Letter of Introduction")
+                            .font(.system(size: 15, weight: .semibold))
+                    }
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color.oxfordBlue,
+                                    Color(red: 0.05, green: 0.2, blue: 0.35)
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .shadow(color: Color.oxfordBlue.opacity(0.4), radius: 8, x: 0, y: 4)
+                )
             }
-        } message: {
-            Text("Your Letter of Introduction request for \(club.name) has been submitted. You will receive confirmation within 3-5 business days.")
+            .disabled(isSubmitting)
+            .alert("Request Submitted", isPresented: $showingConfirmation) {
+                Button("Done", role: .cancel) {
+                    dismiss()
+                }
+            } message: {
+                Text("Your Letter of Introduction request for \(club.name) has been submitted. You will receive confirmation within 3-5 business days.")
+            }
         }
     }
     

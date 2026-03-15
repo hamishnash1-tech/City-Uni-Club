@@ -8,18 +8,8 @@ struct HomeView: View {
     }
     
     var formattedMemberUntil: String {
-        guard let memberUntil = member?.memberUntil else {
-            return "March 2026"
-        }
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        if let date = dateFormatter.date(from: memberUntil) {
-            let outputFormatter = DateFormatter()
-            outputFormatter.dateFormat = "MMMM yyyy"
-            return outputFormatter.string(from: date)
-        }
-        return memberUntil
+        let nextYear = Calendar.current.component(.year, from: Date()) + 1
+        return "March \(nextYear)"
     }
     
     var body: some View {
@@ -58,15 +48,15 @@ struct HomeView: View {
 
                 Spacer()
 
-                // Membership Card - Identical to Profile View
                 membershipCard
+                    .padding(.horizontal, 20)
 
                 Spacer()
             }
         }
     }
     
-    // MARK: - Membership Card (Identical to Profile View)
+    // MARK: - Membership Card
     private var membershipCard: some View {
         VStack(spacing: 0) {
             // Card Header
@@ -74,71 +64,69 @@ struct HomeView: View {
                 Image("cuc-monogram")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 58, height: 72)
-                
+                    .frame(width: 50, height: 65)
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text("CITY UNIVERSITY CLUB")
-                        .font(.system(size: 20, weight: .medium, design: .serif))
+                        .font(.system(size: 16, weight: .medium, design: .serif))
                         .foregroundColor(.oxfordBlue)
                     Text("42 CRUTCHED FRIARS, EC3N 2AP")
-                        .font(.system(size: 11, weight: .regular))
+                        .font(.system(size: 9, weight: .regular))
                         .foregroundColor(.addressGray)
                 }
                 Spacer()
             }
-            .padding(.leading, 20)
-            .padding(.top, 20)
-            .padding(.trailing, 20)
-            
+            .padding(.leading, 16)
+            .padding(.top, 16)
+            .padding(.trailing, 16)
+
             // Member Name
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 Text("This is to introduce")
-                    .font(.system(size: 13, weight: .regular, design: .serif))
+                    .font(.system(size: 11, weight: .regular, design: .serif))
                     .foregroundColor(.secondaryText)
                     .italic()
-                Text(member?.fullName ?? "[MEMBER'S NAME]")
-                    .font(.system(size: 18, weight: .semibold, design: .serif))
+                Text(member?.fullName ?? "Member Name")
+                    .font(.system(size: 15, weight: .semibold, design: .serif))
                     .foregroundColor(.oxfordBlue)
-                    .tracking(1.5)
+                    .tracking(1)
+                    .multilineTextAlignment(.center)
             }
-            .padding(.vertical, 30)
+            .padding(.vertical, 20)
 
             // Card Footer
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Member Until")
-                        .font(.system(size: 10, weight: .regular))
+                        .font(.system(size: 9, weight: .regular))
                         .foregroundColor(.secondaryText)
                     Text(formattedMemberUntil)
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(.oxfordBlue)
                 }
                 Spacer()
                 VStack(alignment: .trailing, spacing: 2) {
                     Text("Secretary")
-                        .font(.system(size: 9, weight: .regular))
+                        .font(.system(size: 8, weight: .regular))
                         .foregroundColor(.secondaryText)
                     Text("H. Senanayake")
-                        .font(.system(size: 11, weight: .regular, design: .serif))
+                        .font(.system(size: 10, weight: .regular, design: .serif))
                         .foregroundColor(.oxfordBlue)
                         .italic()
                 }
             }
-            .padding(.leading, 20)
-            .padding(.trailing, 20)
-            .padding(.bottom, 20)
+            .padding(.leading, 16)
+            .padding(.trailing, 16)
+            .padding(.bottom, 16)
         }
-        .frame(width: 400)
+        .frame(maxWidth: 380)
         .background(Color.cardWhite)
-        .cornerRadius(20)
+        .cornerRadius(16)
         .overlay(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 16)
                 .strokeBorder(
                     LinearGradient(
-                        gradient: Gradient(colors: [
-                            Color.white,
-                            Color(red: 0.88, green: 0.88, blue: 0.90)
-                        ]),
+                        gradient: Gradient(colors: [Color.white, Color(red: 0.88, green: 0.88, blue: 0.90)]),
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     ),

@@ -10,6 +10,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.concurrent.TimeUnit
 
 const val SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im15Zm95b3lqdGtxdGhqanZhYm1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDI5NDAsImV4cCI6MjA4Nzc3ODk0MH0._OhoEKRYAZ0C7oon9e_WSj7p47pJlWQmqBgx2CtBtdg"
+const val APP_VERSION = "0.1.7"
 private const val SUPABASE_BASE = "https://myfoyoyjtkqthjjvabmn.supabase.co"
 private const val API_BASE = "$SUPABASE_BASE/functions/v1"
 private const val LOI_API_URL = "$API_BASE/loi-api"
@@ -83,6 +84,7 @@ object ApiService {
     private fun get(url: String, token: String? = null): String {
         val req = Request.Builder().url(url)
             .addHeader("apikey", SUPABASE_ANON_KEY)
+            .addHeader("X-App-Version", APP_VERSION)
             .apply { if (token != null) addHeader("Authorization", "Bearer $token") }
             .build()
         val resp = client.newCall(req).execute()
@@ -96,6 +98,7 @@ object ApiService {
         val req = Request.Builder().url(url).post(body)
             .addHeader("Content-Type", "application/json")
             .addHeader("apikey", SUPABASE_ANON_KEY)
+            .addHeader("X-App-Version", APP_VERSION)
             .apply { extraHeaders.forEach { (k, v) -> addHeader(k, v) } }
             .build()
         val resp = client.newCall(req).execute()
@@ -119,6 +122,7 @@ object ApiService {
         val req = Request.Builder().url("$API_BASE/status")
             .addHeader("apikey", SUPABASE_ANON_KEY)
             .addHeader("x-session-token", token)
+            .addHeader("X-App-Version", APP_VERSION)
             .build()
         val resp = client.newCall(req).execute()
         val body = resp.body?.string() ?: ""

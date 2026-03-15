@@ -1,17 +1,18 @@
 import SwiftUI
 
 struct EventsView: View {
+    @EnvironmentObject var authManager: AuthManager
     @State private var events: [Event] = []
     @State private var isLoading = true
     @State private var showError = false
     @State private var selectedEvent: Event?
     @State private var showBookingSheet = false
     @State private var selectedMeal: MealOption?
-    @State private var guestCount = 1
+    @State private var guestCount = 0
     @State private var specialRequests = ""
     @State private var showConfirmation = false
     @State private var isBooking = false
-    
+
     private let apiService = APIService.shared
 
     enum MealOption: String, CaseIterable, Identifiable {
@@ -146,6 +147,7 @@ struct EventsView: View {
             
             _ = try await apiService.bookEvent(
                 eventId: event.id,
+                memberEmail: authManager.currentMember?.email ?? "",
                 mealOption: mealOption,
                 guestCount: guestCount,
                 specialRequests: specialRequests.isEmpty ? nil : specialRequests
@@ -214,40 +216,40 @@ struct EventsView: View {
                         
                         // Guest Count
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("Number of Guests")
+                            Text("Additional Guests")
                                 .font(.system(size: 16, weight: .semibold))
                                 .foregroundColor(.oxfordBlue)
-                            
+
                             HStack {
                                 Image(systemName: "person.2.fill")
                                     .foregroundColor(.cambridgeBlue)
                                     .font(.system(size: 20))
-                                
+
                                 HStack(spacing: 20) {
                                     Button {
-                                        if guestCount > 1 { guestCount -= 1 }
+                                        if guestCount > 0 { guestCount -= 1 }
                                     } label: {
                                         Image(systemName: "minus.circle.fill")
                                             .font(.system(size: 32))
-                                            .foregroundColor(guestCount > 1 ? .oxfordBlue : .gray.opacity(0.3))
+                                            .foregroundColor(guestCount > 0 ? .oxfordBlue : .gray.opacity(0.3))
                                     }
-                                    .disabled(guestCount <= 1)
-                                    
-                                    Text("\(guestCount)")
-                                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                                    .disabled(guestCount <= 0)
+
+                                    Text(guestCount == 0 ? "Just me" : "+\(guestCount)")
+                                        .font(.system(size: guestCount == 0 ? 18 : 32, weight: .bold, design: .rounded))
                                         .foregroundColor(.oxfordBlue)
-                                        .frame(width: 60)
-                                    
+                                        .frame(width: 80)
+
                                     Button {
-                                        if guestCount < 10 { guestCount += 1 }
+                                        if guestCount < 5 { guestCount += 1 }
                                     } label: {
                                         Image(systemName: "plus.circle.fill")
                                             .font(.system(size: 32))
-                                            .foregroundColor(guestCount < 10 ? .oxfordBlue : .gray.opacity(0.3))
+                                            .foregroundColor(guestCount < 5 ? .oxfordBlue : .gray.opacity(0.3))
                                     }
-                                    .disabled(guestCount >= 10)
+                                    .disabled(guestCount >= 5)
                                 }
-                                
+
                                 Spacer()
                             }
                             .padding()
@@ -268,32 +270,34 @@ struct EventsView: View {
                                 .textFieldStyle(RoundedBorderTextFieldStyle())
                         }
                         
-                        // Price Summary (example)
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text("Ticket Price:")
-                                    .font(.system(size: 15))
-                                Spacer()
-                                Text("£45 per person")
-                                    .font(.system(size: 15, weight: .semibold))
-                                    .foregroundColor(.oxfordBlue)
+                        // Price Summary
+                        if let event = selectedEvent, event.pricePerPerson > 0 {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Text("Ticket Price:")
+                                        .font(.system(size: 15))
+                                    Spacer()
+                                    Text("£\(Int(event.pricePerPerson)) per person")
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .foregroundColor(.oxfordBlue)
+                                }
+
+                                HStack {
+                                    Text("Total:")
+                                        .font(.system(size: 18, weight: .bold))
+                                    Spacer()
+                                    Text("£\(Int(event.pricePerPerson * Double(1 + guestCount)))")
+                                        .font(.system(size: 22, weight: .bold))
+                                        .foregroundColor(.oxfordBlue)
+                                }
+                                .padding(.top, 8)
                             }
-                            
-                            HStack {
-                                Text("Total:")
-                                    .font(.system(size: 18, weight: .bold))
-                                Spacer()
-                                Text("£\(guestCount * 45)")
-                                    .font(.system(size: 22, weight: .bold))
-                                    .foregroundColor(.oxfordBlue)
-                            }
-                            .padding(.top, 8)
+                            .padding()
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.gray.opacity(0.05))
+                            )
                         }
-                        .padding()
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.gray.opacity(0.05))
-                        )
                     }
                     .padding(.horizontal, 24)
                 }

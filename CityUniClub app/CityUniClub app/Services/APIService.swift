@@ -48,6 +48,7 @@ class APIService {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(APIConfiguration.appVersion, forHTTPHeaderField: "X-App-Version")
 
         if requiresAuth, let token = authToken {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -98,6 +99,7 @@ class APIService {
         var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(APIConfiguration.appVersion, forHTTPHeaderField: "X-App-Version")
 
         if requiresAuth, let token = authToken {
             request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
@@ -134,12 +136,13 @@ class APIService {
         struct LoginRequest: Encodable {
             let email: String
             let password: String
+            let session_type: String
         }
         
         let response: AuthResponse = try await request(
             endpoint: "/login",
             method: "POST",
-            body: LoginRequest(email: email, password: password),
+            body: LoginRequest(email: email, password: password, session_type: "supersession"),
             requiresAuth: false
         )
         
@@ -205,30 +208,32 @@ class APIService {
         return response.events
     }
     
-    func bookEvent(eventId: String, mealOption: String? = nil, guestCount: Int, specialRequests: String? = nil) async throws -> EventBooking {
+    func bookEvent(eventId: String, memberEmail: String, mealOption: String? = nil, guestCount: Int, specialRequests: String? = nil) async throws -> EventBooking {
         struct BookingRequest: Encodable {
             let event_id: String
+            let member_email: String
             let meal_option: String?
             let guest_count: Int
             let special_requests: String?
         }
-        
+
         struct BookingResponse: Decodable {
             let booking: EventBooking
         }
-        
+
         let response: BookingResponse = try await request(
             endpoint: "/events/book",
             method: "POST",
             body: BookingRequest(
                 event_id: eventId,
+                member_email: memberEmail,
                 meal_option: mealOption,
                 guest_count: guestCount,
                 special_requests: specialRequests
             ),
-            requiresAuth: true
+            requiresAuth: false
         )
-        
+
         return response.booking
     }
     
@@ -321,24 +326,62 @@ class APIService {
     }
     
     // MARK: - Reciprocal Clubs Endpoints
-    
-    func getReciprocalClubs(region: String? = nil) async throws -> [ReciprocalClub] {
-        struct ClubsResponse: Decodable {
-            let clubs: [ReciprocalClub]
-        }
-        
-        var endpoint = "/clubs"
-        if let region = region, region != "All" {
-            endpoint += "?region=\(region)"
-        }
-        
-        let response: ClubsResponse = try await request(
-            endpoint: endpoint,
-            method: "GET",
-            requiresAuth: false
-        )
-        
-        return response.clubs
+
+    func getClubRegionCounts() async throws -> [String: Int] {
+        struct Response: Decodable { let regions: [String: Int] }
+        let r: Response = try await request(endpoint: "/clubs", method: "GET", requiresAuth: true)
+        return r.regions
+    }
+
+    func getClubCountryCounts(regions: [String]) async throws -> [ClubCountryCount] {
+        struct Response: Decodable { let countries: [ClubCountryCount] }
+        let enc = encode(regions.joined(separator: ","))
+        let r: Response = try await request(endpoint: "/clubs?regions=\(enc)", method: "GET", requiresAuth: true)
+        return r.countries
+    }
+
+    func getClubCityCounts(regions: [String], country: String) async throws -> [ClubCityCount] {
+        struct Response: Decodable { let cities: [ClubCityCount] }
+        let rEnc = encode(regions.joined(separator: ","))
+        let cEnc = encode(country)
+        let r: Response = try await request(endpoint: "/clubs?regions=\(rEnc)&country=\(cEnc)", method: "GET", requiresAuth: true)
+        return r.cities
+    }
+
+    func getClubsByCity(regions: [String], country: String, city: String) async throws -> [ReciprocalClub] {
+        struct Response: Decodable { let clubs: [ReciprocalClub] }
+        let rEnc = encode(regions.joined(separator: ","))
+        let cEnc = encode(country)
+        let cityEnc = encode(city)
+        let r: Response = try await request(endpoint: "/clubs?regions=\(rEnc)&country=\(cEnc)&city=\(cityEnc)", method: "GET", requiresAuth: true)
+        return r.clubs
+    }
+
+    func getClubsExcludingCity(regions: [String], country: String, excludeCity: String) async throws -> [ReciprocalClub] {
+        struct Response: Decodable { let clubs: [ReciprocalClub] }
+        let rEnc = encode(regions.joined(separator: ","))
+        let cEnc = encode(country)
+        let exEnc = encode(excludeCity)
+        let r: Response = try await request(endpoint: "/clubs?regions=\(rEnc)&country=\(cEnc)&exclude_city=\(exEnc)", method: "GET", requiresAuth: true)
+        return r.clubs
+    }
+
+    func getClubsByCountry(regions: [String], country: String) async throws -> [ReciprocalClub] {
+        struct Response: Decodable { let clubs: [ReciprocalClub] }
+        let rEnc = encode(regions.joined(separator: ","))
+        let cEnc = encode(country)
+        let r: Response = try await request(endpoint: "/clubs?regions=\(rEnc)&country=\(cEnc)&all_clubs=true", method: "GET", requiresAuth: true)
+        return r.clubs
+    }
+
+    func searchClubs(query: String) async throws -> [ReciprocalClub] {
+        struct Response: Decodable { let clubs: [ReciprocalClub] }
+        let r: Response = try await request(endpoint: "/clubs?search=\(encode(query))", method: "GET", requiresAuth: true)
+        return r.clubs
+    }
+
+    private func encode(_ s: String) -> String {
+        s.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? s
     }
     
     func createLoiRequest(
@@ -347,7 +390,7 @@ class APIService {
         departureDate: String,
         purpose: String,
         specialRequests: String? = nil
-    ) async throws -> LoiRequest {
+    ) async throws {
         struct LoiRequestBody: Encodable {
             let club_id: String
             let arrival_date: String
@@ -356,24 +399,30 @@ class APIService {
             let special_requests: String?
         }
 
-        struct LoiResponse: Decodable {
-            let request: LoiRequest
+        guard let url = URL(string: "\(APIConfiguration.baseURL)/loi-api") else {
+            throw APIError.invalidURL
+        }
+        guard let token = authToken else {
+            throw APIError.unauthorized
         }
 
-        let response: LoiResponse = try await request(
-            endpoint: "/loi-requests",
-            method: "POST",
-            body: LoiRequestBody(
-                club_id: clubId,
-                arrival_date: arrivalDate,
-                departure_date: departureDate,
-                purpose: purpose,
-                special_requests: specialRequests
-            ),
-            requiresAuth: true
-        )
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue(token, forHTTPHeaderField: "x-session-token")
+        urlRequest.httpBody = try JSONEncoder().encode(LoiRequestBody(
+            club_id: clubId,
+            arrival_date: arrivalDate,
+            departure_date: departureDate,
+            purpose: purpose,
+            special_requests: specialRequests
+        ))
 
-        return response.request
+        let (_, response) = try await URLSession.shared.data(for: urlRequest)
+
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+            throw APIError.serverError
+        }
     }
     
     func getLoiRequests() async throws -> [LoiRequest] {

@@ -5,25 +5,9 @@ struct MembershipProfileView: View {
     @EnvironmentObject var authManager: AuthManager
     @State private var showingLogoutAlert = false
     @State private var showingEditProfile = false
-    @State private var showingChangePassword = false
 
     var member: Member? {
         authManager.currentMember
-    }
-    
-    var formattedMemberUntil: String {
-        guard let memberUntil = member?.memberUntil else {
-            return "March 2026"
-        }
-        
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        if let date = dateFormatter.date(from: memberUntil) {
-            let outputFormatter = DateFormatter()
-            outputFormatter.dateFormat = "MMMM yyyy"
-            return outputFormatter.string(from: date)
-        }
-        return memberUntil
     }
 
     var body: some View {
@@ -32,16 +16,8 @@ struct MembershipProfileView: View {
 
             ScrollView {
                 VStack(spacing: 24) {
-                    // Membership Card at Top
-                    membershipCard
-
-                    // Profile Information
                     profileSection
-
-                    // Account Settings
                     accountSettingsSection
-
-                    // Logout Button
                     logoutButton
                 }
                 .padding(.horizontal, 20)
@@ -57,10 +33,6 @@ struct MembershipProfileView: View {
                     .environmentObject(authManager)
             }
         }
-        .sheet(isPresented: $showingChangePassword) {
-            ChangePasswordView()
-                .environmentObject(authManager)
-        }
         .alert("Logout", isPresented: $showingLogoutAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Logout", role: .destructive) {
@@ -71,91 +43,6 @@ struct MembershipProfileView: View {
         } message: {
             Text("Are you sure you want to logout of your account?")
         }
-    }
-    
-    // MARK: - Membership Card
-    private var membershipCard: some View {
-        VStack(spacing: 0) {
-            // Card Header
-            HStack(alignment: .top, spacing: 12) {
-                Image("cuc-monogram")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 50, height: 65)
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("CITY UNIVERSITY CLUB")
-                        .font(.system(size: 16, weight: .medium, design: .serif))
-                        .foregroundColor(.oxfordBlue)
-                    Text("42 CRUTCHED FRIARS, EC3N 2AP")
-                        .font(.system(size: 9, weight: .regular))
-                        .foregroundColor(.addressGray)
-                }
-                Spacer()
-            }
-            .padding(.leading, 16)
-            .padding(.top, 16)
-            .padding(.trailing, 16)
-
-            // Member Name
-            VStack(spacing: 6) {
-                Text("This is to introduce")
-                    .font(.system(size: 11, weight: .regular, design: .serif))
-                    .foregroundColor(.secondaryText)
-                    .italic()
-                Text(member?.fullName ?? "Member Name")
-                    .font(.system(size: 15, weight: .semibold, design: .serif))
-                    .foregroundColor(.oxfordBlue)
-                    .tracking(1)
-                    .multilineTextAlignment(.center)
-            }
-            .padding(.vertical, 20)
-
-            // Card Footer
-            HStack {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Member Until")
-                        .font(.system(size: 9, weight: .regular))
-                        .foregroundColor(.secondaryText)
-                    Text(formattedMemberUntil)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundColor(.oxfordBlue)
-                }
-                Spacer()
-                VStack(alignment: .trailing, spacing: 2) {
-                    Text("Secretary")
-                        .font(.system(size: 8, weight: .regular))
-                        .foregroundColor(.secondaryText)
-                    Text("H. Senanayake")
-                        .font(.system(size: 10, weight: .regular, design: .serif))
-                        .foregroundColor(.oxfordBlue)
-                        .italic()
-                }
-            }
-            .padding(.leading, 16)
-            .padding(.trailing, 16)
-            .padding(.bottom, 16)
-        }
-        .frame(maxWidth: 380)
-        .background(Color.cardWhite)
-        .cornerRadius(16)
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(
-                    LinearGradient(
-                        gradient: Gradient(colors: [
-                            Color.white,
-                            Color(red: 0.88, green: 0.88, blue: 0.90)
-                        ]),
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ),
-                    lineWidth: 2
-                )
-        )
-        .shadow(color: Color(red: 0.2, green: 0.25, blue: 0.3).opacity(0.2), radius: 20, x: 0, y: 15)
-        .shadow(color: Color.white.opacity(0.6), radius: 5, x: -2, y: -2)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 2, y: 2)
     }
 
     // MARK: - Profile Section
@@ -180,11 +67,7 @@ struct MembershipProfileView: View {
             VStack(spacing: 0) {
                 profileRow(icon: "person.fill", label: "Full Name", value: member?.fullName ?? "")
                 Divider().background(Color.gray.opacity(0.2))
-
                 profileRow(icon: "envelope.fill", label: "Email Address", value: member?.email ?? "")
-                Divider().background(Color.gray.opacity(0.2))
-
-                profileRow(icon: "phone.fill", label: "Phone Number", value: member?.phoneNumber ?? "")
             }
             .padding()
             .background(
@@ -193,31 +76,16 @@ struct MembershipProfileView: View {
             )
         }
     }
-    
+
     // MARK: - Account Settings Section
     private var accountSettingsSection: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Account Settings")
                 .font(.system(size: 18, weight: .semibold, design: .serif))
                 .foregroundColor(.oxfordBlue)
-            
+
             VStack(spacing: 0) {
-                Button {
-                    showingChangePassword = true
-                } label: {
-                    settingsRow(icon: "lock.fill", label: "Change Password", value: "")
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(PlainButtonStyle())
-                Divider().background(Color.gray.opacity(0.2))
-
                 settingsRow(icon: "bell.fill", label: "Notifications", value: "Enabled")
-                Divider().background(Color.gray.opacity(0.2))
-
-                settingsRow(icon: "doc.text.fill", label: "Terms & Conditions", value: "")
-                Divider().background(Color.gray.opacity(0.2))
-
-                settingsRow(icon: "shield.fill", label: "Privacy Policy", value: "")
             }
             .padding()
             .background(
@@ -226,39 +94,37 @@ struct MembershipProfileView: View {
             )
         }
     }
-    
+
     // MARK: - Logout Button
     private var logoutButton: some View {
-        Button {
-            showingLogoutAlert = true
-        } label: {
-            HStack {
-                Image(systemName: "rectangle.portrait.and.arrow.right")
-                    .font(.system(size: 16))
-                Text("Logout")
-                    .font(.system(size: 15, weight: .semibold))
+        VStack(spacing: 16) {
+            Button {
+                showingLogoutAlert = true
+            } label: {
+                HStack {
+                    Image(systemName: "rectangle.portrait.and.arrow.right")
+                        .font(.system(size: 16))
+                    Text("Logout")
+                        .font(.system(size: 15, weight: .semibold))
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 16)
+                .background(
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color.red.opacity(0.85))
+                        .shadow(color: Color.red.opacity(0.4), radius: 8, x: 0, y: 4)
+                )
             }
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(colors: [
-                                Color.red.opacity(0.8),
-                                Color.red
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .shadow(color: Color.red.opacity(0.4), radius: 8, x: 0, y: 4)
-            )
+
+            Text(APIConfiguration.appVersion)
+                .font(.system(size: 12, weight: .regular))
+                .foregroundColor(Color.white.opacity(0.4))
+                .frame(maxWidth: .infinity, alignment: .center)
         }
         .padding(.top, 8)
     }
-    
+
     // MARK: - Helper Views
     private func profileRow(icon: String, label: String, value: String) -> some View {
         HStack(spacing: 16) {
@@ -266,7 +132,7 @@ struct MembershipProfileView: View {
                 .font(.system(size: 16))
                 .foregroundColor(.cambridgeBlue)
                 .frame(width: 24)
-            
+
             VStack(alignment: .leading, spacing: 2) {
                 Text(label)
                     .font(.system(size: 11, weight: .regular))
@@ -275,16 +141,12 @@ struct MembershipProfileView: View {
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.oxfordBlue)
             }
-            
+
             Spacer()
-            
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12))
-                .foregroundColor(.secondaryText)
         }
         .padding(.vertical, 12)
     }
-    
+
     private func settingsRow(icon: String, label: String, value: String) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
@@ -303,10 +165,6 @@ struct MembershipProfileView: View {
                     .font(.system(size: 13))
                     .foregroundColor(.secondaryText)
             }
-
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12))
-                .foregroundColor(.secondaryText)
         }
         .padding(.vertical, 12)
     }

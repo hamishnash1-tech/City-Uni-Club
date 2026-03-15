@@ -56,24 +56,38 @@ class AuthManager: ObservableObject {
     }
     
     func validateToken(_ token: String) async throws {
-        let url = URL(string: "\(APIConfiguration.baseURL)/auth/validate")!
+        let url = URL(string: "\(APIConfiguration.baseURL)/status")!
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let (_, response) = try await URLSession.shared.data(for: request)
-        
+        request.httpMethod = "GET"
+        request.timeoutInterval = APIConfiguration.timeout
+        request.setValue(token, forHTTPHeaderField: "x-session-token")
+        request.setValue(APIConfiguration.appVersion, forHTTPHeaderField: "X-App-Version")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
         guard let httpResponse = response as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
         }
-        
+
         if httpResponse.statusCode == 200 {
+            struct StatusResponse: Decodable {
+                let member: Member
+            }
+
             let decoder = JSONDecoder()
-            decoder.dateDecodingStrategy = .iso8601
-            
-            if let memberData = UserDefaults.standard.data(forKey: memberKey),
-               let member = try? decoder.decode(Member.self, from: memberData) {
+            if let statusResponse = try? decoder.decode(StatusResponse.self, from: data) {
+                let encoder = JSONEncoder()
+                if let memberData = try? encoder.encode(statusResponse.member) {
+                    UserDefaults.standard.set(memberData, forKey: memberKey)
+                }
+                await MainActor.run {
+                    self.currentMember = statusResponse.member
+                    self.isAuthenticated = true
+                    self.isLoading = false
+                    self.hasCheckedAuth = true
+                }
+            } else if let memberData = UserDefaults.standard.data(forKey: memberKey),
+                      let member = try? decoder.decode(Member.self, from: memberData) {
                 await MainActor.run {
                     self.currentMember = member
                     self.isAuthenticated = true
@@ -81,7 +95,6 @@ class AuthManager: ObservableObject {
                     self.hasCheckedAuth = true
                 }
             } else {
-                // No member data, fetch it
                 await MainActor.run {
                     self.isAuthenticated = true
                     self.isLoading = false
