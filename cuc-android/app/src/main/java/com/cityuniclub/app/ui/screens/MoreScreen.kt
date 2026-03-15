@@ -10,6 +10,9 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Place
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -89,6 +92,59 @@ private fun MoreMenu(onReciprocalClubs: () -> Unit, onProfile: () -> Unit) {
             label = "Profile",
             onClick = onProfile
         )
+        Spacer(Modifier.height(24.dp))
+        Text(
+            "Contact",
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = SecondaryText,
+            modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp)
+        )
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.06f)),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Column(modifier = Modifier.padding(horizontal = 18.dp, vertical = 16.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    Icon(Icons.Default.Place, contentDescription = null, tint = CambridgeBlue, modifier = Modifier.size(22.dp))
+                    Column {
+                        Text("City University Club", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                        Spacer(Modifier.height(4.dp))
+                        Text("42 Crutched Friars", fontSize = 13.sp, color = SecondaryText)
+                        Text("London EC3N 2AP", fontSize = 13.sp, color = SecondaryText)
+                    }
+                }
+                Spacer(Modifier.height(14.dp))
+                Divider(color = Color.White.copy(alpha = 0.08f))
+                Spacer(Modifier.height(14.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    Icon(Icons.Default.Phone, contentDescription = null, tint = CambridgeBlue, modifier = Modifier.size(22.dp))
+                    Text("020 7488 1770", fontSize = 13.sp, color = SecondaryText)
+                }
+                Spacer(Modifier.height(14.dp))
+                Divider(color = Color.White.copy(alpha = 0.08f))
+                Spacer(Modifier.height(14.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)
+                ) {
+                    Icon(Icons.Default.Schedule, contentDescription = null, tint = CambridgeBlue, modifier = Modifier.size(22.dp))
+                    Column {
+                        Text("Opening Hours", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color.White)
+                        Spacer(Modifier.height(4.dp))
+                        Text("Tuesday – Friday", fontSize = 13.sp, color = SecondaryText)
+                        Text("9:00 am – 5:00 pm", fontSize = 13.sp, color = SecondaryText)
+                    }
+                }
+            }
+        }
     }
 }
 
