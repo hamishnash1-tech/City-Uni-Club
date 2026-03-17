@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.cityuniclub.app"
+    namespace = "uk.co.cityuniversityclub"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.cityuniclub.app"
+        applicationId = "uk.co.cityuniversityclub"
         minSdk = 24
         targetSdk = 35
         versionCode = 2

@@ -23,8 +23,8 @@ struct EditProfileView: View {
     private let apiService = APIService.shared
     
     init(member: Member) {
-        _fullName = State(initialValue: member.fullName)
-        _firstName = State(initialValue: member.firstName)
+        _fullName = State(initialValue: member.fullName ?? "")
+        _firstName = State(initialValue: member.firstName ?? "")
         _email = State(initialValue: member.email)
         _phoneNumber = State(initialValue: member.phoneNumber ?? "")
     }

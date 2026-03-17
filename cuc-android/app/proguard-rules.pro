@@ -21,3 +21,13 @@
 #-renamesourcefileattribute SourceFile
 
 -dontwarn com.google.errorprone.annotations.Immutable
+
+# Keep Gson data model classes so R8 doesn't obfuscate field names used during JSON deserialization
+-keep class uk.co.cityuniversityclub.network.** { *; }
+-keepclassmembers class uk.co.cityuniversityclub.network.** { *; }
+
+# Gson internals
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn sun.misc.**
+-keep class com.google.gson.** { *; }
