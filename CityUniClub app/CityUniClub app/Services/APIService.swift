@@ -75,7 +75,10 @@ class APIService {
         case 500...599:
             throw APIError.serverError
         default:
-            throw APIError.httpError(statusCode: httpResponse.statusCode, message: "Request failed")
+            let serverMsg = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])
+                .flatMap { $0["message"] as? String ?? $0["error"] as? String }
+                ?? "Request failed (\(httpResponse.statusCode))"
+            throw APIError.httpError(statusCode: httpResponse.statusCode, message: serverMsg)
         }
 
         do {

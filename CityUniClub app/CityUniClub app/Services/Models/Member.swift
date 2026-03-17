@@ -10,11 +10,11 @@ import Foundation
 struct Member: Codable, Identifiable {
     let id: String
     let email: String
-    let fullName: String
-    let firstName: String
+    let fullName: String?
+    let firstName: String?
     let phoneNumber: String?
-    let membershipNumber: String
-    let membershipType: String
+    let membershipNumber: String?
+    let membershipType: String?
     let memberSince: String?
     let memberUntil: String?
     let isActive: Bool?
