@@ -8,17 +8,14 @@ export const Home: React.FC = () => {
   const isAuthenticated = auth.isAuthenticated
 
   return (
-    <div className="fixed inset-0 overflow-hidden">
-      {/* Background */}
-      <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url('/assets/cuc-building.avif')` }}
-      >
-        <div className="absolute inset-0 bg-navy-gradient" style={{ opacity: 0.62 }}></div>
-      </div>
+    <div
+      className="relative bg-cover bg-center bg-no-repeat min-h-[calc(100vh-2.5rem)]"
+      style={{ backgroundImage: `url('/assets/cuc-building.avif')` }}
+    >
+      <div className="absolute inset-0 bg-navy-gradient" style={{ opacity: 0.62 }}></div>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center h-full pt-12 px-4 pb-4 md:pt-4">
+      <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-2.5rem)] px-4 py-10">
         {/* Logo — square icon on mobile, full logo on desktop */}
         <div className="md:hidden w-16 h-16 mb-4 bg-cambridge/90 rounded-full flex items-center justify-center p-2 overflow-hidden">
           <img src="/assets/cuc-logo-square.png" alt="CUC" className="w-full h-full object-contain" />
@@ -83,3 +80,4 @@ export const Home: React.FC = () => {
     </div>
   )
 }
+

@@ -1,15 +1,16 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import AdminLayout from './components/AdminLayout'
-import LoginPage from './pages/LoginPage'
-import DashboardPage from './pages/DashboardPage'
-import EventsPage from './pages/EventsPage'
-import EventDetailPage from './pages/EventDetailPage'
-import MembersPage from './pages/MembersPage'
-import DiningPage from './pages/DiningPage'
-import ReciprocalClubsPage from './pages/ReciprocalClubsPage'
-import NewsPage from './pages/NewsPage'
-import LoiPage from './pages/LoiPage'
+const LoginPage          = lazy(() => import('./pages/LoginPage'))
+const DashboardPage      = lazy(() => import('./pages/DashboardPage'))
+const EventsPage         = lazy(() => import('./pages/EventsPage'))
+const EventDetailPage    = lazy(() => import('./pages/EventDetailPage'))
+const MembersPage        = lazy(() => import('./pages/MembersPage'))
+const DiningPage         = lazy(() => import('./pages/DiningPage'))
+const ReciprocalClubsPage = lazy(() => import('./pages/ReciprocalClubsPage'))
+const NewsPage           = lazy(() => import('./pages/NewsPage'))
+const LoiPage            = lazy(() => import('./pages/LoiPage'))
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -23,6 +24,7 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 
 function AppRoutes() {
   return (
+    <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>Loading…</div>}>
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route
@@ -44,6 +46,7 @@ function AppRoutes() {
         <Route path="loi" element={<LoiPage />} />
       </Route>
     </Routes>
+    </Suspense>
   )
 }
 

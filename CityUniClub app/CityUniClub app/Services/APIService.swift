@@ -47,6 +47,7 @@ class APIService {
 
         var request = URLRequest(url: url)
         request.httpMethod = method
+        request.timeoutInterval = APIConfiguration.timeout
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue(APIConfiguration.appVersion, forHTTPHeaderField: "X-App-Version")
 
