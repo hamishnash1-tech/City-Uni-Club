@@ -6,9 +6,10 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var showPassword = false
+    @State private var showForgotPassword = false
     @State private var showError = false
     @State private var errorMessage = ""
-    @State private var isLoading = false
+    @State private var isAttempting = false
 
     var body: some View {
         ZStack {
@@ -124,7 +125,7 @@ struct LoginView: View {
                         handleLogin()
                     } label: {
                         HStack {
-                            if isLoading {
+                            if isAttempting {
                                 ProgressView()
                                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
                                     .scaleEffect(0.8)
@@ -153,12 +154,12 @@ struct LoginView: View {
                                 .shadow(color: Color.cambridgeBlue.opacity(0.4), radius: 8, x: 0, y: 4)
                         )
                     }
-                    .disabled(isLoading || email.isEmpty || password.isEmpty)
-                    .opacity(isLoading || email.isEmpty || password.isEmpty ? 0.6 : 1)
+                    .disabled(isAttempting || email.isEmpty || password.isEmpty)
+                    .opacity(isAttempting || email.isEmpty || password.isEmpty ? 0.6 : 1)
 
                     // Forgot Password
                     Button {
-                        // Handle forgot password
+                        showForgotPassword = true
                     } label: {
                         Text("Forgot Password?")
                             .font(.system(size: 13, weight: .medium))
@@ -166,6 +167,11 @@ struct LoginView: View {
                             .underline()
                     }
                     .padding(.top, 8)
+                    .alert("Forgot Password", isPresented: $showForgotPassword) {
+                        Button("OK", role: .cancel) {}
+                    } message: {
+                        Text("Please email the Club Secretary at secretary@cityuniversityclub.co.uk to reset your password.")
+                    }
 
                     // Help Text
                     Text("Contact the secretary for login assistance")
@@ -195,21 +201,21 @@ struct LoginView: View {
     
     // MARK: - Login Handler
     private func handleLogin() {
-        isLoading = true
+        isAttempting = true
         showError = false
-        
+
         Task {
             do {
                 try await authManager.login(email: email, password: password)
             } catch let error as APIError {
                 await MainActor.run {
-                    isLoading = false
+                    isAttempting = false
                     errorMessage = error.errorDescription ?? "Login failed"
                     showError = true
                 }
             } catch {
                 await MainActor.run {
-                    isLoading = false
+                    isAttempting = false
                     errorMessage = "Invalid membership email or password"
                     showError = true
                 }

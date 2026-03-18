@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import type { User } from '../types'
-import { supabase, FUNCTIONS_URL } from '../services/supabase'
+import { FUNCTIONS_URL } from '../services/supabase'
 
 interface AuthContextType {
   user: User | null

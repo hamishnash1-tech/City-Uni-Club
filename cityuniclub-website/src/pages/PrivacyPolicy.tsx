@@ -48,7 +48,7 @@ export const PrivacyPolicy: React.FC = () => (
 
       <section>
         <h2 className="font-serif text-ivory text-lg font-normal mb-3">5. Third-Party Services</h2>
-        <p>This portal is hosted using Supabase (database and authentication infrastructure), which processes data on our behalf under appropriate data processing agreements. Data is stored on servers within the European Economic Area. We do not transfer your personal data outside the UK or EEA without appropriate safeguards.</p>
+        <p>We use third-party infrastructure providers to host this portal and process data on our behalf under appropriate data processing agreements. Data is stored on servers within the European Economic Area. We do not transfer your personal data outside the UK or EEA without appropriate safeguards.</p>
       </section>
 
       <section>

@@ -14,6 +14,6 @@ enum APIConfiguration {
     // For production (Supabase Edge Functions)
     static let baseURL = "https://myfoyoyjtkqthjjvabmn.supabase.co/functions/v1"
 
-    static let timeout: TimeInterval = 30
+    static let timeout: TimeInterval = 60
     static let appVersion = "v0.1.7"
 }
