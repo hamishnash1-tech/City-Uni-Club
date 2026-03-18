@@ -3,18 +3,19 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { RootState } from './store'
 import { logout } from './slices/authSlice'
-import { Login } from './pages/Login'
-import { ForgotPassword } from './pages/ForgotPassword'
-import { ResetPassword } from './pages/ResetPassword'
-import { Home } from './pages/Home'
-import { Events } from './pages/Events'
-import { News } from './pages/News'
-import { Dining } from './pages/Dining'
-const ReciprocalClubs = React.lazy(() => import('./pages/ReciprocalClubs'))
-import { LOIRequest } from './pages/LOIRequest'
-import { Profile } from './pages/Profile'
-import { TermsAndConditions } from './pages/TermsAndConditions'
-import { PrivacyPolicy } from './pages/PrivacyPolicy'
+const Login            = React.lazy(() => import('./pages/Login').then(m => ({ default: m.Login })))
+const ForgotPassword   = React.lazy(() => import('./pages/ForgotPassword').then(m => ({ default: m.ForgotPassword })))
+const ResetPassword    = React.lazy(() => import('./pages/ResetPassword').then(m => ({ default: m.ResetPassword })))
+const Home             = React.lazy(() => import('./pages/Home').then(m => ({ default: m.Home })))
+const Events           = React.lazy(() => import('./pages/Events').then(m => ({ default: m.Events })))
+const News             = React.lazy(() => import('./pages/News').then(m => ({ default: m.News })))
+const Dining           = React.lazy(() => import('./pages/Dining').then(m => ({ default: m.Dining })))
+const ReciprocalClubs  = React.lazy(() => import('./pages/ReciprocalClubs'))
+const LOIRequest       = React.lazy(() => import('./pages/LOIRequest').then(m => ({ default: m.LOIRequest })))
+const Profile          = React.lazy(() => import('./pages/Profile').then(m => ({ default: m.Profile })))
+const TermsAndConditions = React.lazy(() => import('./pages/TermsAndConditions').then(m => ({ default: m.TermsAndConditions })))
+const PrivacyPolicy    = React.lazy(() => import('./pages/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })))
+const MobileApp        = React.lazy(() => import('./pages/MobileApp').then(m => ({ default: m.MobileApp })))
 import { IconHome, IconDining, IconEvents, IconNews, IconClubs, IconUser } from './icons'
 
 const tabs = [
@@ -245,25 +246,24 @@ const App: React.FC = () => {
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       <div className="pt-10 md:pt-12 min-h-screen flex flex-col">
         <div className="flex-1">
-        <Routes>
-          <Route path="/" element={<Navigate to="/home" replace />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/dining" element={<Dining />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/reciprocal-clubs" element={
-            <React.Suspense fallback={<div className="flex justify-center py-20"><div className="w-6 h-6 border-2 border-cambridge/30 border-t-cambridge rounded-full animate-spin" /></div>}>
-              <ReciprocalClubs />
-            </React.Suspense>
-          } />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/loi-request" element={<ProtectedRoute><LOIRequest /></ProtectedRoute>} />
-          <Route path="/terms" element={<TermsAndConditions />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-        </Routes>
+        <React.Suspense fallback={<div className="flex justify-center py-20"><div className="w-6 h-6 border-2 border-cambridge/30 border-t-cambridge rounded-full animate-spin" /></div>}>
+          <Routes>
+            <Route path="/" element={<Navigate to="/home" replace />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/dining" element={<Dining />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/reciprocal-clubs" element={<ReciprocalClubs />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/loi-request" element={<ProtectedRoute><LOIRequest /></ProtectedRoute>} />
+            <Route path="/terms" element={<TermsAndConditions />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/mobile-app" element={<MobileApp />} />
+          </Routes>
+        </React.Suspense>
         </div>
         <footer className="border-t border-cambridge/10 mt-8 pb-8 pt-5 px-4 text-center space-y-1.5">
           <p className="font-cormorant text-sm tracking-widest text-ivory/60">
@@ -273,6 +273,8 @@ const App: React.FC = () => {
             <Link to="/terms" className="hover:text-cambridge transition">Terms & Conditions</Link>
             <span>·</span>
             <Link to="/privacy" className="hover:text-cambridge transition">Privacy Policy</Link>
+            <span>·</span>
+            <Link to="/mobile-app" className="hover:text-cambridge transition">Mobile App</Link>
           </div>
         </footer>
       </div>

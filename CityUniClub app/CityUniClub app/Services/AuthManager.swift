@@ -109,31 +109,21 @@ class AuthManager: ObservableObject {
     // MARK: - Login
     
     func login(email: String, password: String) async throws {
-        isLoading = true
-        
-        do {
-            let authResponse = try await apiService.login(email: email, password: password)
-            
-            // Save token
-            UserDefaults.standard.set(authResponse.session.token, forKey: authTokenKey)
-            
-            // Save member data
-            let encoder = JSONEncoder()
-            encoder.dateEncodingStrategy = .iso8601
-            if let memberData = try? encoder.encode(authResponse.member) {
-                UserDefaults.standard.set(memberData, forKey: memberKey)
-            }
-            
-            await MainActor.run {
-                self.currentMember = authResponse.member
-                self.isAuthenticated = true
-                self.isLoading = false
-            }
-        } catch {
-            await MainActor.run {
-                self.isLoading = false
-            }
-            throw error
+        let authResponse = try await apiService.login(email: email, password: password)
+
+        // Save token
+        UserDefaults.standard.set(authResponse.session.token, forKey: authTokenKey)
+
+        // Save member data
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        if let memberData = try? encoder.encode(authResponse.member) {
+            UserDefaults.standard.set(memberData, forKey: memberKey)
+        }
+
+        await MainActor.run {
+            self.currentMember = authResponse.member
+            self.isAuthenticated = true
         }
     }
     
