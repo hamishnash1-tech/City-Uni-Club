@@ -1,17 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { IconEvents } from '../icons'
+import { api, Event as ApiEvent } from '../services/api'
 
-interface Event {
-  id: string
-  title: string
-  date: string
-  displayDate: string
-  price: string
-  priceValue?: number
-  eventType: 'lunch' | 'dinner' | 'lunch_dinner' | 'meeting' | 'special'
-}
-
-const EVENT_TYPE_LABELS: Record<Event['eventType'], string> = {
+const EVENT_TYPE_LABELS: Record<string, string> = {
   lunch: 'Lunch',
   dinner: 'Dinner',
   lunch_dinner: 'Lunch & Dinner',
@@ -19,27 +10,33 @@ const EVENT_TYPE_LABELS: Record<Event['eventType'], string> = {
   special: 'Special Event',
 }
 
+function formatEventDate(dateStr: string): string {
+  // Parse as local time to avoid UTC midnight timezone shift
+  const [year, month, day] = dateStr.split('-').map(Number)
+  const d = new Date(year, month - 1, day)
+  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+}
+
+function formatPrice(price: number): string {
+  return price % 1 === 0 ? `£${price}` : `£${price.toFixed(2)}`
+}
+
 export const Events: React.FC = () => {
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [events, setEvents] = useState<ApiEvent[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<ApiEvent | null>(null)
   const [showBooking, setShowBooking] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
 
-  const events: Event[] = [
-    { id: '1', title: 'St Patricks Day Lunch', date: '2026-03-17', displayDate: 'Tuesday 17 March', price: '£32', priceValue: 32, eventType: 'lunch' },
-    { id: '2', title: 'Moules Frites Lunch', date: '2026-03-25', displayDate: 'Wednesday 25 March', price: '£34', priceValue: 34, eventType: 'lunch' },
-    { id: '3', title: 'Younger Members Dinner', date: '2026-03-26', displayDate: 'Wednesday 26 March', price: '£45', priceValue: 45, eventType: 'dinner' },
-    { id: '4', title: '4 Course French Tasting Menu with Paired Wines', date: '2026-04-01', displayDate: 'April (TBA)', price: '£TBA', eventType: 'special' },
-    { id: '5', title: 'New Member Candidates Meeting', date: '2026-04-01', displayDate: 'April (TBA)', price: '£TBA', eventType: 'meeting' },
-    { id: '6', title: 'Sea Food Lunch', date: '2026-04-01', displayDate: 'April (TBA)', price: '£TBA', eventType: 'lunch' },
-    { id: '7', title: 'Literary Lunch — The Second Curtain by Roy Fuller', date: '2026-04-17', displayDate: 'Thursday 17 April', price: '£46', priceValue: 46, eventType: 'lunch' },
-    { id: '8', title: 'St Georges Day Lunch and Dinner', date: '2026-04-23', displayDate: 'Wednesday 23 April', price: '£48', priceValue: 48, eventType: 'lunch_dinner' },
-    { id: '9', title: 'Younger Members Dinner', date: '2026-04-30', displayDate: 'Wednesday 30 April', price: '£45', priceValue: 45, eventType: 'dinner' },
-    { id: '10', title: 'Steak and Kidney Lunch', date: '2026-05-13', displayDate: '13/14 May (TBA)', price: '£TBA', eventType: 'lunch' },
-    { id: '11', title: 'Moules Frites', date: '2026-05-27', displayDate: '27/28 May (TBA)', price: '£TBA', eventType: 'lunch' },
-    { id: '12', title: 'Royal Ascot Tent', date: '2026-06-17', displayDate: 'Tuesday 17 June', price: '£320', priceValue: 320, eventType: 'special' },
-  ]
+  useEffect(() => {
+    api.getEvents()
+      .then(setEvents)
+      .catch(() => setError('Unable to load events. Please try again later.'))
+      .finally(() => setLoading(false))
+  }, [])
 
-  const handleBookClick = (event: Event) => {
+  const handleBookClick = (event: ApiEvent) => {
     setSelectedEvent(event)
     setShowBooking(true)
   }
@@ -74,54 +71,68 @@ export const Events: React.FC = () => {
 
       {/* Events List */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
-            <div key={event.id} className="club-card border border-cambridge/50 rounded-md overflow-hidden">
-              {/* Event Type Badge */}
-              <div className="bg-oxford-blue border-b border-cambridge/30 px-4 py-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="label-caps text-cambridge-light/70">
-                    {EVENT_TYPE_LABELS[event.eventType]}
-                  </span>
-                  {event.displayDate.includes('TBA') && (
-                    <span className="label-caps border border-cambridge/25 text-cambridge/60 px-2 py-0.5 rounded-sm text-xs">
-                      TBA
-                    </span>
-                  )}
-                </div>
-              </div>
+        {loading && (
+          <div className="text-center text-cambridge-light/60 py-12">Loading events…</div>
+        )}
+        {error && (
+          <div className="text-center text-red-400 py-12">{error}</div>
+        )}
+        {!loading && !error && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {events.map((event) => {
+              const displayDate = event.is_tba ? 'Date TBA' : formatEventDate(event.event_date)
+              const price = event.price_per_person > 0 ? formatPrice(event.price_per_person) : '£TBA'
+              const isTba = event.is_tba || event.price_per_person === 0
 
-              {/* Event Details */}
-              <div className="p-4">
-                <h3 className="font-serif text-oxford-blue font-normal text-base mb-3 leading-snug">
-                  {event.title}
-                </h3>
+              return (
+                <div key={event.id} className="club-card border border-cambridge/50 rounded-md overflow-hidden">
+                  {/* Event Type Badge */}
+                  <div className="bg-oxford-blue border-b border-cambridge/30 px-4 py-2.5">
+                    <div className="flex items-center justify-between">
+                      <span className="label-caps text-cambridge-light/70">
+                        {EVENT_TYPE_LABELS[event.event_type] ?? event.event_type}
+                      </span>
+                      {isTba && (
+                        <span className="label-caps border border-cambridge/25 text-cambridge/60 px-2 py-0.5 rounded-sm text-xs">
+                          TBA
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-                <div className="flex items-center space-x-2 mb-3">
-                  <svg className="w-4 h-4 text-cambridge-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span className="text-sm text-ink-mid">{event.displayDate}</span>
-                </div>
+                  {/* Event Details */}
+                  <div className="p-4">
+                    <h3 className="font-serif text-oxford-blue font-normal text-base mb-3 leading-snug">
+                      {event.title}
+                    </h3>
 
-                <div className="mb-4">
-                  <span className={`font-serif text-xl ${event.price === '£TBA' ? 'text-ink-light' : 'text-oxford-blue'}`}>
-                    <span className="text-cambridge-muted">£</span>{event.price.replace('£', '')}
-                  </span>
-                </div>
+                    <div className="flex items-center space-x-2 mb-3">
+                      <svg className="w-4 h-4 text-cambridge-muted flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      <span className="text-sm text-ink-mid">{displayDate}</span>
+                    </div>
 
-                <div className="border-t border-cambridge/20 pt-3">
-                  <button
-                    onClick={() => handleBookClick(event)}
-                    className="btn-primary"
-                  >
-                    Book Tickets
-                  </button>
+                    <div className="mb-4">
+                      <span className={`font-serif text-xl ${price === '£TBA' ? 'text-ink-light' : 'text-oxford-blue'}`}>
+                        <span className="text-cambridge-muted">£</span>{price.replace('£', '')}
+                      </span>
+                    </div>
+
+                    <div className="border-t border-cambridge/20 pt-3">
+                      <button
+                        onClick={() => handleBookClick(event)}
+                        className="btn-primary"
+                      >
+                        Book Tickets
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       {/* Booking Modal */}
@@ -144,9 +155,11 @@ export const Events: React.FC = () => {
             <form className="p-6 space-y-4" onSubmit={(e) => { e.preventDefault(); handleBookingSuccess(); }}>
               <div className="border-l-2 border-cambridge/50 bg-ivory-warm p-4">
                 <h3 className="font-serif text-oxford-blue font-normal mb-1">{selectedEvent.title}</h3>
-                <p className="text-sm text-ink-mid">{selectedEvent.displayDate}</p>
-                {selectedEvent.price !== '£TBA' && (
-                  <p className="font-serif text-oxford-blue mt-2">{selectedEvent.price} per person</p>
+                <p className="text-sm text-ink-mid">
+                  {selectedEvent.is_tba ? 'Date TBA' : formatEventDate(selectedEvent.event_date)}
+                </p>
+                {selectedEvent.price_per_person > 0 && (
+                  <p className="font-serif text-oxford-blue mt-2">{formatPrice(selectedEvent.price_per_person)} per person</p>
                 )}
               </div>
 

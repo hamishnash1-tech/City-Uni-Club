@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from 'react'
+import { useState, useEffect, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../services/supabase'
 import type { Event } from '../types'
@@ -41,29 +41,14 @@ const eventTypeOptions = [
   { value: 'special', label: 'Special Event' }
 ]
 
-// Pre-populated events matching iOS/Android apps and website
-const initialEvents: Event[] = [
-  { id: '1', title: "St Patrick's Day Lunch", event_date: '2025-03-17', event_end_date: null, event_type: 'lunch', description: '', price: 32 },
-  { id: '2', title: 'Moules Frites Lunch', event_date: '2025-03-25', event_end_date: null, event_type: 'lunch', description: '', price: 34 },
-  { id: '3', title: "Younger Members Dinner", event_date: '2025-03-26', event_end_date: null, event_type: 'dinner', description: '', price: 45 },
-  { id: '4', title: '4 Course French Tasting Menu with Paired Wines', event_date: '2025-04-30', event_end_date: null, event_type: 'dinner', description: '', price: null },
-  { id: '5', title: 'New Member Candidates Meeting', event_date: '2025-04-30', event_end_date: null, event_type: 'meeting', description: '', price: null },
-  { id: '6', title: 'Sea Food Lunch', event_date: '2025-04-30', event_end_date: null, event_type: 'lunch', description: '', price: null },
-  { id: '7', title: 'Literary Lunch - The Second Curtain by Roy Fuller', event_date: '2025-04-17', event_end_date: null, event_type: 'lunch', description: '', price: 46 },
-  { id: '8', title: "St George's Day Lunch and Dinner", event_date: '2025-04-23', event_end_date: null, event_type: 'lunch_dinner', description: '', price: 48 },
-  { id: '9', title: "Younger Members Dinner", event_date: '2025-04-30', event_end_date: null, event_type: 'dinner', description: '', price: 45 },
-  { id: '10', title: 'Steak and Kidney Lunch', event_date: '2025-05-13', event_end_date: '2025-05-14', event_type: 'lunch', description: '', price: null },
-  { id: '11', title: 'Moules Frites', event_date: '2025-05-27', event_end_date: '2025-05-28', event_type: 'lunch', description: '', price: null },
-  { id: '12', title: 'Royal Ascot Tent', event_date: '2025-06-17', event_end_date: null, event_type: 'special', description: '', price: 320 }
-]
-
 export default function EventsPage() {
   const navigate = useNavigate()
-  const [events, setEvents] = useState<Event[]>(initialEvents)
+  const [events, setEvents] = useState<Event[]>([])
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [loading, setLoading] = useState(true)
   const [openDialog, setOpenDialog] = useState(false)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
   
@@ -71,11 +56,32 @@ export default function EventsPage() {
   const [formData, setFormData] = useState({
     title: '',
     event_date: '',
-    event_end_date: '',
     event_type: 'lunch' as Event['event_type'],
     description: '',
     price: ''
   })
+
+  useEffect(() => {
+    supabase
+      .from('events')
+      .select('*')
+      .order('event_date', { ascending: true })
+      .then(({ data, error }) => {
+        if (error) {
+          setError('Failed to load events')
+        } else {
+          setEvents((data ?? []).map((e: any) => ({
+            id: e.id,
+            title: e.title,
+            event_date: e.event_date,
+            event_type: e.event_type,
+            description: e.description ?? '',
+            price: e.price_per_person ?? null,
+          })))
+        }
+        setLoading(false)
+      })
+  }, [])
 
   const handleOpenDialog = (event?: Event) => {
     if (event) {
@@ -83,7 +89,6 @@ export default function EventsPage() {
       setFormData({
         title: event.title,
         event_date: event.event_date,
-        event_end_date: event.event_end_date || '',
         event_type: event.event_type,
         description: event.description || '',
         price: event.price?.toString() || ''
@@ -93,7 +98,6 @@ export default function EventsPage() {
       setFormData({
         title: '',
         event_date: '',
-        event_end_date: '',
         event_type: 'lunch',
         description: '',
         price: ''
@@ -109,7 +113,6 @@ export default function EventsPage() {
     setFormData({
       title: '',
       event_date: '',
-      event_end_date: '',
       event_type: 'lunch',
       description: '',
       price: ''
@@ -135,12 +138,9 @@ export default function EventsPage() {
       const eventData = {
         title: formData.title,
         event_date: formData.event_date,
-        event_end_date: formData.event_end_date || null,
         event_type: formData.event_type,
         description: formData.description || null,
-        price: formData.price ? parseFloat(formData.price) : null,
-        pdf_url: editingEvent?.pdf_url || null,
-        pdf_name: editingEvent?.pdf_name || null
+        price_per_person: formData.price ? parseFloat(formData.price) : null,
       }
 
       // Handle PDF upload
@@ -167,29 +167,24 @@ export default function EventsPage() {
 
         if (error) throw error
         setSuccess('Event updated successfully')
-        setEvents(events.map(e => e.id === editingEvent.id ? { ...e, ...eventData } : e))
+        setEvents(events.map(e => e.id === editingEvent.id ? { ...e, ...eventData, price: eventData.price_per_person } : e))
       } else {
         // Create new event
-        const newId = String(Date.now())
-        const { error } = await supabase
+        const { data: created, error } = await supabase
           .from('events')
-          .insert([{ ...eventData, id: newId }])
+          .insert([eventData])
+          .select()
+          .single()
 
         if (error) throw error
         setSuccess('Event created successfully')
-        setEvents([...events, { ...eventData, id: newId } as Event])
+        setEvents([...events, { ...created, price: created.price_per_person }])
       }
 
       handleCloseDialog()
     } catch (err) {
       console.error('Error saving event:', err)
       setError(err instanceof Error ? err.message : 'Failed to save event')
-      // Still update local state for demo purposes
-      if (editingEvent) {
-        setEvents(events.map(e => e.id === editingEvent.id ? { ...e, ...formData, event_end_date: formData.event_end_date || null, price: formData.price ? parseFloat(formData.price) : null } : e))
-      } else {
-        setEvents([...events, { id: String(Date.now()), title: formData.title, event_date: formData.event_date, event_end_date: formData.event_end_date || null, event_type: formData.event_type, description: formData.description, price: formData.price ? parseFloat(formData.price) : null } as Event])
-      }
     }
   }
 
@@ -208,8 +203,6 @@ export default function EventsPage() {
     } catch (err) {
       console.error('Error deleting event:', err)
       setError('Failed to delete event')
-      // Still remove from local state for demo
-      setEvents(events.filter(e => e.id !== id))
     }
   }
 
@@ -238,22 +231,6 @@ export default function EventsPage() {
     })
   }
 
-  const formatDateRange = (event: Event) => {
-    if (event.event_end_date) {
-      const startDate = new Date(event.event_date)
-      const endDate = new Date(event.event_end_date)
-      
-      // Same month - show as range (e.g., "13-14 May 2025")
-      if (startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear()) {
-        return `${startDate.toLocaleDateString('en-GB', { day: 'numeric' })}-${endDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
-      }
-      
-      // Different months - show full range
-      return `${formatDate(event.event_date)} - ${formatDate(event.event_end_date)}`
-    }
-    
-    return formatDate(event.event_date)
-  }
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -281,6 +258,8 @@ export default function EventsPage() {
           {success}
         </Alert>
       )}
+
+      {loading && <LinearProgress sx={{ mb: 2 }} />}
 
       <Grid container spacing={3}>
         {events.map((event) => (
@@ -322,7 +301,7 @@ export default function EventsPage() {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <EventIcon fontSize="small" color="action" />
                     <Typography variant="body2">
-                      {formatDateRange(event)}
+                      {formatDate(event.event_date)}
                     </Typography>
                   </Box>
 
@@ -384,22 +363,12 @@ export default function EventsPage() {
 
             <TextField
               fullWidth
-              label="Start Date"
+              label="Date"
               type="date"
               value={formData.event_date}
               onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
               InputLabelProps={{ shrink: true }}
               required
-            />
-
-            <TextField
-              fullWidth
-              label="End Date (optional)"
-              type="date"
-              value={formData.event_end_date}
-              onChange={(e) => setFormData({ ...formData, event_end_date: e.target.value })}
-              InputLabelProps={{ shrink: true }}
-              helperText="For multi-day events"
             />
 
             <FormControl fullWidth>

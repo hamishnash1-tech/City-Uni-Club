@@ -104,14 +104,14 @@ object ApiService {
         val resp = client.newCall(req).execute()
         val respBody = resp.body?.string() ?: ""
         if (!resp.isSuccessful) {
-            val errMsg = try { gson.fromJson(respBody, Map::class.java)["error"] as? String } catch (_: Exception) { null }
+            val errMsg = try { gson.fromJson(respBody, HashHashMap::class.java)["error"] as? String } catch (_: Exception) { null }
             throw Exception(errMsg ?: respBody)
         }
         return respBody
     }
 
     private fun <T> parseList(json: String, key: String, cls: Class<T>): List<T> {
-        val map = gson.fromJson(json, Map::class.java)
+        val map = gson.fromJson(json, HashHashMap::class.java)
         val list = map[key] as? List<*> ?: return emptyList()
         return list.map { gson.fromJson(gson.toJson(it), cls) }
     }
@@ -127,7 +127,7 @@ object ApiService {
         val resp = client.newCall(req).execute()
         val body = resp.body?.string() ?: ""
         if (!resp.isSuccessful) throw Exception("Session expired")
-        val map = gson.fromJson(body, Map::class.java)
+        val map = gson.fromJson(body, HashMap::class.java)
         val memberMap = map["member"] ?: throw Exception("No member data")
         return gson.fromJson(gson.toJson(memberMap), Member::class.java)
     }
@@ -157,7 +157,7 @@ object ApiService {
         if (mealOption != null) payload["meal_option"] = mealOption
         if (!specialRequests.isNullOrBlank()) payload["special_requests"] = specialRequests
         val headers = mapOf("x-session-token" to token)
-        return gson.fromJson(post("$API_BASE/events/book", payload, headers), Map::class.java)
+        return gson.fromJson(post("$API_BASE/events/book", payload, headers), HashHashMap::class.java)
     }
 
     // — News —
@@ -168,7 +168,7 @@ object ApiService {
     // — Clubs —
 
     fun getClubRegionCounts(token: String): Map<String, Int> {
-        val map = gson.fromJson(get("$API_BASE/clubs", token), Map::class.java)
+        val map = gson.fromJson(get("$API_BASE/clubs", token), HashMap::class.java)
         @Suppress("UNCHECKED_CAST")
         return (map["regions"] as? Map<String, Double>)?.mapValues { it.value.toInt() } ?: emptyMap()
     }
@@ -214,7 +214,7 @@ object ApiService {
     fun createDiningReservation(token: String?, reservation: Map<String, Any?>): Map<*, *> {
         val headers = mutableMapOf("Authorization" to "Bearer $SUPABASE_ANON_KEY")
         if (token != null) headers["x-session-token"] = token
-        return gson.fromJson(post("$API_BASE/dining", reservation, headers), Map::class.java)
+        return gson.fromJson(post("$API_BASE/dining", reservation, headers), HashMap::class.java)
     }
 
     // — LOI —
@@ -224,6 +224,6 @@ object ApiService {
             "Authorization" to "Bearer $SUPABASE_ANON_KEY",
             "x-session-token" to token
         )
-        return gson.fromJson(post(LOI_API_URL, request, headers), Map::class.java)
+        return gson.fromJson(post(LOI_API_URL, request, headers), HashMap::class.java)
     }
 }

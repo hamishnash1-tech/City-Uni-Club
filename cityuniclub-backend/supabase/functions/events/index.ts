@@ -17,10 +17,13 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
 
+    const today = new Date().toISOString().split('T')[0]
+
     const { data: events, error } = await supabaseClient
       .from('events')
       .select('*')
       .eq('is_active', true)
+      .gte('event_date', today)
       .order('is_tba', { ascending: true })
       .order('event_date', { ascending: true, nullsFirst: false })
 
