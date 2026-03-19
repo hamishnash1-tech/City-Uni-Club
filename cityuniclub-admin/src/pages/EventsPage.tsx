@@ -92,7 +92,7 @@ export default function EventsPage() {
       setEditingEvent(event)
       setFormData({
         title: event.title,
-        event_date: event.event_date,
+        event_date: event.event_date ?? '',
         event_type: event.event_type,
         description: event.description || '',
         price: event.price?.toString() || ''
@@ -139,7 +139,11 @@ export default function EventsPage() {
     setSuccess('')
 
     try {
-      const eventData = {
+      const eventData: {
+        title: string; event_date: string | null; event_type: Event['event_type']
+        description: string | null; price_per_person: number | null; is_tba: boolean
+        pdf_url?: string | null; pdf_name?: string | null
+      } = {
         title: formData.title,
         event_date: formData.event_date || null,
         event_type: formData.event_type,
@@ -213,13 +217,11 @@ export default function EventsPage() {
     return colors[type] || 'primary'
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-GB', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+  const formatDate = (dateString: string | null) => {
+    if (!dateString) return 'Date TBA'
+    const [year, month, day] = dateString.split('-').map(Number)
+    return new Date(year, month - 1, day).toLocaleDateString('en-GB', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     })
   }
 
