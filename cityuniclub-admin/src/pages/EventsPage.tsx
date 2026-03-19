@@ -1,6 +1,7 @@
 import { useState, useEffect, type ChangeEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { supabase } from '../services/supabase'
+import { FUNCTIONS_URL } from '../services/supabase'
+import { useAuth } from '../context/AuthContext'
 import type { Event } from '../types'
 import {
   Box,
@@ -41,8 +42,12 @@ const eventTypeOptions = [
   { value: 'special', label: 'Special Event' }
 ]
 
+const ADMIN_EVENTS_URL = `${FUNCTIONS_URL}/admin-events`
+
 export default function EventsPage() {
   const navigate = useNavigate()
+  const { sessionToken } = useAuth()
+  const authHeaders = { 'Authorization': `Bearer ${sessionToken}`, 'Content-Type': 'application/json' }
   const [events, setEvents] = useState<Event[]>([])
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
@@ -62,11 +67,9 @@ export default function EventsPage() {
   })
 
   useEffect(() => {
-    supabase
-      .from('events')
-      .select('*')
-      .order('event_date', { ascending: true })
-      .then(({ data, error }) => {
+    fetch(ADMIN_EVENTS_URL, { headers: authHeaders })
+      .then(r => r.json())
+      .then(({ events: data, error }) => {
         if (error) {
           setError('Failed to load events')
         } else {
@@ -81,6 +84,7 @@ export default function EventsPage() {
         }
         setLoading(false)
       })
+      .catch(() => { setError('Failed to load events'); setLoading(false) })
   }, [])
 
   const handleOpenDialog = (event?: Event) => {
@@ -137,10 +141,11 @@ export default function EventsPage() {
     try {
       const eventData = {
         title: formData.title,
-        event_date: formData.event_date,
+        event_date: formData.event_date || null,
         event_type: formData.event_type,
         description: formData.description || null,
         price_per_person: formData.price ? parseFloat(formData.price) : null,
+        is_tba: !formData.event_date || !formData.price,
       }
 
       // Handle PDF upload
@@ -159,26 +164,17 @@ export default function EventsPage() {
       }
 
       if (editingEvent) {
-        // Update existing event
-        const { error } = await supabase
-          .from('events')
-          .update(eventData)
-          .eq('id', editingEvent.id)
-
-        if (error) throw error
+        const res = await fetch(`${ADMIN_EVENTS_URL}?id=${editingEvent.id}`, { method: 'PUT', headers: authHeaders, body: JSON.stringify(eventData) })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error)
         setSuccess('Event updated successfully')
         setEvents(events.map(e => e.id === editingEvent.id ? { ...e, ...eventData, price: eventData.price_per_person } : e))
       } else {
-        // Create new event
-        const { data: created, error } = await supabase
-          .from('events')
-          .insert([eventData])
-          .select()
-          .single()
-
-        if (error) throw error
+        const res = await fetch(ADMIN_EVENTS_URL, { method: 'POST', headers: authHeaders, body: JSON.stringify(eventData) })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error)
         setSuccess('Event created successfully')
-        setEvents([...events, { ...created, price: created.price_per_person }])
+        setEvents([...events, { ...data.event, price: data.event.price_per_person }])
       }
 
       handleCloseDialog()
@@ -192,12 +188,8 @@ export default function EventsPage() {
     if (!confirm('Are you sure you want to delete this event?')) return
 
     try {
-      const { error } = await supabase
-        .from('events')
-        .delete()
-        .eq('id', id)
-
-      if (error) throw error
+      const res = await fetch(`${ADMIN_EVENTS_URL}?id=${id}`, { method: 'DELETE', headers: authHeaders })
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
       setSuccess('Event deleted successfully')
       setEvents(events.filter(e => e.id !== id))
     } catch (err) {
@@ -368,7 +360,7 @@ export default function EventsPage() {
               value={formData.event_date}
               onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
               InputLabelProps={{ shrink: true }}
-              required
+              helperText="Leave blank for TBA events"
             />
 
             <FormControl fullWidth>
@@ -457,7 +449,7 @@ export default function EventsPage() {
           <Button
             onClick={handleSubmit}
             variant="contained"
-            disabled={!formData.title || !formData.event_date || uploading}
+            disabled={!formData.title || uploading}
           >
             {editingEvent ? 'Update' : 'Create'}
           </Button>

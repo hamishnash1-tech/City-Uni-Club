@@ -23,7 +23,7 @@ serve(async (req: Request) => {
       .from('events')
       .select('*')
       .eq('is_active', true)
-      .gte('event_date', today)
+      .or(`event_date.gte.${today},is_tba.eq.true`)
       .order('is_tba', { ascending: true })
       .order('event_date', { ascending: true, nullsFirst: false })
 
