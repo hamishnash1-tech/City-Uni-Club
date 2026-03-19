@@ -52,7 +52,7 @@ const seedEvents = [
     title: 'Younger Member\'s Dinner',
     description: 'Monthly gathering for younger members',
     event_type: 'dinner' as const,
-    event_date: '2026-02-26',
+    event_date: '2026-03-26',
     dinner_time: '19:00:00',
     price_per_person: 40.00,
     is_tba: false
@@ -140,8 +140,8 @@ const seedNews = [
     is_featured: true
   },
   {
-    title: 'Free Gin Friday - every Friday at lunch',
-    content: 'Join us every Friday for our complimentary Gin Friday promotion. Enjoy a selection of premium gins with our sommelier\'s recommendations.',
+    title: 'Club Gin - every Friday at lunch',
+    content: 'Join us every Friday for our Club Gin promotion at lunch. Enjoy a selection of our Club Gin with our sommelier\'s recommendations.',
     category: 'Special Offer' as const,
     published_date: '2026-02-01',
     is_featured: false
@@ -160,13 +160,6 @@ const seedNews = [
     published_date: '2026-02-18',
     is_featured: false
   },
-  {
-    title: 'Easter Sunday Roast',
-    content: 'Book now for our special Easter Sunday Roast. Traditional roast beef with all the trimmings, followed by a selection of Easter desserts.',
-    category: 'Dining' as const,
-    published_date: '2026-03-01',
-    is_featured: true
-  }
 ]
 
 async function seedDatabase() {

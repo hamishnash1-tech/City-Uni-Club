@@ -18,8 +18,7 @@ export interface Member {
 export interface Event {
   id: string
   title: string
-  event_date: string
-  event_end_date?: string | null
+  event_date: string | null
   event_type: 'lunch' | 'dinner' | 'lunch_dinner' | 'meeting' | 'special'
   description?: string | null
   price?: number | null

@@ -22,12 +22,18 @@
 
 -dontwarn com.google.errorprone.annotations.Immutable
 
-# Keep Gson data model classes so R8 doesn't obfuscate field names used during JSON deserialization
--keep class uk.co.cityuniversityclub.network.** { *; }
--keepclassmembers class uk.co.cityuniversityclub.network.** { *; }
+# Keep all app classes (data models, viewmodels, etc.)
+-keep class uk.co.cityuniversityclub.** { *; }
+-keepclassmembers class uk.co.cityuniversityclub.** { *; }
+
+# Keep Kotlin synthetic constructors generated for default parameter values
+-keepclassmembers class uk.co.cityuniversityclub.** {
+    synthetic <methods>;
+}
 
 # Gson internals
 -keepattributes Signature
 -keepattributes *Annotation*
 -dontwarn sun.misc.**
 -keep class com.google.gson.** { *; }
+-keep class com.google.gson.internal.** { *; }
