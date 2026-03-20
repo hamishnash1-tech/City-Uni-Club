@@ -29,7 +29,8 @@ export const Dining: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState<'book' | 'breakfast' | 'lunch'>('book')
+  const [activeTab, setActiveTab] = useState<'book' | 'menu'>('book')
+  const [activeMenuTab, setActiveMenuTab] = useState<'breakfast' | 'lunch'>('breakfast')
 
   const breakfastTimes = ['09:00', '09:30', '10:00', '10:30', '11:00']
   const lunchTimes = ['12:00', '12:30', '13:00', '13:30', '14:00', '14:30']
@@ -102,19 +103,18 @@ export const Dining: React.FC = () => {
           <h1 className="font-serif text-2xl font-normal text-ivory">Dining</h1>
         </div>
 
-        <div className="relative flex max-w-xl mx-auto border border-cambridge/20 rounded-sm p-1">
+        <div className="relative flex max-w-xs mx-auto border border-cambridge/20 rounded-sm p-1">
           <div
             className="absolute top-1 bottom-1 bg-cambridge/25 rounded-sm transition-all duration-300 ease-out"
             style={{
               left: '4px',
-              width: 'calc(33.333% - 3px)',
-              transform: activeTab === 'book' ? 'translateX(0)' : activeTab === 'breakfast' ? 'translateX(100%)' : 'translateX(200%)',
+              width: 'calc(50% - 4px)',
+              transform: activeTab === 'book' ? 'translateX(0)' : 'translateX(100%)',
             }}
           />
           {([
             { id: 'book', label: 'Book a Table' },
-            { id: 'breakfast', label: 'Breakfast' },
-            { id: 'lunch', label: 'Lunch & Dinner' },
+            { id: 'menu', label: 'Menu' },
           ] as const).map(tab => (
             <button
               key={tab.id}
@@ -142,6 +142,35 @@ export const Dining: React.FC = () => {
       )}
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {activeTab === 'menu' && (
+          <div className="flex justify-center mb-6">
+            <div className="relative flex border border-cambridge/20 rounded-sm p-1">
+              <div
+                className="absolute top-1 bottom-1 bg-cambridge/25 rounded-sm transition-all duration-300 ease-out"
+                style={{
+                  left: '4px',
+                  width: 'calc(50% - 4px)',
+                  transform: activeMenuTab === 'breakfast' ? 'translateX(0)' : 'translateX(100%)',
+                }}
+              />
+              {([
+                { id: 'breakfast', label: 'Breakfast' },
+                { id: 'lunch', label: 'Lunch' },
+              ] as const).map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveMenuTab(tab.id)}
+                  className={`relative py-1.5 px-6 text-sm transition-colors duration-200 rounded-sm ${
+                    activeMenuTab === tab.id ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
+                  }`}
+                >
+                  <span className="label-caps">{tab.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {activeTab === 'book' ? (
           <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto">
             {/* Opening Hours */}
@@ -330,7 +359,7 @@ export const Dining: React.FC = () => {
               {isSubmitting ? 'Submitting...' : 'Request Reservation'}
             </button>
           </form>
-        ) : activeTab === 'breakfast' ? (
+        ) : activeMenuTab === 'breakfast' ? (
           <div className="max-w-2xl mx-auto">
             <div className="club-card overflow-hidden">
               <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
@@ -361,10 +390,6 @@ export const Dining: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-10">
-            <div className="club-card p-4 border-l-2 border-cambridge/50">
-              <p className="text-sm text-ink-mid italic">Sample menu — dishes change regularly depending on seasonal availability. Please contact us for the current menu.</p>
-            </div>
-
             {/* Starters */}
             <div className="club-card overflow-hidden">
               <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">

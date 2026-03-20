@@ -19,8 +19,7 @@ const Profile          = React.lazy(() => import('./pages/Profile').then(m => ({
 const TermsAndConditions = React.lazy(() => import('./pages/TermsAndConditions').then(m => ({ default: m.TermsAndConditions })))
 const PrivacyPolicy    = React.lazy(() => import('./pages/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })))
 const MobileApp        = React.lazy(() => import('./pages/MobileApp').then(m => ({ default: m.MobileApp })))
-const About            = React.lazy(() => import('./pages/About').then(m => ({ default: m.About })))
-const Contact          = React.lazy(() => import('./pages/Contact').then(m => ({ default: m.Contact })))
+const Info             = React.lazy(() => import('./pages/Info').then(m => ({ default: m.Info })))
 import { IconUser } from './icons'
 
 const tabs = [
@@ -29,8 +28,7 @@ const tabs = [
   { id: 'events',  label: 'Events',  path: '/events' },
   { id: 'news',    label: 'News',    path: '/news' },
   { id: 'clubs',   label: 'Clubs',   path: '/reciprocal-clubs' },
-  { id: 'about',   label: 'About',   path: '/about' },
-  { id: 'contact', label: 'Contact', path: '/contact' },
+  { id: 'info',    label: 'Info',    path: '/info' },
 ]
 
 // Mobile tab bar
@@ -151,9 +149,8 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
             </button>
           </div>
         ) : (
-          <div className="border-t border-cambridge/20 pt-4 space-y-2">
+          <div className="border-t border-cambridge/20 pt-4">
             <Link to="/login" className="block px-3 py-2 label-caps text-ivory/50 hover:text-cambridge transition">Sign In</Link>
-            <Link to="/join" className="block px-3 py-2 label-caps text-cambridge-light/70 hover:text-cambridge-light border border-cambridge/30 rounded-sm transition">Join the Club</Link>
           </div>
         )}
       </div>
@@ -219,14 +216,9 @@ const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean }> = ({ 
               <span className="text-sm font-light tracking-wide text-ivory/80">{auth.member.full_name}</span>
             </Link>
           ) : (
-            <>
-              <Link to="/login" className="label-caps text-cambridge-light/60 hover:text-cambridge-light transition">
-                Sign In
-              </Link>
-              <Link to="/join" className="label-caps px-3 py-1 border border-cambridge/50 text-cambridge-light/80 hover:border-cambridge hover:text-cambridge-light rounded-sm transition">
-                Join
-              </Link>
-            </>
+            <Link to="/login" className="label-caps text-cambridge-light/60 hover:text-cambridge-light transition">
+              Sign In
+            </Link>
           )}
         </div>
       </div>
@@ -286,8 +278,9 @@ const App: React.FC = () => {
             <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/mobile-app" element={<MobileApp />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
+            <Route path="/info" element={<Info />} />
+            <Route path="/about" element={<Navigate to="/info" replace />} />
+            <Route path="/contact" element={<Navigate to="/info" replace />} />
             <Route path="/join" element={<Join />} />
           </Routes>
         </React.Suspense>
@@ -303,9 +296,7 @@ const App: React.FC = () => {
             <span>·</span>
             <Link to="/mobile-app" className="hover:text-cambridge transition">Mobile App</Link>
             <span>·</span>
-            <Link to="/about" className="hover:text-cambridge transition">About</Link>
-            <span>·</span>
-            <Link to="/contact" className="hover:text-cambridge transition">Contact</Link>
+            <Link to="/info" className="hover:text-cambridge transition">Info</Link>
           </div>
         </footer>
       </div>
