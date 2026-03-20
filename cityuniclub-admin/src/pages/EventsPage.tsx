@@ -1,4 +1,4 @@
-import { useState, useEffect, type ChangeEvent } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FUNCTIONS_URL } from '../services/supabase'
 import { useAuth } from '../context/AuthContext'
@@ -31,8 +31,6 @@ import EditIcon from '@mui/icons-material/Edit'
 import PeopleIcon from '@mui/icons-material/People'
 import EventIcon from '@mui/icons-material/Event'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
-import AttachFileIcon from '@mui/icons-material/AttachFile'
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 
 const eventTypeOptions = [
   { value: 'lunch', label: 'Lunch' },
@@ -49,8 +47,6 @@ export default function EventsPage() {
   const { sessionToken } = useAuth()
   const authHeaders = { 'Authorization': `Bearer ${sessionToken}`, 'Content-Type': 'application/json' }
   const [events, setEvents] = useState<Event[]>([])
-  const [pdfFile, setPdfFile] = useState<File | null>(null)
-  const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(true)
@@ -60,11 +56,20 @@ export default function EventsPage() {
   // Form state
   const [formData, setFormData] = useState({
     title: '',
+    slug: '',
     event_date: '',
     event_type: 'lunch' as Event['event_type'],
     description: '',
     price: ''
   })
+
+  const generateSlug = (title: string, date: string, shortId?: number) => {
+    const datePart = date || 'tba'
+    const titlePart = title.trim().split(/\s+/).slice(0, 4).join(' ')
+      .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    const idPart = shortId ?? ''
+    return `${datePart}-${titlePart}${idPart ? `-${idPart}` : ''}`
+  }
 
   useEffect(() => {
     fetch(ADMIN_EVENTS_URL, { headers: authHeaders })
@@ -75,6 +80,8 @@ export default function EventsPage() {
         } else {
           setEvents((data ?? []).map((e: any) => ({
             id: e.id,
+            short_id: e.short_id,
+            slug: e.slug,
             title: e.title,
             event_date: e.event_date,
             event_type: e.event_type,
@@ -92,6 +99,7 @@ export default function EventsPage() {
       setEditingEvent(event)
       setFormData({
         title: event.title,
+        slug: event.slug,
         event_date: event.event_date ?? '',
         event_type: event.event_type,
         description: event.description || '',
@@ -101,6 +109,7 @@ export default function EventsPage() {
       setEditingEvent(null)
       setFormData({
         title: '',
+        slug: '',
         event_date: '',
         event_type: 'lunch',
         description: '',
@@ -113,9 +122,9 @@ export default function EventsPage() {
   const handleCloseDialog = () => {
     setOpenDialog(false)
     setEditingEvent(null)
-    setPdfFile(null)
     setFormData({
       title: '',
+      slug: '',
       event_date: '',
       event_type: 'lunch',
       description: '',
@@ -123,48 +132,19 @@ export default function EventsPage() {
     })
   }
 
-  const handlePdfChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0]
-      if (file.type === 'application/pdf') {
-        setPdfFile(file)
-      } else {
-        setError('Please select a PDF file')
-      }
-    }
-  }
-
   const handleSubmit = async () => {
     setError('')
     setSuccess('')
 
     try {
-      const eventData: {
-        title: string; event_date: string | null; event_type: Event['event_type']
-        description: string | null; price_per_person: number | null; is_tba: boolean
-        pdf_url?: string | null; pdf_name?: string | null
-      } = {
+      const eventData = {
         title: formData.title,
+        slug: formData.slug || generateSlug(formData.title, formData.event_date, editingEvent?.short_id),
         event_date: formData.event_date || null,
         event_type: formData.event_type,
         description: formData.description || null,
         price_per_person: formData.price ? parseFloat(formData.price) : null,
         is_tba: !formData.event_date || !formData.price,
-      }
-
-      // Handle PDF upload
-      if (pdfFile) {
-        setUploading(true)
-        // In production, upload to Supabase Storage:
-        // const { data, error } = await supabase.storage
-        //   .from('event-pdfs')
-        //   .upload(`events/${Date.now()}_${pdfFile.name}`, pdfFile)
-        
-        // Mock upload for demo
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        eventData.pdf_url = `/event-pdfs/${pdfFile.name}`
-        eventData.pdf_name = pdfFile.name
-        setUploading(false)
       }
 
       if (editingEvent) {
@@ -268,7 +248,7 @@ export default function EventsPage() {
                   boxShadow: 6
                 }
               }}
-              onClick={() => navigate(`/events/${event.id}`)}
+              onClick={() => navigate(`/events/${event.slug}`)}
             >
               <CardContent>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
@@ -315,18 +295,6 @@ export default function EventsPage() {
                     </Box>
                   )}
 
-                  {event.pdf_name && (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-                      <PictureAsPdfIcon color="error" fontSize="small" />
-                      <Typography variant="caption" color="textSecondary" sx={{ flexGrow: 1 }}>
-                        {event.pdf_name}
-                      </Typography>
-                      <IconButton size="small" onClick={(e) => { e.stopPropagation(); alert('Download PDF: ' + event.pdf_name) }}>
-                        <AttachFileIcon fontSize="small" />
-                      </IconButton>
-                    </Box>
-                  )}
-
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <PeopleIcon fontSize="small" color="action" />
                     <Typography variant="body2">
@@ -351,7 +319,11 @@ export default function EventsPage() {
               fullWidth
               label="Event Name"
               value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              onChange={(e) => {
+                const title = e.target.value
+                const autoSlug = generateSlug(title, formData.event_date, editingEvent?.short_id)
+                setFormData({ ...formData, title, slug: autoSlug })
+              }}
               required
             />
 
@@ -360,9 +332,22 @@ export default function EventsPage() {
               label="Date"
               type="date"
               value={formData.event_date}
-              onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
+              onChange={(e) => {
+                const date = e.target.value
+                const autoSlug = generateSlug(formData.title, date, editingEvent?.short_id)
+                setFormData({ ...formData, event_date: date, slug: autoSlug })
+              }}
               InputLabelProps={{ shrink: true }}
               helperText="Leave blank for TBA events"
+            />
+
+            <TextField
+              fullWidth
+              label="URL Slug"
+              value={formData.slug}
+              onChange={(e) => setFormData({ ...formData, slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '') })}
+              helperText="Auto-generated — edit to customise. Format: date-text-id"
+              InputProps={{ sx: { fontFamily: 'monospace', fontSize: '0.85rem' } }}
             />
 
             <FormControl fullWidth>
@@ -400,50 +385,6 @@ export default function EventsPage() {
               placeholder="Leave empty for TBA"
             />
 
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="subtitle2" gutterBottom>
-                Attach PDF (optional)
-              </Typography>
-              <input
-                accept="application/pdf"
-                style={{ display: 'none' }}
-                id="event-pdf-upload"
-                type="file"
-                onChange={handlePdfChange}
-              />
-              <label htmlFor="event-pdf-upload">
-                <Button
-                  variant="outlined"
-                  component="span"
-                  startIcon={<AttachFileIcon />}
-                  fullWidth
-                >
-                  {pdfFile ? pdfFile.name : 'Upload PDF (menu, flyer, etc.)'}
-                </Button>
-              </label>
-              {pdfFile && (
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
-                  <PictureAsPdfIcon color="error" fontSize="small" />
-                  <Typography variant="caption" color="textSecondary">
-                    {pdfFile.name} ({(pdfFile.size / 1024).toFixed(1)} KB)
-                  </Typography>
-                </Box>
-              )}
-              {editingEvent?.pdf_name && !pdfFile && (
-                <Typography variant="caption" color="textSecondary">
-                  Current PDF: {editingEvent.pdf_name}
-                </Typography>
-              )}
-            </Box>
-
-            {uploading && (
-              <Box sx={{ width: '100%', mt: 2 }}>
-                <LinearProgress />
-                <Typography variant="caption" color="textSecondary">
-                  Uploading PDF...
-                </Typography>
-              </Box>
-            )}
           </Box>
         </DialogContent>
         <DialogActions>
@@ -451,7 +392,7 @@ export default function EventsPage() {
           <Button
             onClick={handleSubmit}
             variant="contained"
-            disabled={!formData.title || uploading}
+            disabled={!formData.title}
           >
             {editingEvent ? 'Update' : 'Create'}
           </Button>

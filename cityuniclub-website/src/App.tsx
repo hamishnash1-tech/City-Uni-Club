@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { RootState } from './store'
@@ -8,7 +8,10 @@ const ForgotPassword   = React.lazy(() => import('./pages/ForgotPassword').then(
 const ResetPassword    = React.lazy(() => import('./pages/ResetPassword').then(m => ({ default: m.ResetPassword })))
 const Home             = React.lazy(() => import('./pages/Home').then(m => ({ default: m.Home })))
 const Events           = React.lazy(() => import('./pages/Events').then(m => ({ default: m.Events })))
+const EventDetail      = React.lazy(() => import('./pages/EventDetail').then(m => ({ default: m.EventDetail })))
 const News             = React.lazy(() => import('./pages/News').then(m => ({ default: m.News })))
+const NewsDetail       = React.lazy(() => import('./pages/NewsDetail').then(m => ({ default: m.NewsDetail })))
+const Join             = React.lazy(() => import('./pages/Join').then(m => ({ default: m.Join })))
 const Dining           = React.lazy(() => import('./pages/Dining').then(m => ({ default: m.Dining })))
 const ReciprocalClubs  = React.lazy(() => import('./pages/ReciprocalClubs'))
 const LOIRequest       = React.lazy(() => import('./pages/LOIRequest').then(m => ({ default: m.LOIRequest })))
@@ -16,14 +19,18 @@ const Profile          = React.lazy(() => import('./pages/Profile').then(m => ({
 const TermsAndConditions = React.lazy(() => import('./pages/TermsAndConditions').then(m => ({ default: m.TermsAndConditions })))
 const PrivacyPolicy    = React.lazy(() => import('./pages/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })))
 const MobileApp        = React.lazy(() => import('./pages/MobileApp').then(m => ({ default: m.MobileApp })))
-import { IconHome, IconDining, IconEvents, IconNews, IconClubs, IconUser } from './icons'
+const About            = React.lazy(() => import('./pages/About').then(m => ({ default: m.About })))
+const Contact          = React.lazy(() => import('./pages/Contact').then(m => ({ default: m.Contact })))
+import { IconUser } from './icons'
 
 const tabs = [
-  { id: 'home',   label: 'Home',   path: '/home',             icon: <IconHome className="w-4 h-4" /> },
-  { id: 'dining', label: 'Dining', path: '/dining',           icon: <IconDining className="w-4 h-4" /> },
-  { id: 'events', label: 'Events', path: '/events',           icon: <IconEvents className="w-4 h-4" /> },
-  { id: 'news',   label: 'News',   path: '/news',             icon: <IconNews className="w-4 h-4" /> },
-  { id: 'clubs',  label: 'Clubs',  path: '/reciprocal-clubs', icon: <IconClubs className="w-4 h-4" /> },
+  { id: 'home',    label: 'Home',    path: '/home' },
+  { id: 'dining',  label: 'Dining',  path: '/dining' },
+  { id: 'events',  label: 'Events',  path: '/events' },
+  { id: 'news',    label: 'News',    path: '/news' },
+  { id: 'clubs',   label: 'Clubs',   path: '/reciprocal-clubs' },
+  { id: 'about',   label: 'About',   path: '/about' },
+  { id: 'contact', label: 'Contact', path: '/contact' },
 ]
 
 // Mobile tab bar
@@ -42,7 +49,6 @@ const TabBar: React.FC = () => {
                 isActive ? 'text-cambridge' : 'text-ivory hover:text-cambridge'
               }`}
             >
-              {tab.icon}
               <span className="font-cormorant text-sm tracking-wide mt-1">{tab.label}</span>
             </Link>
           )
@@ -55,38 +61,36 @@ const TabBar: React.FC = () => {
 // Desktop nav — used inside TopBanner
 const DesktopNav: React.FC = () => {
   const { pathname } = useLocation()
-  const activeIndex = tabs.findIndex(t => t.path === pathname)
-  const [indicatorIndex, setIndicatorIndex] = useState(activeIndex >= 0 ? activeIndex : 0)
+  const spanRefs = useRef<(HTMLSpanElement | null)[]>([])
+  const [indicator, setIndicator] = useState({ left: 0, width: 0 })
 
   useEffect(() => {
-    if (activeIndex >= 0) setIndicatorIndex(activeIndex)
-  }, [activeIndex])
-
-  const pct = 100 / tabs.length
+    const activeIndex = tabs.findIndex(t => t.path === pathname)
+    const el = spanRefs.current[activeIndex]
+    if (el) setIndicator({ left: el.offsetLeft, width: el.offsetWidth })
+  }, [pathname])
 
   return (
     <nav className="hidden md:flex items-center relative">
-      {/* Sliding underline indicator */}
       <div
         className="absolute bottom-0 h-0.5 bg-cambridge rounded-full"
         style={{
-          width: `${pct}%`,
-          left: `${indicatorIndex * pct}%`,
-          transition: 'left 0.3s cubic-bezier(0.34, 1.15, 0.64, 1)',
+          left: indicator.left,
+          width: indicator.width,
+          transition: 'left 0.3s cubic-bezier(0.34, 1.15, 0.64, 1), width 0.3s cubic-bezier(0.34, 1.15, 0.64, 1)',
         }}
       />
-      {tabs.map((tab) => {
+      {tabs.map((tab, i) => {
         const isActive = pathname === tab.path
         return (
           <Link
             key={tab.id}
             to={tab.path}
-            className={`flex items-center gap-2 px-5 py-2 transition-colors duration-200 ${
+            className={`px-4 py-2 transition-colors duration-200 ${
               isActive ? 'text-cambridge' : 'text-ivory/40 hover:text-cambridge'
             }`}
           >
-            {tab.icon}
-            <span className="font-cormorant text-lg font-semibold tracking-wide">{tab.label}</span>
+            <span ref={el => { spanRefs.current[i] = el }} className="font-cormorant text-lg font-semibold tracking-wide">{tab.label}</span>
           </Link>
         )
       })}
@@ -122,19 +126,18 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
               <Link
                 key={tab.id}
                 to={tab.path}
-                className={`flex items-center gap-3 px-3 py-3 rounded-sm transition ${
+                className={`block px-3 py-3 rounded-sm transition font-cormorant text-base tracking-wide ${
                   isActive
                     ? 'text-cambridge bg-cambridge/10'
                     : 'text-ivory/60 hover:text-cambridge'
                 }`}
               >
-                {tab.icon}
-                <span className="font-cormorant text-base tracking-wide">{tab.label}</span>
+                {tab.label}
               </Link>
             )
           })}
         </nav>
-        {auth.isAuthenticated && auth.member && (
+        {auth.isAuthenticated && auth.member ? (
           <div className="border-t border-cambridge/20 pt-4 pb-2 px-3 rounded-sm bg-cambridge/10 space-y-3">
             <Link to="/profile" className="flex items-center gap-2 text-ivory/60 hover:text-ivory transition">
               <IconUser className="w-4 h-4" />
@@ -146,6 +149,11 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
             >
               Sign out
             </button>
+          </div>
+        ) : (
+          <div className="border-t border-cambridge/20 pt-4 space-y-2">
+            <Link to="/login" className="block px-3 py-2 label-caps text-ivory/50 hover:text-cambridge transition">Sign In</Link>
+            <Link to="/join" className="block px-3 py-2 label-caps text-cambridge-light/70 hover:text-cambridge-light border border-cambridge/30 rounded-sm transition">Join the Club</Link>
           </div>
         )}
       </div>
@@ -203,7 +211,7 @@ const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean }> = ({ 
           <DesktopNav />
         </div>
 
-        {/* Desktop right — user or login */}
+        {/* Desktop right — user or login/join */}
         <div className="hidden md:flex items-center gap-3 flex-shrink-0">
           {auth.isAuthenticated && auth.member ? (
             <Link to="/profile" className="flex items-center gap-1.5 text-ivory/80 hover:text-ivory transition">
@@ -211,9 +219,14 @@ const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean }> = ({ 
               <span className="text-sm font-light tracking-wide text-ivory/80">{auth.member.full_name}</span>
             </Link>
           ) : (
-            <Link to="/login" className="label-caps text-cambridge-light/60 hover:text-cambridge-light transition">
-              Sign In
-            </Link>
+            <>
+              <Link to="/login" className="label-caps text-cambridge-light/60 hover:text-cambridge-light transition">
+                Sign In
+              </Link>
+              <Link to="/join" className="label-caps px-3 py-1 border border-cambridge/50 text-cambridge-light/80 hover:border-cambridge hover:text-cambridge-light rounded-sm transition">
+                Join
+              </Link>
+            </>
           )}
         </div>
       </div>
@@ -244,8 +257,17 @@ const App: React.FC = () => {
       <ScrollToTop />
       <TopBanner onMenuToggle={() => setMenuOpen(o => !o)} menuOpen={menuOpen} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <div className="pt-10 md:pt-12 min-h-screen flex flex-col">
-        <div className="flex-1">
+      <div
+        className="pt-10 md:pt-12 min-h-screen flex flex-col"
+        style={{
+          backgroundImage: 'url(/assets/cuc-building.avif)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
+        }}
+      >
+        <div className="fixed inset-0 bg-navy-deep/80 pointer-events-none" style={{ zIndex: 0 }} />
+        <div className="flex-1 relative" style={{ zIndex: 1 }}>
         <React.Suspense fallback={<div className="flex justify-center py-20"><div className="w-6 h-6 border-2 border-cambridge/30 border-t-cambridge rounded-full animate-spin" /></div>}>
           <Routes>
             <Route path="/" element={<Navigate to="/home" replace />} />
@@ -255,26 +277,35 @@ const App: React.FC = () => {
             <Route path="/home" element={<Home />} />
             <Route path="/dining" element={<Dining />} />
             <Route path="/events" element={<Events />} />
+            <Route path="/events/:slug" element={<EventDetail />} />
             <Route path="/news" element={<News />} />
+            <Route path="/news/:id" element={<NewsDetail />} />
             <Route path="/reciprocal-clubs" element={<ReciprocalClubs />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/loi-request" element={<ProtectedRoute><LOIRequest /></ProtectedRoute>} />
             <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
             <Route path="/mobile-app" element={<MobileApp />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/join" element={<Join />} />
           </Routes>
         </React.Suspense>
         </div>
-        <footer className="border-t border-cambridge/10 mt-8 pb-8 pt-5 px-4 text-center space-y-1.5">
-          <p className="font-cormorant text-sm tracking-widest text-ivory/60">
+        <footer className="relative border-t border-cambridge/20 mt-8 pb-8 pt-5 px-4 text-center space-y-1.5 bg-navy-deep/60" style={{ zIndex: 1 }}>
+          <p className="font-cormorant text-sm tracking-widest text-ivory/80">
             &copy; {new Date().getFullYear()} City University Club · All rights reserved
           </p>
-          <div className="flex justify-center gap-4 font-cormorant text-sm tracking-wide text-ivory/50">
+          <div className="flex justify-center gap-4 font-cormorant text-sm tracking-wide text-ivory/60">
             <Link to="/terms" className="hover:text-cambridge transition">Terms & Conditions</Link>
             <span>·</span>
             <Link to="/privacy" className="hover:text-cambridge transition">Privacy Policy</Link>
             <span>·</span>
             <Link to="/mobile-app" className="hover:text-cambridge transition">Mobile App</Link>
+            <span>·</span>
+            <Link to="/about" className="hover:text-cambridge transition">About</Link>
+            <span>·</span>
+            <Link to="/contact" className="hover:text-cambridge transition">Contact</Link>
           </div>
         </footer>
       </div>

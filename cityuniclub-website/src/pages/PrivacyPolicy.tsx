@@ -1,7 +1,7 @@
 import React from 'react'
 
 export const PrivacyPolicy: React.FC = () => (
-  <div className="bg-navy-deep pb-20">
+  <div className="pb-20">
     <div className="bg-cambridge/15 pt-7 pb-5 px-4 border-b border-cambridge/20">
       <h1 className="font-serif text-2xl font-normal text-ivory text-center">Privacy Policy</h1>
     </div>

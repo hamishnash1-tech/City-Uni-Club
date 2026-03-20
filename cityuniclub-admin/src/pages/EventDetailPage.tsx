@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import membersData from '../data/members.json'
+import { FUNCTIONS_URL } from '../services/supabase'
+import { useAuth } from '../context/AuthContext'
 import {
   Box,
   Container,
@@ -19,551 +20,618 @@ import {
   TableRow,
   Paper,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+  LinearProgress,
+  Switch,
+  FormControlLabel,
   TextField,
-  Autocomplete
+  Divider,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import DeleteIcon from '@mui/icons-material/Delete'
+import EditIcon from '@mui/icons-material/Edit'
+import CheckIcon from '@mui/icons-material/Check'
+import CloseIcon from '@mui/icons-material/Close'
 import PeopleIcon from '@mui/icons-material/People'
-import PersonAddIcon from '@mui/icons-material/PersonAdd'
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney'
 import EventIcon from '@mui/icons-material/Event'
+import UploadFileIcon from '@mui/icons-material/UploadFile'
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
+import ImageIcon from '@mui/icons-material/Image'
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
+
+const ASSET_TYPES = ['Menu', 'Details', 'Location', 'Programme', 'Other']
+
+interface EventAsset {
+  id: string
+  event_id: string
+  type: string
+  file_url: string
+  file_name: string | null
+  mime_type: string | null
+  created_at: string
+}
 
 interface Booking {
   id: string
   member_id: string | null
-  member_name?: string
-  member_email?: string
-  guest_name: string
-  guest_email?: string
+  member_email: string | null
+  guest_name: string | null
+  guest_phone: string | null
   guest_count: number
-  meal_option?: string
-  special_requests?: string
-  status: 'pending' | 'confirmed' | 'cancelled'
+  special_requests: string | null
+  status: string
+  total_price: number | null
   created_at: string
-  is_member: boolean
+  members: { full_name: string; email: string; membership_number: string } | null
 }
 
 interface EventDetails {
   id: string
   title: string
-  event_date: string
-  event_end_date?: string | null
+  event_date: string | null
   event_type: string
-  description?: string | null
-  price?: number | null
+  description: string | null
+  price_per_person: number | null
+  is_tba: boolean
+  is_active: boolean
+  slug: string
 }
 
-// Mock events data
-const mockEvents: Record<string, EventDetails> = {
-  '1': { id: '1', title: "St Patrick's Day Lunch", event_date: '2025-03-17', event_type: 'lunch', price: 32 },
-  '2': { id: '2', title: 'Moules Frites Lunch', event_date: '2025-03-25', event_type: 'lunch', price: 34 },
-  '3': { id: '3', title: "Younger Members Dinner", event_date: '2025-03-26', event_type: 'dinner', price: 45 },
-  '4': { id: '4', title: '4 Course French Tasting Menu with Paired Wines', event_date: '2025-04-30', event_type: 'dinner', price: null },
-  '5': { id: '5', title: 'New Member Candidates Meeting', event_date: '2025-04-30', event_type: 'meeting', price: null },
-  '6': { id: '6', title: 'Sea Food Lunch', event_date: '2025-04-30', event_type: 'lunch', price: null },
-  '7': { id: '7', title: 'Literary Lunch - The Second Curtain by Roy Fuller', event_date: '2025-04-17', event_type: 'lunch', price: 46 },
-  '8': { id: '8', title: "St George's Day Lunch and Dinner", event_date: '2025-04-23', event_end_date: null, event_type: 'lunch_dinner', price: 48 },
-  '9': { id: '9', title: "Younger Members Dinner", event_date: '2025-04-30', event_type: 'dinner', price: 45 },
-  '10': { id: '10', title: 'Steak and Kidney Lunch', event_date: '2025-05-13', event_end_date: '2025-05-14', event_type: 'lunch', price: null },
-  '11': { id: '11', title: 'Moules Frites', event_date: '2025-05-27', event_end_date: '2025-05-28', event_type: 'lunch', price: null },
-  '12': { id: '12', title: 'Royal Ascot Tent', event_date: '2025-06-17', event_type: 'special', price: 320 }
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  lunch: 'Lunch', dinner: 'Dinner', lunch_dinner: 'Lunch & Dinner',
+  meeting: 'Meeting', special: 'Special Event',
+}
+const EVENT_TYPE_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'info' | 'warning'> = {
+  lunch: 'success', dinner: 'secondary', lunch_dinner: 'primary', meeting: 'info', special: 'warning',
 }
 
-// Mock bookings data
-const mockBookings: Record<string, Booking[]> = {
-  '1': [
-    { id: 'b1', member_id: 'stephen@example.com', member_name: 'Stephen Rayner', member_email: 'stephen@example.com', guest_name: 'Stephen Rayner', guest_email: 'stephen@example.com', guest_count: 2, meal_option: 'lunch', status: 'confirmed', created_at: '2025-03-01', is_member: true },
-    { id: 'b2', member_id: 'john@example.com', member_name: 'John Smith', member_email: 'john@example.com', guest_name: 'John Smith', guest_email: 'john@example.com', guest_count: 1, meal_option: 'lunch', status: 'confirmed', created_at: '2025-03-02', is_member: true },
-    { id: 'b3', member_id: null, guest_name: 'Alice Johnson', guest_email: 'alice.johnson@gmail.com', guest_count: 2, meal_option: 'lunch', status: 'confirmed', created_at: '2025-03-04', is_member: false },
-    { id: 'b4', member_id: null, guest_name: 'Bob Williams', guest_email: 'bob.williams@yahoo.com', guest_count: 1, meal_option: 'lunch', status: 'pending', created_at: '2025-03-05', is_member: false, special_requests: 'Wheelchair access' },
-  ],
-  '10': [
-    { id: 'b5', member_id: 'jane@example.com', member_name: 'Jane Doe', member_email: 'jane@example.com', guest_name: 'Jane Doe', guest_email: 'jane@example.com', guest_count: 3, meal_option: 'lunch', status: 'confirmed', created_at: '2025-03-03', is_member: true, special_requests: 'Gluten free' },
-  ]
+function formatDate(dateStr: string | null): string {
+  if (!dateStr) return 'Date TBA'
+  const [year, month, day] = dateStr.split('-').map(Number)
+  return new Date(year, month - 1, day).toLocaleDateString('en-GB', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+  })
+}
+
+function AssetIcon({ mimeType }: { mimeType: string | null }) {
+  if (mimeType?.startsWith('image/')) return <ImageIcon color="primary" fontSize="small" />
+  if (mimeType === 'application/pdf') return <PictureAsPdfIcon color="error" fontSize="small" />
+  return <InsertDriveFileIcon color="action" fontSize="small" />
 }
 
 export default function EventDetailPage() {
-  const { eventId } = useParams<{ eventId: string }>()
+  const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
+  const { sessionToken } = useAuth()
+  const authHeaders = { 'Authorization': `Bearer ${sessionToken}`, 'Content-Type': 'application/json' }
+
   const [event, setEvent] = useState<EventDetails | null>(null)
   const [bookings, setBookings] = useState<Booking[]>([])
+  const [assets, setAssets] = useState<EventAsset[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [openAddDialog, setOpenAddDialog] = useState(false)
-  const [selectedMember, setSelectedMember] = useState<{ id: string; name: string; email: string } | null>(null)
-  const [guestCount, setGuestCount] = useState(1)
-  const [mealOption, setMealOption] = useState('')
-  const [specialRequests, setSpecialRequests] = useState('')
 
-  // Prepare members list for autocomplete
-  const membersList = membersData.map((m: any) => ({
-    id: m.id,
-    name: m.name,
-    email: m.email
-  }))
+  // Inline editing
+  const [editingTitle, setEditingTitle] = useState(false)
+  const [editTitle, setEditTitle] = useState('')
+  const [editingDescription, setEditingDescription] = useState(false)
+  const [editDescription, setEditDescription] = useState('')
+
+  // Asset rename
+  const [renamingAssetId, setRenamingAssetId] = useState<string | null>(null)
+  const [renameValue, setRenameValue] = useState('')
+
+  // Asset upload
+  const [assetFiles, setAssetFiles] = useState<File[]>([])
+  const [assetType, setAssetType] = useState('Menu')
+  const [assetDisplayName, setAssetDisplayName] = useState('')
+  const [uploadingAsset, setUploadingAsset] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState('')
+  const [assetDocWarning, setAssetDocWarning] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Visibility
+  const [savingVisibility, setSavingVisibility] = useState(false)
+
+  // Store the UUID separately for mutations (URL uses slug)
+  const [eventUuid, setEventUuid] = useState<string | null>(null)
 
   useEffect(() => {
-    if (eventId) {
-      loadEventData()
-      loadBookings()
-    }
-  }, [eventId])
+    if (!slug) return
+    if (!sessionToken) { setError('Not authenticated'); setLoading(false); return }
+    fetch(`${FUNCTIONS_URL}/admin-events?slug=${encodeURIComponent(slug)}`, { headers: authHeaders })
+      .then(async (res) => {
+        if (res.status === 401 || res.status === 403) { setError('Session expired — please sign in again.'); return }
+        const data = await res.json()
+        if (data.event) {
+          setEvent(data.event)
+          setEventUuid(data.event.id)
+          setEditTitle(data.event.title)
+          setEditDescription(data.event.description ?? '')
+        } else setError('Event not found')
+        setBookings(data.bookings ?? [])
+        setAssets(data.pdfs ?? [])
+      })
+      .catch(() => setError('Failed to load event'))
+      .finally(() => setLoading(false))
+  }, [slug, sessionToken])
 
-  const loadEventData = () => {
-    if (!eventId) return
-    
-    const eventData = mockEvents[eventId as keyof typeof mockEvents]
-    if (eventData) {
-      setEvent(eventData)
-    } else {
-      setError('Event not found')
-    }
-    setLoading(false)
+  const patch = async (fields: Record<string, unknown>) => {
+    const res = await fetch(`${FUNCTIONS_URL}/admin-events?id=${eventUuid}`, {
+      method: 'PUT',
+      headers: authHeaders,
+      body: JSON.stringify(fields),
+    })
+    if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
+    return res.json()
   }
 
-  const loadBookings = () => {
-    if (!eventId) return
-
-    const eventBookings = mockBookings[eventId] || []
-    setBookings(eventBookings)
-  }
-
-  const handleAddBooking = () => {
-    if (!eventId) return
-
-    const newBooking: Booking = {
-      id: `b${Date.now()}`,
-      member_id: selectedMember?.email || null,
-      member_name: selectedMember?.name,
-      member_email: selectedMember?.email,
-      guest_name: selectedMember?.name || 'Guest',
-      guest_email: selectedMember?.email,
-      guest_count: guestCount,
-      meal_option: mealOption || undefined,
-      special_requests: specialRequests || undefined,
-      status: 'pending',
-      created_at: new Date().toISOString(),
-      is_member: !!selectedMember
+  const handleSaveTitle = async () => {
+    if (!editTitle.trim() || editTitle === event?.title) { setEditingTitle(false); return }
+    try {
+      await patch({ title: editTitle.trim() })
+      setEvent(e => e ? { ...e, title: editTitle.trim() } : e)
+      setSuccess('Title updated')
+    } catch (e: any) {
+      setError(e.message)
     }
-
-    setBookings([newBooking, ...bookings])
-    setSuccess('Booking added successfully')
-    setOpenAddDialog(false)
-    resetForm()
+    setEditingTitle(false)
   }
 
-  const handleDeleteBooking = (bookingId: string) => {
-    if (!confirm('Are you sure you want to cancel this booking?')) return
+  const handleSaveDescription = async () => {
+    const desc = editDescription.trim() || null
+    if (desc === (event?.description ?? null)) { setEditingDescription(false); return }
+    try {
+      await patch({ description: desc })
+      setEvent(e => e ? { ...e, description: desc } : e)
+      setSuccess('Description updated')
+    } catch (e: any) {
+      setError(e.message)
+    }
+    setEditingDescription(false)
+  }
+
+  const handleToggleVisibility = async () => {
+    if (!event) return
+    setSavingVisibility(true)
+    try {
+      await patch({ is_active: !event.is_active })
+      setEvent(e => e ? { ...e, is_active: !e.is_active } : e)
+      setSuccess(event.is_active ? 'Event hidden from public view' : 'Event is now visible')
+    } catch (e: any) {
+      setError(e.message)
+    }
+    setSavingVisibility(false)
+  }
+
+  const handleAssetUpload = async () => {
+    if (!assetFiles.length || !sessionToken || !eventUuid) return
+    setUploadingAsset(true)
+    const uploaded: EventAsset[] = []
+    try {
+      for (let i = 0; i < assetFiles.length; i++) {
+        const file = assetFiles[i]
+        if (assetFiles.length > 1) setUploadProgress(`Uploading ${i + 1} of ${assetFiles.length}…`)
+        const displayName = assetFiles.length === 1
+          ? (assetDisplayName.trim() || file.name)
+          : file.name.replace(/\.[^.]+$/, '')
+        const form = new FormData()
+        form.append('file', file)
+        form.append('event_id', eventUuid)
+        form.append('type', assetType)
+        form.append('file_name', displayName)
+        const res = await fetch(`${FUNCTIONS_URL}/admin-event-assets`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${sessionToken}` },
+          body: form,
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(`${file.name}: ${data.error}`)
+        uploaded.push(data.asset)
+      }
+      setAssets(prev => [...prev, ...uploaded])
+      setAssetFiles([])
+      setAssetDisplayName('')
+      setAssetType('Menu')
+      setAssetDocWarning(false)
+      setUploadProgress('')
+      if (fileInputRef.current) fileInputRef.current.value = ''
+      setSuccess(`${uploaded.length} asset${uploaded.length > 1 ? 's' : ''} uploaded`)
+    } catch (e: any) {
+      setError(e.message || 'Upload failed')
+      if (uploaded.length) setAssets(prev => [...prev, ...uploaded])
+    }
+    setUploadingAsset(false)
+    setUploadProgress('')
+  }
+
+  const handleDeleteAsset = async (assetId: string) => {
+    if (!confirm('Remove this asset?')) return
+    try {
+      const res = await fetch(`${FUNCTIONS_URL}/admin-event-assets?id=${assetId}`, {
+        method: 'DELETE',
+        headers: authHeaders,
+      })
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
+      setAssets(prev => prev.filter(a => a.id !== assetId))
+      setSuccess('Asset removed')
+    } catch (e: any) {
+      setError(e.message)
+    }
+  }
+
+  const handleRenameAsset = async (assetId: string) => {
+    if (!renameValue.trim()) { setRenamingAssetId(null); return }
+    try {
+      const res = await fetch(`${FUNCTIONS_URL}/admin-event-assets?id=${assetId}`, {
+        method: 'PATCH',
+        headers: authHeaders,
+        body: JSON.stringify({ file_name: renameValue.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error)
+      setAssets(prev => prev.map(a => a.id === assetId ? { ...a, file_name: renameValue.trim() } : a))
+      setSuccess('Asset renamed')
+    } catch (e: any) {
+      setError(e.message)
+    }
+    setRenamingAssetId(null)
+  }
+
+  const handleDeleteBooking = async (bookingId: string) => {
+    if (!confirm('Cancel this booking?')) return
     setBookings(bookings.filter(b => b.id !== bookingId))
     setSuccess('Booking cancelled')
   }
 
-  const resetForm = () => {
-    setSelectedMember(null)
-    setGuestCount(1)
-    setMealOption('')
-    setSpecialRequests('')
-  }
+  const memberBookings = bookings.filter(b => b.member_id)
+  const nonMemberBookings = bookings.filter(b => !b.member_id)
+  const totalTickets = bookings.reduce((sum, b) => sum + b.guest_count, 0)
+  const totalRevenue = bookings.reduce((sum, b) => sum + (b.total_price ?? 0), 0)
 
-  const memberBookings = bookings.filter(b => b.is_member)
-  const nonMemberBookings = bookings.filter(b => !b.is_member)
-
-  const totalMemberTickets = memberBookings.reduce((sum, b) => sum + b.guest_count, 0)
-  const totalNonMemberTickets = nonMemberBookings.reduce((sum, b) => sum + b.guest_count, 0)
-  const totalRevenue = bookings
-    .filter(b => b.status === 'confirmed')
-    .reduce((sum, b) => sum + ((event?.price || 0) * b.guest_count), 0)
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-GB', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
-
-  const formatDateRange = () => {
-    if (!event) return ''
-    
-    if (event.event_end_date) {
-      const startDate = new Date(event.event_date)
-      const endDate = new Date(event.event_end_date)
-      
-      if (startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear()) {
-        return `${startDate.toLocaleDateString('en-GB', { day: 'numeric' })}-${endDate.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`
-      }
-      
-      return `${formatDate(event.event_date)} - ${formatDate(event.event_end_date)}`
-    }
-    
-    return formatDate(event.event_date)
-  }
-
-  const getEventTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      lunch: 'Lunch',
-      dinner: 'Dinner',
-      lunch_dinner: 'Lunch & Dinner',
-      meeting: 'Meeting',
-      special: 'Special Event'
-    }
-    return labels[type] || type
-  }
-
-  const getEventTypeColor = (type: string) => {
-    const colors: Record<string, 'primary' | 'secondary' | 'success' | 'info' | 'warning'> = {
-      lunch: 'success',
-      dinner: 'secondary',
-      lunch_dinner: 'primary',
-      meeting: 'info',
-      special: 'warning'
-    }
-    return colors[type] || 'primary'
-  }
-
-  if (loading) {
-    return (
-      <Container maxWidth="lg" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-        <Typography>Loading...</Typography>
-      </Container>
-    )
-  }
+  if (loading) return <Container maxWidth="lg" sx={{ mt: 4 }}><LinearProgress /></Container>
 
   if (!event) {
     return (
       <Container maxWidth="lg" sx={{ mt: 4 }}>
-        <Alert severity="error">Event not found</Alert>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/events')} sx={{ mt: 2 }}>
-          Back to Events
-        </Button>
+        <Alert severity="error">{error || 'Event not found'}</Alert>
+        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/events')} sx={{ mt: 2 }}>Back to Events</Button>
       </Container>
     )
   }
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      {/* Header */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/events')}>
-          Back to Events
-        </Button>
-        <Button
-          variant="contained"
-          startIcon={<PersonAddIcon />}
-          onClick={() => setOpenAddDialog(true)}
-        >
-          Add Booking
-        </Button>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate('/events')}>Back to Events</Button>
       </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-          {error}
-        </Alert>
-      )}
-
-      {success && (
-        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>
-          {success}
-        </Alert>
-      )}
+      {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>{error}</Alert>}
+      {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess('')}>{success}</Alert>}
 
       {/* Event Details Card */}
       <Card sx={{ mb: 4 }}>
         <CardContent>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-            <Typography variant="h4" gutterBottom>
-              {event.title}
-            </Typography>
+
+          {/* Title row */}
+          <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2, gap: 2 }}>
+            {editingTitle ? (
+              <Box sx={{ display: 'flex', gap: 1, flex: 1 }}>
+                <TextField
+                  value={editTitle}
+                  onChange={e => setEditTitle(e.target.value)}
+                  size="small"
+                  fullWidth
+                  autoFocus
+                  onKeyDown={e => { if (e.key === 'Enter') handleSaveTitle(); if (e.key === 'Escape') setEditingTitle(false) }}
+                />
+                <IconButton size="small" color="primary" onClick={handleSaveTitle}><CheckIcon /></IconButton>
+                <IconButton size="small" onClick={() => { setEditingTitle(false); setEditTitle(event.title) }}><CloseIcon /></IconButton>
+              </Box>
+            ) : (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
+                <Typography variant="h5">{event.title}</Typography>
+                <IconButton size="small" onClick={() => setEditingTitle(true)} title="Edit title">
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            )}
             <Chip
-              label={getEventTypeLabel(event.event_type)}
-              color={getEventTypeColor(event.event_type)}
+              label={EVENT_TYPE_LABELS[event.event_type] ?? event.event_type}
+              color={EVENT_TYPE_COLORS[event.event_type] ?? 'primary'}
             />
           </Box>
 
-          <Grid container spacing={3}>
+          <Divider sx={{ mb: 2 }} />
+
+          {/* Stats row */}
+          <Grid container spacing={3} sx={{ mb: 2 }}>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <EventIcon color="action" />
                 <Box>
-                  <Typography variant="body2" color="textSecondary">
-                    Date
-                  </Typography>
-                  <Typography variant="body1" fontWeight={500}>
-                    {formatDateRange()}
-                  </Typography>
+                  <Typography variant="body2" color="textSecondary">Date</Typography>
+                  <Typography variant="body1" fontWeight={500}>{formatDate(event.event_date)}</Typography>
                 </Box>
               </Box>
             </Grid>
-
-            {event.price !== null && (
+            {event.price_per_person != null && (
               <Grid size={{ xs: 12, sm: 6, md: 3 }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <AttachMoneyIcon color="action" />
                   <Box>
-                    <Typography variant="body2" color="textSecondary">
-                      Price
-                    </Typography>
-                    <Typography variant="body1" fontWeight={500}>
-                      £{event.price}
-                    </Typography>
+                    <Typography variant="body2" color="textSecondary">Price per person</Typography>
+                    <Typography variant="body1" fontWeight={500}>£{event.price_per_person}</Typography>
                   </Box>
                 </Box>
               </Grid>
             )}
-
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <PeopleIcon color="action" />
                 <Box>
-                  <Typography variant="body2" color="textSecondary">
-                    Total RSVPs
-                  </Typography>
-                  <Typography variant="body1" fontWeight={500}>
-                    {totalMemberTickets + totalNonMemberTickets} tickets
-                  </Typography>
+                  <Typography variant="body2" color="textSecondary">Total Tickets</Typography>
+                  <Typography variant="body1" fontWeight={500}>{totalTickets}</Typography>
                 </Box>
               </Box>
             </Grid>
-
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <AttachMoneyIcon color="success" />
                 <Box>
-                  <Typography variant="body2" color="textSecondary">
-                    Revenue
-                  </Typography>
-                  <Typography variant="body1" fontWeight={500} color="success.main">
-                    £{totalRevenue}
-                  </Typography>
+                  <Typography variant="body2" color="textSecondary">Revenue</Typography>
+                  <Typography variant="body1" fontWeight={500} color="success.main">£{totalRevenue.toFixed(2)}</Typography>
                 </Box>
               </Box>
             </Grid>
           </Grid>
+
+          <Divider sx={{ mb: 2 }} />
+
+          {/* Description */}
+          <Box sx={{ mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <Typography variant="body2" fontWeight={500}>Description</Typography>
+              {!editingDescription && (
+                <IconButton size="small" onClick={() => setEditingDescription(true)} title="Edit description">
+                  <EditIcon fontSize="small" />
+                </IconButton>
+              )}
+            </Box>
+            {editingDescription ? (
+              <Box>
+                <TextField
+                  value={editDescription}
+                  onChange={e => setEditDescription(e.target.value)}
+                  multiline
+                  rows={3}
+                  fullWidth
+                  size="small"
+                  autoFocus
+                  placeholder="Event description (optional)"
+                />
+                <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                  <Button size="small" variant="contained" startIcon={<CheckIcon />} onClick={handleSaveDescription}>Save</Button>
+                  <Button size="small" startIcon={<CloseIcon />} onClick={() => { setEditingDescription(false); setEditDescription(event?.description ?? '') }}>Cancel</Button>
+                </Box>
+              </Box>
+            ) : (
+              <Typography variant="body2" color={event.description ? 'textPrimary' : 'textSecondary'}>
+                {event.description || 'No description'}
+              </Typography>
+            )}
+          </Box>
+
+          <Divider sx={{ mb: 2 }} />
+
+          {/* Visibility toggle */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={event.is_active}
+                  onChange={handleToggleVisibility}
+                  disabled={savingVisibility}
+                  color="success"
+                />
+              }
+              label={
+                <Box>
+                  <Typography variant="body2" fontWeight={500}>
+                    {event.is_active ? 'Visible to members' : 'Hidden from members'}
+                  </Typography>
+                  <Typography variant="caption" color="textSecondary">
+                    {event.is_active ? 'This event appears on the website and app' : 'This event is not shown publicly'}
+                  </Typography>
+                </Box>
+              }
+            />
+          </Box>
+
+          <Divider sx={{ mb: 2 }} />
+
+          {/* Assets section */}
+          <Box>
+            <Typography variant="body2" fontWeight={500} gutterBottom>Event Assets</Typography>
+
+            {/* Existing assets list */}
+            {assets.length > 0 && (
+              <Box sx={{ mb: 2, display: 'flex', flexDirection: 'column', gap: 1 }}>
+                {assets.map(asset => (
+                  <Box key={asset.id} sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1, border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
+                    <AssetIcon mimeType={asset.mime_type} />
+                    <Chip label={asset.type} size="small" variant="outlined" sx={{ fontSize: '0.7rem', flexShrink: 0 }} />
+                    {renamingAssetId === asset.id ? (
+                      <>
+                        <TextField
+                          size="small"
+                          value={renameValue}
+                          onChange={e => setRenameValue(e.target.value)}
+                          autoFocus
+                          sx={{ flex: 1 }}
+                          onKeyDown={e => { if (e.key === 'Enter') handleRenameAsset(asset.id); if (e.key === 'Escape') setRenamingAssetId(null) }}
+                        />
+                        <IconButton size="small" color="primary" onClick={() => handleRenameAsset(asset.id)}><CheckIcon /></IconButton>
+                        <IconButton size="small" onClick={() => setRenamingAssetId(null)}><CloseIcon /></IconButton>
+                      </>
+                    ) : (
+                      <>
+                        <Typography variant="body2" sx={{ flex: 1 }}>
+                          <a href={asset.file_url} target="_blank" rel="noopener noreferrer">
+                            {asset.file_name || asset.file_url}
+                          </a>
+                        </Typography>
+                        <IconButton size="small" onClick={() => { setRenamingAssetId(asset.id); setRenameValue(asset.file_name || '') }} title="Rename">
+                          <EditIcon fontSize="small" />
+                        </IconButton>
+                        <IconButton size="small" color="error" onClick={() => handleDeleteAsset(asset.id)}>
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
+                      </>
+                    )}
+                  </Box>
+                ))}
+              </Box>
+            )}
+
+            {/* Add new asset */}
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+              <Typography variant="caption" color="textSecondary" fontWeight={500}>Add Assets</Typography>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                <FormControl size="small" sx={{ minWidth: 130 }}>
+                  <InputLabel>Type</InputLabel>
+                  <Select value={assetType} label="Type" onChange={e => setAssetType(e.target.value)}>
+                    {ASSET_TYPES.map(t => <MenuItem key={t} value={t}>{t}</MenuItem>)}
+                  </Select>
+                </FormControl>
+                {assetFiles.length === 1 && (
+                  <TextField
+                    size="small"
+                    label="Display name"
+                    value={assetDisplayName}
+                    onChange={e => setAssetDisplayName(e.target.value)}
+                    placeholder="e.g. Summer Menu 2026"
+                    sx={{ flex: 1, minWidth: 180 }}
+                  />
+                )}
+              </Box>
+              <input
+                type="file"
+                multiple
+                accept="application/pdf,image/*,.doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={e => {
+                  const files = Array.from(e.target.files ?? [])
+                  setAssetFiles(files)
+                  if (files.length === 1) setAssetDisplayName(files[0].name.replace(/\.[^.]+$/, ''))
+                  else setAssetDisplayName('')
+                  setAssetDocWarning(files.some(f => /\.(doc|docx)$/i.test(f.name)))
+                }}
+              />
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<UploadFileIcon />}
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingAsset}
+                >
+                  {assetFiles.length === 0 ? 'Choose files' : assetFiles.length === 1 ? assetFiles[0].name : `${assetFiles.length} files selected`}
+                </Button>
+                {assetFiles.length > 0 && (
+                  <Button
+                    variant="contained"
+                    size="small"
+                    onClick={handleAssetUpload}
+                    disabled={uploadingAsset}
+                  >
+                    {uploadingAsset ? (uploadProgress || 'Uploading…') : `Upload ${assetFiles.length > 1 ? `${assetFiles.length} files` : ''}`}
+                  </Button>
+                )}
+              </Box>
+              {assetDocWarning && (
+                <Alert severity="warning" sx={{ py: 0.5 }}>
+                  Word documents may not display correctly on all devices. We recommend converting to PDF before uploading.
+                </Alert>
+              )}
+              {uploadingAsset && <LinearProgress />}
+            </Box>
+          </Box>
+
         </CardContent>
       </Card>
 
       {/* Member Bookings */}
-      <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 2 }}>
-        Member Bookings ({memberBookings.length} bookings, {totalMemberTickets} tickets)
-      </Typography>
-
+      <Typography variant="h6" gutterBottom>Member Bookings ({memberBookings.length})</Typography>
       <TableContainer component={Paper} sx={{ mb: 4 }}>
-        <Table>
+        <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Member Name</TableCell>
+              <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
+              <TableCell>Membership No.</TableCell>
               <TableCell>Tickets</TableCell>
-              <TableCell>Meal Option</TableCell>
-              <TableCell>Status</TableCell>
               <TableCell>Special Requests</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
             {memberBookings.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
-                  <Typography color="textSecondary" sx={{ py: 2 }}>
-                    No member bookings yet
-                  </Typography>
-                </TableCell>
+              <TableRow><TableCell colSpan={7} align="center"><Typography color="textSecondary" sx={{ py: 2 }}>No member bookings</Typography></TableCell></TableRow>
+            ) : memberBookings.map(b => (
+              <TableRow key={b.id}>
+                <TableCell>{b.members?.full_name ?? '—'}</TableCell>
+                <TableCell>{b.members?.email ? <a href={`mailto:${b.members.email}`}>{b.members.email}</a> : '—'}</TableCell>
+                <TableCell>{b.members?.membership_number ?? '—'}</TableCell>
+                <TableCell>{b.guest_count}</TableCell>
+                <TableCell>{b.special_requests ?? '—'}</TableCell>
+                <TableCell><Chip label={b.status} size="small" color={b.status === 'confirmed' ? 'success' : 'warning'} /></TableCell>
+                <TableCell><IconButton size="small" color="error" onClick={() => handleDeleteBooking(b.id)}><DeleteIcon fontSize="small" /></IconButton></TableCell>
               </TableRow>
-            ) : (
-              memberBookings.map((booking) => (
-                <TableRow key={booking.id}>
-                  <TableCell>{booking.member_name || booking.guest_name}</TableCell>
-                  <TableCell>
-                    {booking.member_email ? (
-                      <a href={`mailto:${booking.member_email}`}>
-                        {booking.member_email}
-                      </a>
-                    ) : (
-                      '-'
-                    )}
-                  </TableCell>
-                  <TableCell>{booking.guest_count}</TableCell>
-                  <TableCell>
-                    {booking.meal_option ? (
-                      <Chip label={booking.meal_option} size="small" />
-                    ) : (
-                      '-'
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={booking.status}
-                      size="small"
-                      color={booking.status === 'confirmed' ? 'success' : 'warning'}
-                    />
-                  </TableCell>
-                  <TableCell>{booking.special_requests || '-'}</TableCell>
-                  <TableCell>
-                    <IconButton size="small" color="error" onClick={() => handleDeleteBooking(booking.id)}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
 
       {/* Non-Member Bookings */}
-      <Typography variant="h5" gutterBottom sx={{ mt: 4, mb: 2 }}>
-        Non-Member Bookings ({nonMemberBookings.length} bookings, {totalNonMemberTickets} tickets)
-      </Typography>
-
+      <Typography variant="h6" gutterBottom>Non-Member Bookings ({nonMemberBookings.length})</Typography>
       <TableContainer component={Paper}>
-        <Table>
+        <Table size="small">
           <TableHead>
             <TableRow>
-              <TableCell>Guest Name</TableCell>
+              <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
+              <TableCell>Phone</TableCell>
               <TableCell>Tickets</TableCell>
-              <TableCell>Meal Option</TableCell>
-              <TableCell>Status</TableCell>
               <TableCell>Special Requests</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell />
             </TableRow>
           </TableHead>
           <TableBody>
             {nonMemberBookings.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
-                  <Typography color="textSecondary" sx={{ py: 2 }}>
-                    No non-member bookings yet
-                  </Typography>
-                </TableCell>
+              <TableRow><TableCell colSpan={7} align="center"><Typography color="textSecondary" sx={{ py: 2 }}>No non-member bookings</Typography></TableCell></TableRow>
+            ) : nonMemberBookings.map(b => (
+              <TableRow key={b.id}>
+                <TableCell>{b.guest_name ?? '—'}</TableCell>
+                <TableCell>{b.member_email ? <a href={`mailto:${b.member_email}`}>{b.member_email}</a> : '—'}</TableCell>
+                <TableCell>{b.guest_phone ?? '—'}</TableCell>
+                <TableCell>{b.guest_count}</TableCell>
+                <TableCell>{b.special_requests ?? '—'}</TableCell>
+                <TableCell><Chip label={b.status} size="small" color={b.status === 'confirmed' ? 'success' : 'warning'} /></TableCell>
+                <TableCell><IconButton size="small" color="error" onClick={() => handleDeleteBooking(b.id)}><DeleteIcon fontSize="small" /></IconButton></TableCell>
               </TableRow>
-            ) : (
-              nonMemberBookings.map((booking) => (
-                <TableRow key={booking.id}>
-                  <TableCell>{booking.guest_name}</TableCell>
-                  <TableCell>
-                    {booking.guest_email ? (
-                      <a href={`mailto:${booking.guest_email}`}>
-                        {booking.guest_email}
-                      </a>
-                    ) : (
-                      '-'
-                    )}
-                  </TableCell>
-                  <TableCell>{booking.guest_count}</TableCell>
-                  <TableCell>
-                    {booking.meal_option ? (
-                      <Chip label={booking.meal_option} size="small" />
-                    ) : (
-                      '-'
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      label={booking.status}
-                      size="small"
-                      color={booking.status === 'confirmed' ? 'success' : 'warning'}
-                    />
-                  </TableCell>
-                  <TableCell>{booking.special_requests || '-'}</TableCell>
-                  <TableCell>
-                    <IconButton size="small" color="error" onClick={() => handleDeleteBooking(booking.id)}>
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
+            ))}
           </TableBody>
         </Table>
       </TableContainer>
-
-      {/* Add Booking Dialog */}
-      <Dialog open={openAddDialog} onClose={() => { setOpenAddDialog(false); resetForm() }} maxWidth="sm" fullWidth>
-        <DialogTitle>Add Booking for {event.title}</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 2 }}>
-            <Autocomplete
-              options={membersList}
-              getOptionLabel={(option) => option.name}
-              renderInput={(params) => (
-                <TextField {...params} label="Select Member (optional)" />
-              )}
-              value={selectedMember}
-              onChange={(_, newValue) => setSelectedMember(newValue)}
-              renderOption={(props, option) => (
-                <Box component="li" {...props}>
-                  <Box>
-                    <Typography variant="body2">{option.name}</Typography>
-                    <Typography variant="caption" color="textSecondary">{option.email}</Typography>
-                  </Box>
-                </Box>
-              )}
-            />
-
-            <TextField
-              fullWidth
-              label="Guest Name (if not member)"
-              value={selectedMember?.name || ''}
-              disabled={!!selectedMember}
-            />
-
-            <TextField
-              fullWidth
-              label="Number of Tickets"
-              type="number"
-              value={guestCount}
-              onChange={(e) => setGuestCount(parseInt(e.target.value) || 1)}
-              inputProps={{ min: 1, max: 10 }}
-            />
-
-            {(event.event_type === 'lunch' || event.event_type === 'dinner' || event.event_type === 'lunch_dinner') && (
-              <TextField
-                fullWidth
-                select
-                label="Meal Option"
-                value={mealOption}
-                onChange={(e) => setMealOption(e.target.value)}
-                SelectProps={{ native: true }}
-              >
-                <option value="">Select...</option>
-                {event.event_type === 'lunch_dinner' ? (
-                  <>
-                    <option value="lunch">Lunch</option>
-                    <option value="dinner">Dinner</option>
-                  </>
-                ) : (
-                  <option value={event.event_type}>{getEventTypeLabel(event.event_type)}</option>
-                )}
-              </TextField>
-            )}
-
-            <TextField
-              fullWidth
-              label="Special Requests"
-              value={specialRequests}
-              onChange={(e) => setSpecialRequests(e.target.value)}
-              multiline
-              rows={3}
-              placeholder="Dietary requirements, accessibility needs, etc."
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => { setOpenAddDialog(false); resetForm() }}>Cancel</Button>
-          <Button onClick={handleAddBooking} variant="contained">
-            Add Booking
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Container>
   )
 }

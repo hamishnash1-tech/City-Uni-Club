@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { IconEvents } from '../icons'
 import { api, Event as ApiEvent } from '../services/api'
 
@@ -11,10 +12,8 @@ const EVENT_TYPE_LABELS: Record<string, string> = {
 }
 
 function formatEventDate(dateStr: string): string {
-  // Parse as local time to avoid UTC midnight timezone shift
   const [year, month, day] = dateStr.split('-').map(Number)
-  const d = new Date(year, month - 1, day)
-  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+  return new Date(year, month - 1, day).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
 }
 
 function formatPrice(price: number): string {
@@ -25,9 +24,6 @@ export const Events: React.FC = () => {
   const [events, setEvents] = useState<ApiEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedEvent, setSelectedEvent] = useState<ApiEvent | null>(null)
-  const [showBooking, setShowBooking] = useState(false)
-  const [showSuccess, setShowSuccess] = useState(false)
 
   useEffect(() => {
     api.getEvents()
@@ -36,19 +32,8 @@ export const Events: React.FC = () => {
       .finally(() => setLoading(false))
   }, [])
 
-  const handleBookClick = (event: ApiEvent) => {
-    setSelectedEvent(event)
-    setShowBooking(true)
-  }
-
-  const handleBookingSuccess = () => {
-    setShowBooking(false)
-    setShowSuccess(true)
-    setTimeout(() => setShowSuccess(false), 3000)
-  }
-
   return (
-    <div className="bg-navy-deep">
+    <div className="">
       {/* Header */}
       <div className="bg-cambridge/15 pt-7 pb-5 px-4 border-b border-cambridge/20">
         <div className="flex items-center justify-center gap-2 text-ivory">
@@ -56,18 +41,6 @@ export const Events: React.FC = () => {
           <h1 className="font-serif text-2xl font-normal text-ivory">Club Events</h1>
         </div>
       </div>
-
-      {/* Success Message */}
-      {showSuccess && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 bg-oxford-blue border border-cambridge/30 text-ivory px-6 py-3 rounded shadow-modal z-50">
-          <div className="flex items-center space-x-2">
-            <svg className="w-5 h-5 text-cambridge" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-            <span className="text-sm">Booking request sent. We'll confirm shortly.</span>
-          </div>
-        </div>
-      )}
 
       {/* Events List */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -85,7 +58,11 @@ export const Events: React.FC = () => {
               const isTba = event.is_tba || event.price_per_person === 0
 
               return (
-                <div key={event.id} className="club-card border border-cambridge/50 rounded-md overflow-hidden">
+                <Link
+                  key={event.id}
+                  to={`/events/${event.slug}`}
+                  className="club-card border border-cambridge/50 rounded-md overflow-hidden hover:shadow-card transition block"
+                >
                   {/* Event Type Badge */}
                   <div className="bg-oxford-blue border-b border-cambridge/30 px-4 py-2.5">
                     <div className="flex items-center justify-between">
@@ -113,95 +90,23 @@ export const Events: React.FC = () => {
                       <span className="text-sm text-ink-mid">{displayDate}</span>
                     </div>
 
-                    <div className="mb-4">
+                    {event.description && (
+                      <p className="text-sm text-ink-mid leading-relaxed mb-3 line-clamp-2">{event.description}</p>
+                    )}
+
+                    <div className="flex items-center justify-between border-t border-cambridge/20 pt-3">
                       <span className={`font-serif text-xl ${price === '£TBA' ? 'text-ink-light' : 'text-oxford-blue'}`}>
                         <span className="text-cambridge-muted">£</span>{price.replace('£', '')}
                       </span>
-                    </div>
-
-                    <div className="border-t border-cambridge/20 pt-3">
-                      <button
-                        onClick={() => handleBookClick(event)}
-                        className="btn-primary"
-                      >
-                        Book Tickets
-                      </button>
+                      <span className="label-caps text-cambridge-muted">View & Book →</span>
                     </div>
                   </div>
-                </div>
+                </Link>
               )
             })}
           </div>
         )}
       </div>
-
-      {/* Booking Modal */}
-      {showBooking && selectedEvent && (
-        <div className="fixed inset-0 bg-navy-deep/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-ivory border border-ivory-border shadow-modal rounded-sm max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            {/* Header */}
-            <div className="bg-navy-deep border-b border-white/10 px-5 py-4">
-              <div className="flex items-center justify-between">
-                <h2 className="font-serif text-ivory font-normal text-lg">Book Event</h2>
-                <button onClick={() => setShowBooking(false)} className="text-ivory/50 hover:text-cambridge-light transition">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Form */}
-            <form className="p-6 space-y-4" onSubmit={(e) => { e.preventDefault(); handleBookingSuccess(); }}>
-              <div className="border-l-2 border-cambridge/50 bg-ivory-warm p-4">
-                <h3 className="font-serif text-oxford-blue font-normal mb-1">{selectedEvent.title}</h3>
-                <p className="text-sm text-ink-mid">
-                  {selectedEvent.is_tba ? 'Date TBA' : formatEventDate(selectedEvent.event_date)}
-                </p>
-                {selectedEvent.price_per_person > 0 && (
-                  <p className="font-serif text-oxford-blue mt-2">{formatPrice(selectedEvent.price_per_person)} per person</p>
-                )}
-              </div>
-
-              <div>
-                <label className="label-caps text-ink-light block mb-2">Your Name *</label>
-                <input type="text" required className="club-input" placeholder="John Smith" />
-              </div>
-
-              <div>
-                <label className="label-caps text-ink-light block mb-2">Email Address *</label>
-                <input type="email" required className="club-input" placeholder="john@example.com" />
-              </div>
-
-              <div>
-                <label className="label-caps text-ink-light block mb-2">Phone Number</label>
-                <input type="tel" className="club-input" placeholder="+44 7700 900123" />
-              </div>
-
-              <div>
-                <label className="label-caps text-ink-light block mb-2">Number of Guests</label>
-                <select className="club-input">
-                  <option value="1">1 (Just me)</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="label-caps text-ink-light block mb-2">Special Requests</label>
-                <textarea className="club-input" rows={3} placeholder="Dietary requirements, seating preferences, etc." />
-              </div>
-
-              <button type="submit" className="btn-primary">
-                Request Booking
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

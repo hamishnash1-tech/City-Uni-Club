@@ -1,0 +1,266 @@
+import React, { useState, useEffect } from 'react'
+import { useParams, Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { RootState } from '../store'
+import { api, Event as ApiEvent } from '../services/api'
+
+const EVENT_TYPE_LABELS: Record<string, string> = {
+  lunch: 'Lunch',
+  dinner: 'Dinner',
+  lunch_dinner: 'Lunch & Dinner',
+  meeting: 'Meeting',
+  special: 'Special Event',
+}
+
+function formatEventDate(dateStr: string): string {
+  const [year, month, day] = dateStr.split('-').map(Number)
+  return new Date(year, month - 1, day).toLocaleDateString('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+  })
+}
+
+function formatPrice(price: number): string {
+  return price % 1 === 0 ? `£${price}` : `£${price.toFixed(2)}`
+}
+
+export const EventDetail: React.FC = () => {
+  const { slug } = useParams<{ slug: string }>()
+  const auth = useSelector((state: RootState) => state.auth)
+  const isLoggedIn = auth.isAuthenticated && !!auth.member
+
+  const [event, setEvent] = useState<ApiEvent | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const [guestCount, setGuestCount] = useState(1)
+  const [guestName, setGuestName] = useState('')
+  const [guestEmail, setGuestEmail] = useState('')
+  const [guestPhone, setGuestPhone] = useState('')
+  const [specialRequests, setSpecialRequests] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [showSuccess, setShowSuccess] = useState(false)
+
+  useEffect(() => {
+    if (!slug) return
+    api.getEventBySlug(slug)
+      .then(setEvent)
+      .catch(() => setError('Event not found.'))
+      .finally(() => setLoading(false))
+  }, [slug])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSubmitError(null)
+    setSubmitting(true)
+    try {
+      await api.createEventBooking(auth.token ?? null, {
+        event_id: event!.id,
+        guest_count: guestCount,
+        special_requests: specialRequests || undefined,
+        guest_name: !isLoggedIn ? guestName : undefined,
+        guest_email: !isLoggedIn ? guestEmail : undefined,
+        guest_phone: guestPhone || undefined,
+      })
+      setShowSuccess(true)
+    } catch (err: any) {
+      setSubmitError(err.message || 'Failed to submit booking. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-cambridge/30 border-t-cambridge rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (error || !event) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <p className="text-ivory/60">{error ?? 'Event not found.'}</p>
+        <Link to="/events" className="label-caps text-cambridge-muted hover:text-cambridge transition">← Back to Events</Link>
+      </div>
+    )
+  }
+
+  const displayDate = event.is_tba ? 'Date TBA' : formatEventDate(event.event_date)
+  const price = event.price_per_person > 0 ? formatPrice(event.price_per_person) : null
+
+  return (
+    <div className="pb-20">
+      {/* Header */}
+      <div className="bg-cambridge/15 pt-7 pb-6 px-4 border-b border-cambridge/20">
+        <div className="max-w-2xl mx-auto">
+          <Link to="/events" className="label-caps text-cambridge-muted hover:text-cambridge transition mb-4 inline-block">
+            ← All Events
+          </Link>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="label-caps border border-cambridge/40 text-cambridge-muted px-2.5 py-0.5 rounded-sm">
+              {EVENT_TYPE_LABELS[event.event_type] ?? event.event_type}
+            </span>
+            {event.is_tba && (
+              <span className="label-caps border border-cambridge/25 text-cambridge/60 px-2 py-0.5 rounded-sm text-xs">TBA</span>
+            )}
+          </div>
+          <h1 className="font-serif text-2xl font-normal text-ivory">{event.title}</h1>
+          <p className="text-ivory/60 text-sm mt-1">{displayDate}</p>
+        </div>
+      </div>
+
+      <div className="max-w-2xl mx-auto px-4 py-8 space-y-8">
+
+        {/* Event info */}
+        <div className="club-card p-5 space-y-4">
+          {event.description && (
+            <p className="text-sm text-ink leading-relaxed">{event.description}</p>
+          )}
+          {price && (
+            <div className="flex items-baseline gap-2 border-t border-cambridge/10 pt-4">
+              <span className="label-caps text-ink-light">Price per person</span>
+              <span className="font-serif text-2xl text-oxford-blue">{price}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Event Assets */}
+        {event.assets && event.assets.length > 0 && (
+          <div className="space-y-2">
+            {event.assets.map(asset => (
+              <a
+                key={asset.id}
+                href={asset.file_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="club-card p-4 flex items-center gap-4 hover:shadow-card-hover transition group"
+              >
+                <div className="w-10 h-10 rounded-sm bg-red-50 border border-red-200/60 flex items-center justify-center flex-shrink-0">
+                  {asset.mime_type?.startsWith('image/') ? (
+                    <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  ) : (
+                    <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                    </svg>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-serif text-oxford-blue text-base font-normal group-hover:text-cambridge-muted transition">{asset.file_name || asset.type}</p>
+                  <p className="label-caps text-ink-light mt-0.5">
+                    {asset.mime_type === 'application/pdf' ? 'PDF' : asset.mime_type?.startsWith('image/') ? 'Image' : asset.mime_type?.split('/')[1]?.toUpperCase() ?? 'File'}
+                  </p>
+                </div>
+                <svg className="w-5 h-5 text-ink-light group-hover:text-cambridge transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </a>
+            ))}
+          </div>
+        )}
+
+        {/* Booking form */}
+        <div className="club-card overflow-hidden">
+          <div className="bg-oxford-blue border-b border-cambridge/30 px-5 py-4">
+            <h2 className="font-serif text-ivory font-normal text-lg">Book Tickets</h2>
+          </div>
+
+          {showSuccess ? (
+            <div className="p-6 flex items-center gap-3 text-ink">
+              <svg className="w-5 h-5 text-cambridge flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              <p className="text-sm">Booking request sent. We'll be in touch to confirm shortly.</p>
+            </div>
+          ) : (
+            <form className="p-5 space-y-4" onSubmit={handleSubmit}>
+
+              {/* Member info or guest fields */}
+              {isLoggedIn ? (
+                <div className="bg-ivory-warm border border-cambridge/20 rounded-sm px-4 py-3">
+                  <p className="label-caps text-ink-light mb-1">Booking as</p>
+                  <p className="font-serif text-oxford-blue">{auth.member!.full_name}</p>
+                  <p className="text-xs text-ink-light mt-0.5">{auth.member!.email}</p>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <label className="label-caps text-ink-light block mb-2">Your Name *</label>
+                    <input
+                      type="text"
+                      required
+                      value={guestName}
+                      onChange={e => setGuestName(e.target.value)}
+                      className="club-input"
+                      placeholder="John Smith"
+                    />
+                  </div>
+                  <div>
+                    <label className="label-caps text-ink-light block mb-2">Email Address *</label>
+                    <input
+                      type="email"
+                      required
+                      value={guestEmail}
+                      onChange={e => setGuestEmail(e.target.value)}
+                      className="club-input"
+                      placeholder="john@example.com"
+                    />
+                  </div>
+                </>
+              )}
+
+              {!isLoggedIn && (
+                <div>
+                  <label className="label-caps text-ink-light block mb-2">Phone Number</label>
+                  <input
+                    type="tel"
+                    value={guestPhone}
+                    onChange={e => setGuestPhone(e.target.value)}
+                    className="club-input"
+                    placeholder="+44 7700 900123"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="label-caps text-ink-light block mb-2">Number of Guests</label>
+                <select
+                  className="club-input"
+                  value={guestCount}
+                  onChange={e => setGuestCount(Number(e.target.value))}
+                >
+                  {[1,2,3,4,5,6].map(n => (
+                    <option key={n} value={n}>{n === 1 ? '1 (Just me)' : n}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="label-caps text-ink-light block mb-2">Special Requests</label>
+                <textarea
+                  value={specialRequests}
+                  onChange={e => setSpecialRequests(e.target.value)}
+                  className="club-input"
+                  rows={3}
+                  placeholder="Dietary requirements, seating preferences, etc."
+                />
+              </div>
+
+              {submitError && (
+                <p className="text-red-400 text-sm border-l-2 border-red-400/60 pl-3">{submitError}</p>
+              )}
+
+              <button type="submit" className="btn-primary" disabled={submitting}>
+                {submitting ? 'Submitting…' : 'Request Booking'}
+              </button>
+            </form>
+          )}
+        </div>
+
+      </div>
+    </div>
+  )
+}

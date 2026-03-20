@@ -17,13 +17,13 @@ export interface Member {
 
 export interface Event {
   id: string
+  short_id: number
+  slug: string
   title: string
   event_date: string | null
   event_type: 'lunch' | 'dinner' | 'lunch_dinner' | 'meeting' | 'special'
   description?: string | null
   price?: number | null
-  pdf_url?: string | null
-  pdf_name?: string | null
 }
 
 export interface DiningReservation {

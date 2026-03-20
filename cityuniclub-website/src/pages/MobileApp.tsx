@@ -13,20 +13,20 @@ const AndroidIcon = () => (
 )
 
 const Feature: React.FC<{ icon: React.ReactNode; title: string; description: string }> = ({ icon, title, description }) => (
-  <div className="flex gap-4">
-    <div className="w-10 h-10 rounded-full bg-cambridge/20 flex items-center justify-center flex-shrink-0 text-cambridge-light">
+  <div className="club-card p-4 flex gap-4">
+    <div className="w-10 h-10 rounded-full bg-cambridge/20 flex items-center justify-center flex-shrink-0 text-cambridge-muted">
       {icon}
     </div>
     <div>
-      <h3 className="font-serif text-ivory text-base font-normal mb-1">{title}</h3>
-      <p className="text-ivory/60 text-sm leading-relaxed">{description}</p>
+      <h3 className="font-serif text-oxford-blue text-base font-normal mb-1">{title}</h3>
+      <p className="text-ink-mid text-sm leading-relaxed">{description}</p>
     </div>
   </div>
 )
 
 
 export const MobileApp: React.FC = () => (
-  <div className="bg-navy-deep pb-20">
+  <div className="pb-20">
 
     {/* Header */}
     <div className="bg-cambridge/15 pt-7 pb-6 px-4 border-b border-cambridge/20 text-center">

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { IconNews } from '../icons'
 import { api, ClubNews } from '../services/api'
 
@@ -20,7 +21,7 @@ export const News: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-navy-deep flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-ivory text-center">
           <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-cambridge mx-auto mb-4"></div>
           <p className="label-caps text-ivory/40">Loading</p>
@@ -30,7 +31,7 @@ export const News: React.FC = () => {
   }
 
   return (
-    <div className="bg-navy-deep">
+    <div className="">
       {/* Header */}
       <div className="bg-cambridge/15 pt-7 pb-5 px-4 border-b border-cambridge/20">
         <div className="flex items-center justify-center gap-2 text-ivory">
@@ -58,17 +59,17 @@ export const News: React.FC = () => {
               </h3>
 
               {/* Content */}
-              <p className="text-ink-mid text-sm leading-relaxed mb-3 line-clamp-3 flex-1">
+              <p className="text-ink-mid text-sm leading-relaxed mb-3 flex-1 line-clamp-3">
                 {item.content}
               </p>
 
               {/* Read More */}
-              <button className="flex items-center space-x-1 mt-auto">
+              <Link to={`/news/${item.id}`} className="flex items-center space-x-1 mt-auto">
                 <span className="label-caps text-cambridge-muted hover:text-oxford-blue transition">Read More</span>
                 <svg className="w-3 h-3 text-cambridge-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-              </button>
+              </Link>
             </div>
           ))}
         </div>
