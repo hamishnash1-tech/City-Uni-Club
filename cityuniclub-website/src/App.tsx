@@ -49,7 +49,6 @@ const TabBar: React.FC = () => {
                 isActive ? 'text-cambridge' : 'text-ivory hover:text-cambridge'
               }`}
             >
-              {tab.icon}
               <span className="font-cormorant text-sm tracking-wide mt-1">{tab.label}</span>
             </Link>
           )
