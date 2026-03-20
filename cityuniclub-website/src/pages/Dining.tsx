@@ -29,7 +29,7 @@ export const Dining: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState<'book' | 'menu'>('book')
+  const [activeTab, setActiveTab] = useState<'book' | 'breakfast' | 'lunch'>('book')
 
   const breakfastTimes = ['09:00', '09:30', '10:00', '10:30', '11:00']
   const lunchTimes = ['12:00', '12:30', '13:00', '13:30', '14:00', '14:30']
@@ -94,7 +94,7 @@ export const Dining: React.FC = () => {
   const puddings = menuItems.filter(item => item.category === 'Puddings')
 
   return (
-    <div className="bg-navy-deep">
+    <div className="">
       {/* Header */}
       <div className="bg-cambridge/15 pt-7 pb-5 px-4 border-b border-cambridge/20">
         <div className="flex items-center justify-center gap-2 mb-4 text-ivory">
@@ -102,27 +102,30 @@ export const Dining: React.FC = () => {
           <h1 className="font-serif text-2xl font-normal text-ivory">Dining</h1>
         </div>
 
-        <div className="relative flex max-w-md mx-auto border border-cambridge/20 rounded-sm p-1">
+        <div className="relative flex max-w-xl mx-auto border border-cambridge/20 rounded-sm p-1">
           <div
-            className="absolute top-1 bottom-1 bg-cambridge/25 rounded-sm transition-transform duration-300 ease-out"
-            style={{ left: '4px', width: 'calc(50% - 4px)', transform: activeTab === 'book' ? 'translateX(0)' : 'translateX(100%)' }}
+            className="absolute top-1 bottom-1 bg-cambridge/25 rounded-sm transition-all duration-300 ease-out"
+            style={{
+              left: '4px',
+              width: 'calc(33.333% - 3px)',
+              transform: activeTab === 'book' ? 'translateX(0)' : activeTab === 'breakfast' ? 'translateX(100%)' : 'translateX(200%)',
+            }}
           />
-          <button
-            onClick={() => setActiveTab('book')}
-            className={`relative flex-1 py-2 px-4 text-sm transition-colors duration-200 rounded-sm ${
-              activeTab === 'book' ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
-            }`}
-          >
-            <span className="label-caps">Book a Table</span>
-          </button>
-          <button
-            onClick={() => setActiveTab('menu')}
-            className={`relative flex-1 py-2 px-4 text-sm transition-colors duration-200 rounded-sm ${
-              activeTab === 'menu' ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
-            }`}
-          >
-            <span className="label-caps">View Menu</span>
-          </button>
+          {([
+            { id: 'book', label: 'Book a Table' },
+            { id: 'breakfast', label: 'Breakfast' },
+            { id: 'lunch', label: 'Lunch & Dinner' },
+          ] as const).map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`relative flex-1 py-2 px-2 text-sm transition-colors duration-200 rounded-sm ${
+                activeTab === tab.id ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
+              }`}
+            >
+              <span className="label-caps">{tab.label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
@@ -327,8 +330,41 @@ export const Dining: React.FC = () => {
               {isSubmitting ? 'Submitting...' : 'Request Reservation'}
             </button>
           </form>
+        ) : activeTab === 'breakfast' ? (
+          <div className="max-w-2xl mx-auto">
+            <div className="club-card overflow-hidden">
+              <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
+                <p className="label-caps text-cambridge-light/60 mb-1">Morning</p>
+                <h2 className="font-serif text-ivory text-xl font-normal">Breakfast Menu</h2>
+              </div>
+              <div className="px-6 py-4">
+                <p className="text-sm text-ink-mid italic mb-5">All breakfasts include Tea, Coffee, Juice and Toast</p>
+                <div className="divide-y divide-cambridge/10">
+                  {[
+                    { name: 'Full English Breakfast', description: 'Egg, Bacon, Sausages, Tomatoes, Mushrooms, Black Pudding and Hash Browns (Beans optional)', price: '£24.50' },
+                    { name: 'Continental Breakfast', description: '', price: '£14.50' },
+                    { name: 'Vegetarian Breakfast', description: 'Pre-order required', price: '£18.50' },
+                    { name: 'Smoked Salmon & Scrambled Eggs', description: '', price: '£18.50' },
+                    { name: 'Bacon or Sausage Sandwich', description: '', price: '£8.50' },
+                  ].map((item, i) => (
+                    <div key={i} className="flex items-baseline justify-between py-3 gap-4">
+                      <div>
+                        <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
+                        {item.description && <p className="text-xs text-ink-mid mt-0.5">{item.description}</p>}
+                      </div>
+                      <span className="font-serif text-oxford-blue flex-shrink-0">{item.price}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="space-y-10">
+            <div className="club-card p-4 border-l-2 border-cambridge/50">
+              <p className="text-sm text-ink-mid italic">Sample menu — dishes change regularly depending on seasonal availability. Please contact us for the current menu.</p>
+            </div>
+
             {/* Starters */}
             <div className="club-card overflow-hidden">
               <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">

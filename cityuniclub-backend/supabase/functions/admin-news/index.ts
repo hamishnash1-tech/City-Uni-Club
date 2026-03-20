@@ -1,4 +1,4 @@
-// v2
+// v1
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -19,7 +19,6 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
 
-    // Verify caller is an authenticated admin via their JWT
     const authHeader = req.headers.get('Authorization')
     if (!authHeader?.startsWith('Bearer ')) {
       return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
@@ -34,57 +33,34 @@ serve(async (req: Request) => {
 
     const url = new URL(req.url)
     const id = url.searchParams.get('id')
-    const slug = url.searchParams.get('slug')
 
     if (req.method === 'GET') {
-      if (id || slug) {
-        const eventQuery = db.from('events').select('*')
-        const eventResult = await (slug ? eventQuery.eq('slug', slug) : eventQuery.eq('id', id!)).single()
-        if (eventResult.error) throw eventResult.error
-        const eventId = eventResult.data.id
-        const [bookingsResult, pdfsResult] = await Promise.all([
-          db.from('event_bookings')
-            .select('*, members(full_name, email, membership_number)')
-            .eq('event_id', eventId)
-            .order('created_at', { ascending: false }),
-          db.from('event_assets')
-            .select('*')
-            .eq('event_id', eventId)
-            .order('created_at', { ascending: true }),
-        ])
-        return new Response(JSON.stringify({ event: eventResult.data, bookings: bookingsResult.data ?? [], pdfs: pdfsResult.data ?? [] }), {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        })
-      }
-      const today = new Date().toISOString().split('T')[0]
       const { data, error } = await db
-        .from('events')
+        .from('club_news')
         .select('*')
-        .or(`event_date.gte.${today},is_tba.eq.true`)
-        .order('is_tba', { ascending: true })
-        .order('event_date', { ascending: true, nullsFirst: false })
+        .order('published_date', { ascending: false })
       if (error) throw error
-      return new Response(JSON.stringify({ events: data }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ news: data }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     if (req.method === 'POST') {
       const body = await req.json()
-      const { data, error } = await db.from('events').insert([body]).select().single()
+      const { data, error } = await db.from('club_news').insert([body]).select().single()
       if (error) throw error
-      return new Response(JSON.stringify({ event: data }), { status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ article: data }), { status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     if (req.method === 'PUT') {
       if (!id) return new Response(JSON.stringify({ error: 'Missing id' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
       const body = await req.json()
-      const { data, error } = await db.from('events').update(body).eq('id', id).select().single()
+      const { data, error } = await db.from('club_news').update(body).eq('id', id).select().single()
       if (error) throw error
-      return new Response(JSON.stringify({ event: data }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      return new Response(JSON.stringify({ article: data }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     if (req.method === 'DELETE') {
       if (!id) return new Response(JSON.stringify({ error: 'Missing id' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
-      const { error } = await db.from('events').delete().eq('id', id)
+      const { error } = await db.from('club_news').delete().eq('id', id)
       if (error) throw error
       return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }

@@ -1,0 +1,3 @@
+ALTER TABLE event_bookings
+  ADD COLUMN IF NOT EXISTS guest_name  VARCHAR(255),
+  ADD COLUMN IF NOT EXISTS guest_phone VARCHAR(50);

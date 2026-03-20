@@ -77,7 +77,7 @@ export const LOIRequest: React.FC = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-navy-deep flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="club-card rounded-sm p-8 text-center max-w-md w-full">
           <div className="w-16 h-16 border-2 border-cambridge rounded-full flex items-center justify-center mx-auto mb-5">
             <svg className="w-7 h-7 text-cambridge" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +94,7 @@ export const LOIRequest: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-navy-deep pb-20">
+    <div className="min-h-screen pb-20">
       {/* Header */}
       <div className="bg-navy-deep sticky top-0 z-10 pt-12 pb-4 px-4 border-b border-white/10">
         <div className="flex items-center space-x-4">

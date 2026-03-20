@@ -104,14 +104,14 @@ object ApiService {
         val resp = client.newCall(req).execute()
         val respBody = resp.body?.string() ?: ""
         if (!resp.isSuccessful) {
-            val errMsg = try { gson.fromJson(respBody, HashHashMap::class.java)["error"] as? String } catch (_: Exception) { null }
+            val errMsg = try { gson.fromJson(respBody, HashMap::class.java)["error"] as? String } catch (_: Exception) { null }
             throw Exception(errMsg ?: respBody)
         }
         return respBody
     }
 
     private fun <T> parseList(json: String, key: String, cls: Class<T>): List<T> {
-        val map = gson.fromJson(json, HashHashMap::class.java)
+        val map = gson.fromJson(json, HashMap::class.java)
         val list = map[key] as? List<*> ?: return emptyList()
         return list.map { gson.fromJson(gson.toJson(it), cls) }
     }
@@ -157,7 +157,7 @@ object ApiService {
         if (mealOption != null) payload["meal_option"] = mealOption
         if (!specialRequests.isNullOrBlank()) payload["special_requests"] = specialRequests
         val headers = mapOf("x-session-token" to token)
-        return gson.fromJson(post("$API_BASE/events/book", payload, headers), HashHashMap::class.java)
+        return gson.fromJson(post("$API_BASE/events/book", payload, headers), HashMap::class.java)
     }
 
     // — News —

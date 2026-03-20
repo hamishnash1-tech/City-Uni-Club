@@ -61,6 +61,7 @@ fun AppNavigation(member: Member, token: String, displayName: String, onSetDispl
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(OxfordBlue)
+                        .navigationBarsPadding()
                         .padding(vertical = 4.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {

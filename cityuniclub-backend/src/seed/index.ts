@@ -140,8 +140,8 @@ const seedNews = [
     is_featured: true
   },
   {
-    title: 'Club Gin - every Friday at lunch',
-    content: 'Join us every Friday for our Club Gin promotion at lunch. Enjoy a selection of our Club Gin with our sommelier\'s recommendations.',
+    title: '1895 CUC London Dry Gin',
+    content: 'The City University Club is proud to serve our IWSC-winning 1895 CUC London Dry Gin, available exclusively with lunch bookings.',
     category: 'Special Offer' as const,
     published_date: '2026-02-01',
     is_featured: false

@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import AdminLayout from './components/AdminLayout'
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography } from '@mui/material'
 const LoginPage          = lazy(() => import('./pages/LoginPage'))
 const DashboardPage      = lazy(() => import('./pages/DashboardPage'))
 const EventsPage         = lazy(() => import('./pages/EventsPage'))
@@ -22,9 +23,33 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return user ? children : <Navigate to="/login" />
 }
 
+function SessionExpiredModal() {
+  const { sessionExpired, logout } = useAuth()
+  const navigate = useNavigate()
+
+  const handleSignIn = () => {
+    logout()
+    navigate('/login')
+  }
+
+  return (
+    <Dialog open={sessionExpired} disableEscapeKeyDown>
+      <DialogTitle>Session Expired</DialogTitle>
+      <DialogContent>
+        <Typography>Your session has expired. Please sign in again to continue.</Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button variant="contained" onClick={handleSignIn}>Sign In</Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
 function AppRoutes() {
   return (
     <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>Loading…</div>}>
+    <>
+    <SessionExpiredModal />
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route
@@ -39,13 +64,14 @@ function AppRoutes() {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="members" element={<MembersPage />} />
         <Route path="events" element={<EventsPage />} />
-        <Route path="events/:eventId" element={<EventDetailPage />} />
+        <Route path="events/:slug" element={<EventDetailPage />} />
         <Route path="dining" element={<DiningPage />} />
         <Route path="clubs" element={<ReciprocalClubsPage />} />
         <Route path="news" element={<NewsPage />} />
         <Route path="loi" element={<LoiPage />} />
       </Route>
     </Routes>
+    </>
     </Suspense>
   )
 }

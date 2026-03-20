@@ -86,7 +86,7 @@ const ReciprocalClubs: React.FC = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className="bg-navy-deep">
+      <div className="">
         <div className="bg-cambridge/15 pt-7 pb-5 px-4 border-b border-cambridge/20">
           <div className="flex items-center justify-center gap-2 text-ivory">
             <IconClubs />
@@ -171,7 +171,7 @@ const ReciprocalClubs: React.FC = () => {
   )
 
   return (
-    <div className="bg-navy-deep">
+    <div className="">
       <div className="bg-cambridge/15 pt-7 pb-5 border-b border-cambridge/20">
         <div className="max-w-2xl mx-auto px-4 relative flex items-center justify-center">
           {view !== 'regions' && (
@@ -205,7 +205,7 @@ const ReciprocalClubs: React.FC = () => {
           </div>
         )}
 
-        <div className="flex gap-2 mb-4">
+        <div className="club-card p-3 mb-4 flex gap-2">
           <div className="relative flex-1">
             <input
               type="text"
@@ -213,16 +213,16 @@ const ReciprocalClubs: React.FC = () => {
               onChange={e => setSearchInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
               placeholder="Search clubs by name or location..."
-              className="club-input-dark pl-9 text-sm py-2"
+              className="club-input pl-9 text-sm py-2"
             />
-            <svg className="w-4 h-4 text-ivory/30 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 text-ink-light absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
           </div>
           <button
             onClick={handleSearch}
             disabled={!searchInput.trim()}
-            className="px-4 py-2 bg-cambridge/20 hover:bg-cambridge/30 text-cambridge-light text-sm rounded-sm border border-cambridge/30 transition disabled:opacity-30 disabled:cursor-not-allowed label-caps"
+            className="px-4 py-2 bg-oxford-blue hover:bg-oxford-blue/90 text-ivory text-sm rounded-sm transition disabled:opacity-30 disabled:cursor-not-allowed label-caps"
           >
             Search
           </button>

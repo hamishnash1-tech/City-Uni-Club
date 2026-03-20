@@ -32,7 +32,11 @@ export const Home: React.FC = () => {
         {/* Decorative gold rule */}
         <div className="w-48 my-3 gold-rule"></div>
 
-        <p className="label-caps text-cambridge-light mb-10 tracking-widest">42 Crutched Friars · London EC3N 2AP</p>
+        <p className="label-caps text-cambridge-light mb-3 tracking-widest">42 Crutched Friars · London EC3N 2AP</p>
+        <div className="flex flex-col items-center gap-1 mb-10 text-sm text-ivory/60">
+          <a href="tel:+442071676682" className="hover:text-cambridge transition">0207 167 6682</a>
+          <a href="mailto:secretary@cityuniversityclub.co.uk" className="hover:text-cambridge transition">secretary@cityuniversityclub.co.uk</a>
+        </div>
 
         {/* Info Cards */}
         <div className="grid md:grid-cols-3 gap-4 max-w-3xl w-full">
@@ -65,15 +69,20 @@ export const Home: React.FC = () => {
         </div>
 
         {/* Member CTA */}
-        <div className="mt-10">
+        <div className="mt-10 flex flex-col items-center gap-3">
           {isAuthenticated ? (
             <a href="/reciprocal-clubs" className="btn-outline">
               Member Area
             </a>
           ) : (
-            <a href="/login" className="btn-outline">
-              Member Login
-            </a>
+            <>
+              <a href="/login" className="btn-outline">
+                Member Login
+              </a>
+              <a href="mailto:secretary@cityuniversityclub.co.uk?subject=Membership%20Application" className="label-caps text-cambridge-light/60 hover:text-cambridge-light transition text-xs tracking-widest">
+                Apply for Membership →
+              </a>
+            </>
           )}
         </div>
       </div>

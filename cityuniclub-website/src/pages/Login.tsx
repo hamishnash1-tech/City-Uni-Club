@@ -117,6 +117,15 @@ export const Login: React.FC = () => {
             Use the email address registered with your City University Club membership
           </p>
         </div>
+
+        <div className="mt-10 pt-8 border-t border-cambridge/15 text-center">
+          <p className="text-xs text-ivory/50">
+            Not yet a member?{' '}
+            <Link to="/join" className="text-cambridge/70 hover:text-cambridge transition underline underline-offset-2">
+              Request to join
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

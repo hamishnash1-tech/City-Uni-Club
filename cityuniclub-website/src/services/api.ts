@@ -25,12 +25,14 @@ export interface AuthResponse {
 
 export interface Event {
   id: string
+  slug: string
   title: string
   description: string | null
   event_type: string
   event_date: string
   price_per_person: number
   is_tba: boolean
+  assets?: { id: string; type: string; file_url: string; file_name: string | null; mime_type: string | null }[]
 }
 
 export interface ClubNews {
@@ -80,6 +82,41 @@ export const api = {
     if (!response.ok) throw new Error('Failed to fetch events')
     const data = await response.json()
     return data.events || []
+  },
+
+  async createEventBooking(
+    sessionToken: string | null,
+    booking: {
+      event_id: string
+      guest_count: number
+      special_requests?: string
+      guest_name?: string
+      guest_email?: string
+      guest_phone?: string
+    }
+  ): Promise<any> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (sessionToken) headers['x-session-token'] = sessionToken
+
+    const response = await fetch(`${API_BASE}/event-bookings`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(booking),
+    })
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to submit booking')
+    }
+
+    return response.json()
+  },
+
+  async getEventBySlug(slug: string): Promise<Event> {
+    const response = await fetch(`${API_BASE}/events?slug=${encodeURIComponent(slug)}`)
+    if (!response.ok) throw new Error('Failed to fetch event')
+    const data = await response.json()
+    return data.event
   },
 
   async getNews(): Promise<ClubNews[]> {
