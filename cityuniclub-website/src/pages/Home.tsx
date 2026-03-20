@@ -75,14 +75,14 @@ export const Home: React.FC = () => {
               Member Area
             </a>
           ) : (
-            <>
+            <div className="flex gap-3">
               <a href="/login" className="btn-outline">
                 Member Login
               </a>
-              <a href="mailto:secretary@cityuniversityclub.co.uk?subject=Membership%20Application" className="label-caps text-cambridge-light/60 hover:text-cambridge-light transition text-xs tracking-widest">
-                Apply for Membership →
+              <a href="/join" className="btn-outline" style={{ backgroundColor: 'rgba(250,247,242,0.0)' }}>
+                Apply for Membership
               </a>
-            </>
+            </div>
           )}
         </div>
       </div>

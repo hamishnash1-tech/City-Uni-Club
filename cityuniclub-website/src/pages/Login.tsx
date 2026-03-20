@@ -122,7 +122,7 @@ export const Login: React.FC = () => {
           <p className="text-xs text-ivory/50">
             Not yet a member?{' '}
             <Link to="/join" className="text-cambridge/70 hover:text-cambridge transition underline underline-offset-2">
-              Request to join
+              Apply for membership
             </Link>
           </p>
         </div>
