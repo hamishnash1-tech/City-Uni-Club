@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import * as bcrypt from 'https://deno.land/x/bcrypt@v0.4.1/mod.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -8,20 +9,14 @@ const corsHeaders = {
 
 async function authenticate(req: Request, supabaseClient: any) {
   const authHeader = req.headers.get('Authorization')
-  
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
-  }
-
+  if (!authHeader?.startsWith('Bearer ')) return null
   const token = authHeader.substring(7)
-
   const { data } = await supabaseClient
     .from('sessions')
     .select('member_id')
     .eq('token', token)
     .gt('expires_at', new Date().toISOString())
     .single()
-
   return data?.member_id || null
 }
 
@@ -31,9 +26,7 @@ serve(async (req: Request) => {
   }
 
   try {
-    if (req.method !== 'POST') {
-      throw new Error('Method not allowed')
-    }
+    if (req.method !== 'POST') throw new Error('Method not allowed')
 
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
@@ -41,68 +34,44 @@ serve(async (req: Request) => {
     )
 
     const member_id = await authenticate(req, supabaseClient)
-    
-    if (!member_id) {
-      throw new Error('Unauthorized')
-    }
+    if (!member_id) throw new Error('Unauthorized')
 
     const { current_password, new_password } = await req.json()
+    if (!current_password || !new_password) throw new Error('Current and new password required')
+    if (new_password.length < 8) throw new Error('Password must be at least 8 characters')
 
-    if (!current_password || !new_password) {
-      throw new Error('Current and new password required')
-    }
-
-    if (new_password.length < 6) {
-      throw new Error('Password must be at least 6 characters')
-    }
-
-    // Get current member - password is stored as plain text for now
     const { data: member, error: memberError } = await supabaseClient
       .from('members')
       .select('password_hash')
       .eq('id', member_id)
       .single()
 
-    if (memberError || !member) {
-      console.error('Member error:', memberError)
-      throw new Error('Member not found')
-    }
+    if (memberError || !member) throw new Error('Member not found')
 
-    // Simple password comparison (plain text for now)
-    // TODO: Implement proper bcrypt hashing when Deno bcrypt is available
-    if (current_password !== member.password_hash) {
-      throw new Error('Current password is incorrect')
-    }
+    const storedHash = member.password_hash as string
+    const isBcrypt = storedHash?.startsWith('$2')
+    const valid = isBcrypt
+      ? bcrypt.compareSync(current_password, storedHash)
+      : current_password === storedHash
 
-    // Update password (store as plain text for now)
+    if (!valid) throw new Error('Current password is incorrect')
+
+    const newHash = bcrypt.hashSync(new_password)
     const { error: updateError } = await supabaseClient
       .from('members')
-      .update({ 
-        password_hash: new_password,
-        updated_at: new Date().toISOString()
-      })
+      .update({ password_hash: newHash, updated_at: new Date().toISOString() })
       .eq('id', member_id)
 
-    if (updateError) {
-      console.error('Update error:', updateError)
-      throw updateError
-    }
+    if (updateError) throw updateError
 
     return new Response(
       JSON.stringify({ message: 'Password changed successfully' }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   } catch (error: any) {
-    console.error('Change password error:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: error.message === 'Unauthorized' ? 401 : 400
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: error.message === 'Unauthorized' ? 401 : 400 }
     )
   }
 })

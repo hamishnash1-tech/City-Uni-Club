@@ -78,16 +78,34 @@ struct MoreView: View {
                 .padding(.top, 16)
                 .padding(.bottom, 12)
 
-            Map(initialPosition: .region(MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: 51.5115, longitude: -0.0793),
-                latitudinalMeters: 400,
-                longitudinalMeters: 400
-            ))) {
-                Marker("City University Club", coordinate: CLLocationCoordinate2D(latitude: 51.5115, longitude: -0.0793))
-                    .tint(Color.oxfordBlue)
+            Button {
+                let url = URL(string: "maps://?q=City+University+Club&ll=51.5115,-0.0793")!
+                UIApplication.shared.open(url)
+            } label: {
+                ZStack(alignment: .bottomTrailing) {
+                    Map(initialPosition: .region(MKCoordinateRegion(
+                        center: CLLocationCoordinate2D(latitude: 51.5115, longitude: -0.0793),
+                        latitudinalMeters: 400,
+                        longitudinalMeters: 400
+                    ))) {
+                        Marker("City University Club", coordinate: CLLocationCoordinate2D(latitude: 51.5115, longitude: -0.0793))
+                            .tint(Color.oxfordBlue)
+                    }
+                    .frame(height: 160)
+                    .clipShape(Rectangle())
+                    .disabled(true)
+
+                    Label("Open in Maps", systemImage: "map.fill")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.oxfordBlue)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 6))
+                        .padding(8)
+                }
             }
-            .frame(height: 160)
-            .clipShape(Rectangle())
+            .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .top, spacing: 16) {

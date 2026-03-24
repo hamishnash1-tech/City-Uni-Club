@@ -59,11 +59,16 @@ class APIService {
             request.httpBody = try JSONEncoder().encode(body)
         }
 
+        print("[API] \(method) \(url.absoluteString)")
+
         let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
+            print("[API] Error: no HTTP response for \(method) \(url.absoluteString)")
             throw APIError.noData
         }
+
+        print("[API] \(httpResponse.statusCode) \(method) \(url.absoluteString)")
 
         switch httpResponse.statusCode {
         case 200...299:
@@ -74,17 +79,21 @@ class APIService {
         case 404:
             throw APIError.httpError(statusCode: httpResponse.statusCode, message: "Not found")
         case 500...599:
+            print("[API] Server error body: \(String(data: data, encoding: .utf8) ?? "<non-utf8>")")
             throw APIError.serverError
         default:
             let serverMsg = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])
                 .flatMap { $0["message"] as? String ?? $0["error"] as? String }
                 ?? "Request failed (\(httpResponse.statusCode))"
+            print("[API] Error body: \(String(data: data, encoding: .utf8) ?? "<non-utf8>")")
             throw APIError.httpError(statusCode: httpResponse.statusCode, message: serverMsg)
         }
 
         do {
             return try JSONDecoder().decode(T.self, from: data)
         } catch {
+            print("[API] Decode error for \(method) \(url.absoluteString): \(error)")
+            print("[API] Response body: \(String(data: data, encoding: .utf8) ?? "<non-utf8>")")
             throw APIError.decodingError
         }
     }
@@ -113,11 +122,16 @@ class APIService {
             request.httpBody = try JSONEncoder().encode(body)
         }
 
-        let (_, response) = try await URLSession.shared.data(for: request)
+        print("[API] \(method) \(url.absoluteString)")
+
+        let (data, response) = try await URLSession.shared.data(for: request)
 
         guard let httpResponse = response as? HTTPURLResponse else {
+            print("[API] Error: no HTTP response for \(method) \(url.absoluteString)")
             throw APIError.noData
         }
+
+        print("[API] \(httpResponse.statusCode) \(method) \(url.absoluteString)")
 
         switch httpResponse.statusCode {
         case 200...299:
@@ -128,8 +142,10 @@ class APIService {
         case 404:
             throw APIError.httpError(statusCode: httpResponse.statusCode, message: "Not found")
         case 500...599:
+            print("[API] Server error body: \(String(data: data, encoding: .utf8) ?? "<non-utf8>")")
             throw APIError.serverError
         default:
+            print("[API] Error body: \(String(data: data, encoding: .utf8) ?? "<non-utf8>")")
             throw APIError.httpError(statusCode: httpResponse.statusCode, message: "Request failed")
         }
     }

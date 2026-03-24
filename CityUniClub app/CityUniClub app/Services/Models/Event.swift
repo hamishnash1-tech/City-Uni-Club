@@ -12,10 +12,10 @@ struct Event: Codable, Identifiable {
     let title: String
     let description: String?
     let eventType: String
-    let eventDate: String
+    let eventDate: String?
     let lunchTime: String?
     let dinnerTime: String?
-    let pricePerPerson: Double
+    let pricePerPerson: Double?
     let maxCapacity: Int?
     let isTba: Bool
     let isActive: Bool
@@ -35,9 +35,7 @@ struct Event: Codable, Identifiable {
     }
     
     var displayDate: String {
-        if isTba {
-            return "To Be Announced"
-        }
+        guard let eventDate = eventDate, !isTba else { return "To Be Announced" }
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         if let date = formatter.date(from: eventDate) {
@@ -50,14 +48,10 @@ struct Event: Codable, Identifiable {
     
     var displayDateTime: String {
         switch eventType {
-        case "lunch":
-            return "\(displayDate) · 12:30 PM"
-        case "dinner":
-            return "\(displayDate) · 7:00 PM"
-        case "lunch_dinner":
-            return "\(displayDate) · 12:30 PM & 7:00 PM"
-        default:
-            return displayDate
+        case "lunch":       return "\(displayDate) · 12:30 PM"
+        case "dinner":      return "\(displayDate) · 7:00 PM"
+        case "lunch_dinner": return "\(displayDate) · 12:30 PM & 7:00 PM"
+        default:            return displayDate
         }
     }
 }

@@ -1,5 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import * as bcrypt from 'https://deno.land/x/bcrypt@v0.4.1/mod.ts'
 import { SITE_URL, CLUB_NAME, CLUB_EMAIL, CLUB_PHONE, FROM_EMAIL } from '../_shared/constants.ts'
 
 const corsHeaders = {
@@ -97,9 +98,10 @@ serve(async (req) => {
 
       if (!resetRecord) throw new Error('Invalid or expired reset link')
 
+      const newHash = bcrypt.hashSync(new_password)
       await supabase
         .from('members')
-        .update({ password_hash: new_password })
+        .update({ password_hash: newHash })
         .eq('id', resetRecord.member_id)
 
       await supabase
