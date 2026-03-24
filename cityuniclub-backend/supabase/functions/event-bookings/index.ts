@@ -105,6 +105,13 @@ serve(async (req: Request) => {
       })
     }
 
+    if (event.is_tba) {
+      return new Response(JSON.stringify({ error: 'This event date is TBA — bookings are not yet open' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      })
+    }
+
     const total_price = (event.price_per_person ?? 0) * guest_count
 
     const { data: booking, error: bookingError } = await supabase

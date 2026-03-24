@@ -27,7 +27,7 @@ struct DiningView: View {
                     .padding(.bottom, 20)
                 
                 // Meal Type Toggle - Cambridge Blue
-                HStack(spacing: 0) {
+                HStack(spacing: 10) {
                     mealTypeButton("Breakfast")
                     mealTypeButton("Lunch")
                 }
@@ -288,6 +288,7 @@ struct DiningView: View {
                 ])
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 20)
@@ -296,21 +297,23 @@ struct DiningView: View {
         )
         .padding(.horizontal, 20)
     }
-    
+
     // MARK: - Menu Section (No Prices)
     private func menuSection(title: String, items: [String]) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
                 .font(.system(size: 16, weight: .semibold, design: .serif))
                 .foregroundColor(.oxfordBlue)
-            
+
             ForEach(items, id: \.self) { item in
                 Text(item)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(.darkText)
                     .padding(.vertical, 2)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     // MARK: - Formatted Date

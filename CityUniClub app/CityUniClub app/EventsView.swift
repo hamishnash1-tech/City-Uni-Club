@@ -116,12 +116,26 @@ struct EventsView: View {
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "yyyy-MM-dd"
                 
-                let upcomingEvents = loadedEvents.filter { event in
-                    if let eventDate = dateFormatter.date(from: event.eventDate) {
+                let upcomingEvents = loadedEvents
+                    .filter { event in
+                        if event.isTba { return true }
+                        guard let dateString = event.eventDate,
+                              let eventDate = dateFormatter.date(from: dateString) else {
+                            return true
+                        }
                         return eventDate >= today
                     }
-                    return false
-                }
+                    .sorted { a, b in
+                        // TBA events always go to the end
+                        let aIsTba = a.isTba || a.eventDate == nil
+                        let bIsTba = b.isTba || b.eventDate == nil
+                        if aIsTba && bIsTba { return false }
+                        if aIsTba { return false }
+                        if bIsTba { return true }
+                        guard let aDate = dateFormatter.date(from: a.eventDate!),
+                              let bDate = dateFormatter.date(from: b.eventDate!) else { return false }
+                        return aDate < bDate
+                    }
                 
                 await MainActor.run {
                     self.events = upcomingEvents
@@ -271,13 +285,13 @@ struct EventsView: View {
                         }
                         
                         // Price Summary
-                        if let event = selectedEvent, event.pricePerPerson > 0 {
+                        if let event = selectedEvent, let price = event.pricePerPerson, price > 0 {
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack {
                                     Text("Ticket Price:")
                                         .font(.system(size: 15))
                                     Spacer()
-                                    Text("£\(Int(event.pricePerPerson)) per person")
+                                    Text("£\(Int(price)) per person")
                                         .font(.system(size: 15, weight: .semibold))
                                         .foregroundColor(.oxfordBlue)
                                 }
@@ -286,7 +300,7 @@ struct EventsView: View {
                                     Text("Total:")
                                         .font(.system(size: 18, weight: .bold))
                                     Spacer()
-                                    Text("£\(Int(event.pricePerPerson * Double(1 + guestCount)))")
+                                    Text("£\(Int(price * Double(1 + guestCount)))")
                                         .font(.system(size: 22, weight: .bold))
                                         .foregroundColor(.oxfordBlue)
                                 }
@@ -452,9 +466,6 @@ struct EventCard: View {
         VStack(alignment: .leading, spacing: 0) {
             // Top accent bar with event type
             HStack {
-                Image(systemName: eventTypeIcon)
-                    .foregroundColor(.white)
-                    .font(.system(size: 14))
                 Text(eventTypeString)
                     .font(.system(size: 12, weight: .medium))
                     .foregroundColor(.white)
@@ -493,44 +504,59 @@ struct EventCard: View {
                     Spacer()
                 }
 
-                // Show time options indicator for lunch/dinner events
-                if event.eventType == "lunch_dinner" {
-                    HStack(spacing: 12) {
-                        Label("Lunch 12:30", systemImage: "sun.max.fill")
-                            .font(.system(size: 12))
-                            .foregroundColor(.orange)
-                        Label("Dinner 19:00", systemImage: "moon.stars.fill")
-                            .font(.system(size: 12))
-                            .foregroundColor(.indigo)
+                HStack(spacing: 8) {
+                    Image(systemName: "sterlingsign.circle")
+                        .font(.system(size: 14))
+                        .foregroundColor(.cambridgeBlue)
+                    if let price = event.pricePerPerson, price > 0 {
+                        Text("£\(Int(price)) per person")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.secondaryText)
+                    } else {
+                        Text("£TBA")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.secondaryText)
                     }
-                    .padding(.top, 4)
+                    Spacer()
                 }
 
                 Divider()
                     .background(Color.gray.opacity(0.2))
 
-                // Book Tickets Button
-                Button(action: onBook) {
+                if event.isTba {
                     HStack {
                         Spacer()
-                        Image(systemName: "ticket.fill")
-                            .font(.system(size: 16))
-                        Text("Book Tickets")
-                            .font(.system(size: 16, weight: .semibold))
+                        Text("Bookings open when date is confirmed")
+                            .font(.system(size: 13))
+                            .foregroundColor(.secondaryText)
+                            .multilineTextAlignment(.center)
                         Spacer()
                     }
-                    .foregroundColor(.white)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.oxfordBlue)
-                    )
+                    .padding(.vertical, 10)
+                } else {
+                    // Book Tickets Button
+                    Button(action: onBook) {
+                        HStack {
+                            Spacer()
+                            Image(systemName: "ticket.fill")
+                                .font(.system(size: 16))
+                            Text("Book Tickets")
+                                .font(.system(size: 16, weight: .semibold))
+                            Spacer()
+                        }
+                        .foregroundColor(.white)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.oxfordBlue)
+                        )
+                    }
+                    .scaleEffect(isHovered ? 0.98 : 1.0)
+                    .animation(.spring(response: 0.3), value: isHovered)
+                    .onLongPressGesture(minimumDuration: .infinity, maximumDistance: .infinity, pressing: { pressing in
+                        isHovered = pressing
+                    }, perform: { })
                 }
-                .scaleEffect(isHovered ? 0.98 : 1.0)
-                .animation(.spring(response: 0.3), value: isHovered)
-                .onLongPressGesture(minimumDuration: .infinity, maximumDistance: .infinity, pressing: { pressing in
-                    isHovered = pressing
-                }, perform: { })
             }
             .padding(16)
         }
@@ -549,17 +575,6 @@ struct EventCard: View {
         case "meeting": return "MEETING"
         case "special": return "SPECIAL EVENT"
         default: return "EVENT"
-        }
-    }
-    
-    private var eventTypeIcon: String {
-        switch event.eventType {
-        case "lunch": return "sun.max.fill"
-        case "dinner": return "moon.stars.fill"
-        case "lunch_dinner": return "sun.and.horizon.fill"
-        case "meeting": return "person.2.fill"
-        case "special": return "star.fill"
-        default: return "calendar"
         }
     }
     

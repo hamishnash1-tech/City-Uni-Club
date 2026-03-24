@@ -6,6 +6,9 @@ struct MoreView: View {
     @State private var showReciprocalClubs = false
     @State private var showClubNews = false
     @State private var showMembershipProfile = false
+    @State private var newsItems: [ClubNews] = []
+
+    private let apiService = APIService.shared
 
     var member: Member? {
         authManager.currentMember
@@ -41,22 +44,26 @@ struct MoreView: View {
                         }
 
                         // RECIPROCAL CLUBS - Button to Page
-                        reciprocalClubsButton
-                            .onTapGesture {
-                                showReciprocalClubs = true
-                            }
-                            .navigationDestination(isPresented: $showReciprocalClubs) {
-                                ReciprocalClubsView()
-                            }
+                        Button {
+                            showReciprocalClubs = true
+                        } label: {
+                            reciprocalClubsButton
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .navigationDestination(isPresented: $showReciprocalClubs) {
+                            ReciprocalClubsView()
+                        }
 
                         // CLUB NEWS - Button to Page
-                        clubNewsButton
-                            .onTapGesture {
-                                showClubNews = true
-                            }
-                            .navigationDestination(isPresented: $showClubNews) {
-                                ClubNewsView()
-                            }
+                        Button {
+                            showClubNews = true
+                        } label: {
+                            clubNewsButton
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .navigationDestination(isPresented: $showClubNews) {
+                            ClubNewsView()
+                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 100)
@@ -64,6 +71,13 @@ struct MoreView: View {
             }
             .navigationTitle("")
             .navigationBarHidden(true)
+            .onAppear {
+                Task {
+                    if let items = try? await apiService.getNews() {
+                        await MainActor.run { newsItems = items }
+                    }
+                }
+            }
         }
     }
     }
@@ -78,16 +92,34 @@ struct MoreView: View {
                 .padding(.top, 16)
                 .padding(.bottom, 12)
 
-            Map(initialPosition: .region(MKCoordinateRegion(
-                center: CLLocationCoordinate2D(latitude: 51.5115, longitude: -0.0793),
-                latitudinalMeters: 400,
-                longitudinalMeters: 400
-            ))) {
-                Marker("City University Club", coordinate: CLLocationCoordinate2D(latitude: 51.5115, longitude: -0.0793))
-                    .tint(Color.oxfordBlue)
+            Button {
+                let url = URL(string: "maps://?q=City+University+Club&ll=51.5115,-0.0793")!
+                UIApplication.shared.open(url)
+            } label: {
+                ZStack(alignment: .bottomTrailing) {
+                    Map(initialPosition: .region(MKCoordinateRegion(
+                        center: CLLocationCoordinate2D(latitude: 51.5115, longitude: -0.0793),
+                        latitudinalMeters: 400,
+                        longitudinalMeters: 400
+                    ))) {
+                        Marker("City University Club", coordinate: CLLocationCoordinate2D(latitude: 51.5115, longitude: -0.0793))
+                            .tint(Color.oxfordBlue)
+                    }
+                    .frame(height: 160)
+                    .clipShape(Rectangle())
+                    .disabled(true)
+
+                    Label("Open in Maps", systemImage: "map.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(.oxfordBlue)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 9)
+                        .background(.ultraThinMaterial)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .padding(10)
+                }
             }
-            .frame(height: 160)
-            .clipShape(Rectangle())
+            .buttonStyle(.plain)
 
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .top, spacing: 16) {
@@ -238,14 +270,35 @@ struct MoreView: View {
     // MARK: - Club News Button
     private var clubNewsButton: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("NEWS")
-                .font(.system(size: 20, weight: .semibold, design: .serif))
-                .foregroundColor(.oxfordBlue)
+            HStack {
+                Text("NEWS")
+                    .font(.system(size: 20, weight: .semibold, design: .serif))
+                    .foregroundColor(.oxfordBlue)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.cambridgeBlue)
+            }
 
-            VStack(spacing: 12) {
-                newsItemPreview(title: "Dining Room open 23 February for Dinner", date: "February 2026")
-                newsItemPreview(title: "Free Gin Friday - every Friday at lunch", date: "Weekly")
-                newsItemPreview(title: "Sri Lankan Lunch - 25 February", date: "February 2026")
+            if newsItems.isEmpty {
+                Text("No news available")
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondaryText)
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(newsItems.prefix(3)) { item in
+                        newsItemPreview(title: item.title, date: item.formattedDate)
+                    }
+                }
+
+                if newsItems.count > 3 {
+                    Divider()
+                    Text("View All (\(newsItems.count))")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.cambridgeBlue)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top, 2)
+                }
             }
         }
         .padding()
@@ -266,19 +319,13 @@ struct MoreView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.oxfordBlue)
                     .lineLimit(2)
-
                 Text(date)
                     .font(.system(size: 12))
                     .foregroundColor(.secondaryText)
             }
-
             Spacer()
-
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12))
-                .foregroundColor(.cambridgeBlue)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 }
 

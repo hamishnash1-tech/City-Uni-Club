@@ -1,70 +1,50 @@
-// Follow Deno runtime
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import * as bcrypt from 'https://deno.land/x/bcrypt@v0.4.1/mod.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// Simple password verification using Supabase Auth
-// Passwords should be hashed using bcrypt before storing in members table
-async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  // For compatibility with existing bcrypt hashes
-  // We'll use a simple comparison for now
-  // In production, you'd want to use proper bcrypt verification
-  const encoder = new TextEncoder()
-  const passwordData = encoder.encode(password)
-  const hashData = encoder.encode(hash)
-  
-  // This is a simplified check - for production use proper bcrypt
-  // Since we can't import bcrypt reliably, we'll check if it matches
-  // For new projects, use Supabase Auth instead of custom password storage
-  return password.length > 0 && hash.length > 0
-}
-
 serve(async (req: Request) => {
-  // Handle CORS
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    // Only accept POST requests
-    if (req.method !== 'POST') {
-      throw new Error('Method not allowed')
-    }
+    if (req.method !== 'POST') throw new Error('Method not allowed')
 
     const { email, password, session_type } = await req.json()
+    if (!email || !password) throw new Error('Email and password required')
 
-    if (!email || !password) {
-      throw new Error('Email and password required')
-    }
-
-    // Create Supabase client with service role
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
 
-    // Get member by email
     const { data: member, error: memberError } = await supabaseClient
       .from('members')
       .select('id, email, password_hash, full_name, first_name, membership_number, membership_type, is_active')
-      .eq('email', email)
+      .eq('email', email.toLowerCase().trim())
       .eq('is_active', true)
       .single()
 
-    if (memberError || !member) {
-      throw new Error('Invalid email or password')
-    }
+    if (memberError || !member) throw new Error('Invalid email or password')
 
     const forwardedFor = req.headers.get('x-forwarded-for')
     const ipAddress = forwardedFor ? forwardedFor.split(',')[0].trim() : null
     const userAgent = req.headers.get('user-agent')
 
-    // Verify password (plain text comparison)
-    if (password !== member.password_hash) {
+    const storedHash = member.password_hash as string | null
+
+    if (!storedHash) {
+      throw new Error('No password set — please use "Forgot password" to set one')
+    }
+
+    const passwordValid = bcrypt.compareSync(password, storedHash)
+
+    if (!passwordValid) {
       await supabaseClient.from('audit_logs').insert({
         table_name: 'auth', operation: 'INSERT', record_id: member.id,
         new_data: { app: 'main', email, ip_address: ipAddress, user_agent: userAgent, success: false }
@@ -72,7 +52,6 @@ serve(async (req: Request) => {
       throw new Error('Invalid email or password')
     }
 
-    // Create session
     const token = crypto.randomUUID()
     const expiresAt = new Date()
     if (session_type === 'supersession') {
@@ -85,7 +64,7 @@ serve(async (req: Request) => {
       .from('sessions')
       .insert({
         member_id: member.id,
-        token: token,
+        token,
         device_info: userAgent,
         ip_address: ipAddress,
         expires_at: expiresAt.toISOString()
@@ -93,9 +72,7 @@ serve(async (req: Request) => {
       .select()
       .single()
 
-    if (sessionError) {
-      throw sessionError
-    }
+    if (sessionError) throw sessionError
 
     await supabaseClient.from('audit_logs').insert({
       table_name: 'auth', operation: 'INSERT', record_id: member.id,
@@ -117,18 +94,12 @@ serve(async (req: Request) => {
           expires_at: sessionData.expires_at
         }
       }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   } catch (error: any) {
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
     )
   }
 })

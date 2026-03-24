@@ -1,6 +1,7 @@
 import SwiftUI
 
-struct HomeView: View {
+struct MembershipCardView: View {
+    @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authManager: AuthManager
 
     var member: Member? { authManager.currentMember }
@@ -11,47 +12,37 @@ struct HomeView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Image("cuc-building")
-                    .resizable()
-                    .aspectRatio(contentMode: .fill)
-                    .ignoresSafeArea()
+        ZStack {
+            Image("cuc-building")
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .ignoresSafeArea()
 
-                Color.oxfordBlue.opacity(0.35)
-                    .ignoresSafeArea()
+            Color.oxfordBlue.opacity(0.55)
+                .ignoresSafeArea()
 
-                VStack(spacing: 0) {
-                    // Logo & Welcome
-                    VStack(spacing: 8) {
-                        Image("cuc-logo")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 80, height: 80)
-
-                        Text("Welcome")
-                            .font(.system(size: 16, weight: .regular))
-                            .foregroundColor(.cambridgeBlue)
-
-                        Text(member?.firstName ?? "Member")
-                            .font(.system(size: 32, weight: .light))
-                            .foregroundColor(.white)
-                    }
-                    .padding(.top, 50)
-                    .padding(.bottom, 20)
-
-                    Spacer()
-
-                    membershipCard
-                        .padding(.horizontal, 20)
-
-                    Spacer()
-                }
+            membershipCard
+                .padding(.horizontal, 24)
+                .onTapGesture { dismiss() }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .safeAreaInset(edge: .bottom) {
+            Button {
+                dismiss()
+            } label: {
+                Text("Close")
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 12)
+                    .background(Color.white.opacity(0.2))
+                    .clipShape(Capsule())
+                    .overlay(Capsule().strokeBorder(Color.white.opacity(0.4), lineWidth: 1))
             }
+            .padding(.bottom, 24)
         }
     }
 
-    // MARK: - Membership Card
     private var membershipCard: some View {
         VStack(spacing: 0) {
             HStack(alignment: .top, spacing: 12) {
@@ -107,8 +98,7 @@ struct HomeView: View {
                         .italic()
                 }
             }
-            .padding(.leading, 16)
-            .padding(.trailing, 16)
+            .padding(.horizontal, 16)
             .padding(.bottom, 16)
         }
         .frame(maxWidth: 380)
@@ -125,14 +115,6 @@ struct HomeView: View {
                     lineWidth: 2
                 )
         )
-        .shadow(color: Color(red: 0.2, green: 0.25, blue: 0.3).opacity(0.2), radius: 20, x: 0, y: 15)
-        .shadow(color: Color.white.opacity(0.6), radius: 5, x: -2, y: -2)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 2, y: 2)
-    }
-}
-
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomeView()
+        .shadow(color: Color(red: 0.2, green: 0.25, blue: 0.3).opacity(0.25), radius: 30, x: 0, y: 20)
     }
 }

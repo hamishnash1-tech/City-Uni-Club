@@ -114,17 +114,17 @@ export const EventDetail: React.FC = () => {
       <div className="max-w-2xl mx-auto px-4 py-8 space-y-8">
 
         {/* Event info */}
-        <div className="club-card p-5 space-y-4">
-          {event.description && (
-            <p className="text-sm text-ink leading-relaxed">{event.description}</p>
-          )}
-          {price && (
+        {(event.description || price || !event.is_tba) && (
+          <div className="club-card p-5 space-y-4">
+            {event.description && (
+              <p className="text-sm text-ink leading-relaxed">{event.description}</p>
+            )}
             <div className="flex items-baseline gap-2 border-t border-cambridge/10 pt-4">
               <span className="label-caps text-ink-light">Price per person</span>
-              <span className="font-serif text-2xl text-oxford-blue">{price}</span>
+              <span className="font-serif text-2xl text-oxford-blue">{price ?? 'TBA'}</span>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Event Assets */}
         {event.assets && event.assets.length > 0 && (
@@ -168,7 +168,11 @@ export const EventDetail: React.FC = () => {
             <h2 className="font-serif text-ivory font-normal text-lg">Book Tickets</h2>
           </div>
 
-          {showSuccess ? (
+          {event.is_tba ? (
+            <div className="p-6 text-center text-ink text-sm">
+              Bookings will open once the date is confirmed.
+            </div>
+          ) : showSuccess ? (
             <div className="p-6 flex items-center gap-3 text-ink">
               <svg className="w-5 h-5 text-cambridge flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -259,6 +263,7 @@ export const EventDetail: React.FC = () => {
             </form>
           )}
         </div>
+
 
       </div>
     </div>
