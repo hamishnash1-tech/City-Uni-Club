@@ -6,6 +6,9 @@ struct MoreView: View {
     @State private var showReciprocalClubs = false
     @State private var showClubNews = false
     @State private var showMembershipProfile = false
+    @State private var newsItems: [ClubNews] = []
+
+    private let apiService = APIService.shared
 
     var member: Member? {
         authManager.currentMember
@@ -68,6 +71,13 @@ struct MoreView: View {
             }
             .navigationTitle("")
             .navigationBarHidden(true)
+            .onAppear {
+                Task {
+                    if let items = try? await apiService.getNews() {
+                        await MainActor.run { newsItems = items }
+                    }
+                }
+            }
         }
     }
     }
@@ -260,14 +270,35 @@ struct MoreView: View {
     // MARK: - Club News Button
     private var clubNewsButton: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("NEWS")
-                .font(.system(size: 20, weight: .semibold, design: .serif))
-                .foregroundColor(.oxfordBlue)
+            HStack {
+                Text("NEWS")
+                    .font(.system(size: 20, weight: .semibold, design: .serif))
+                    .foregroundColor(.oxfordBlue)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(.cambridgeBlue)
+            }
 
-            VStack(spacing: 12) {
-                newsItemPreview(title: "Dining Room open 23 February for Dinner", date: "February 2026")
-                newsItemPreview(title: "Free Gin Friday - every Friday at lunch", date: "Weekly")
-                newsItemPreview(title: "Sri Lankan Lunch - 25 February", date: "February 2026")
+            if newsItems.isEmpty {
+                Text("No news available")
+                    .font(.system(size: 14))
+                    .foregroundColor(.secondaryText)
+            } else {
+                VStack(spacing: 12) {
+                    ForEach(newsItems.prefix(3)) { item in
+                        newsItemPreview(title: item.title, date: item.formattedDate)
+                    }
+                }
+
+                if newsItems.count > 3 {
+                    Divider()
+                    Text("View All (\(newsItems.count))")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.cambridgeBlue)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top, 2)
+                }
             }
         }
         .padding()
@@ -288,19 +319,13 @@ struct MoreView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.oxfordBlue)
                     .lineLimit(2)
-
                 Text(date)
                     .font(.system(size: 12))
                     .foregroundColor(.secondaryText)
             }
-
             Spacer()
-
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12))
-                .foregroundColor(.cambridgeBlue)
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 2)
     }
 }
 

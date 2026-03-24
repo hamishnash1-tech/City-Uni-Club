@@ -1,7 +1,6 @@
 import SwiftUI
 
 struct ClubNewsView: View {
-    @Environment(\.dismiss) private var dismiss
     @State private var newsItems: [ClubNews] = []
     @State private var isLoading = true
     @State private var showError = false
@@ -9,74 +8,47 @@ struct ClubNewsView: View {
     private let apiService = APIService.shared
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.oxfordBlue.ignoresSafeArea()
+        ZStack {
+            Color.oxfordBlue.ignoresSafeArea()
 
-                VStack(spacing: 0) {
-                    // Header
-                    HStack {
-                        Button { dismiss() } label: {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 18, weight: .semibold))
-                                .foregroundColor(.oxfordBlue)
-                        }
-                        Spacer()
-                        Text("Club News")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.oxfordBlue)
-                        Spacer()
-                        Image(systemName: "chevron.left")
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(.clear)
-                    }
-                    .padding()
-                    .background(Color.cardWhite)
-
-                    if isLoading {
-                        Spacer()
-                        ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                            .scaleEffect(1.5)
-                        Spacer()
-                    } else if showError {
-                        Spacer()
-                        VStack(spacing: 16) {
-                            Image(systemName: "exclamationmark.triangle")
-                                .font(.system(size: 48))
-                                .foregroundColor(.white.opacity(0.7))
-                            Text("Failed to load news")
-                                .foregroundColor(.white)
-                            Button("Retry") { loadNews() }
-                                .padding()
-                                .background(Color.cambridgeBlue)
-                                .cornerRadius(10)
-                                .foregroundColor(.white)
-                        }
-                        Spacer()
-                    } else if newsItems.isEmpty {
-                        Spacer()
-                        Text("No news available")
-                            .foregroundColor(.white.opacity(0.7))
-                        Spacer()
-                    } else {
-                        ScrollView {
-                            VStack(spacing: 16) {
-                                ForEach(newsItems) { item in
-                                    NavigationLink(destination: NewsDetailView(item: item)) {
-                                        newsCard(item: item)
-                                    }
-                                    .buttonStyle(.plain)
-                                }
+            if isLoading {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    .scaleEffect(1.5)
+            } else if showError {
+                VStack(spacing: 16) {
+                    Image(systemName: "exclamationmark.triangle")
+                        .font(.system(size: 48))
+                        .foregroundColor(.white.opacity(0.7))
+                    Text("Failed to load news")
+                        .foregroundColor(.white)
+                    Button("Retry") { loadNews() }
+                        .padding()
+                        .background(Color.cambridgeBlue)
+                        .cornerRadius(10)
+                        .foregroundColor(.white)
+                }
+            } else if newsItems.isEmpty {
+                Text("No news available")
+                    .foregroundColor(.white.opacity(0.7))
+            } else {
+                ScrollView {
+                    VStack(spacing: 16) {
+                        ForEach(newsItems) { item in
+                            NavigationLink(destination: NewsDetailView(item: item)) {
+                                newsCard(item: item)
                             }
-                            .padding(.horizontal)
-                            .padding(.vertical, 20)
-                            .padding(.bottom, 40)
+                            .buttonStyle(.plain)
                         }
                     }
+                    .padding(.horizontal)
+                    .padding(.vertical, 20)
+                    .padding(.bottom, 40)
                 }
             }
         }
+        .navigationTitle("Club News")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear { loadNews() }
     }
 
@@ -100,30 +72,37 @@ struct ClubNewsView: View {
     }
 
     private func newsCard(item: ClubNews) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(item.category)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(Capsule().fill(Color.cambridgeBlue))
-                Spacer()
-                Text(item.formattedDate)
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondaryText)
+        HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 10) {
+                HStack {
+                    Text(item.category)
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Capsule().fill(Color.cambridgeBlue))
+                    Spacer()
+                    Text(item.formattedDate)
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondaryText)
+                }
+
+                Text(item.title)
+                    .font(.system(size: 17, weight: .semibold, design: .serif))
+                    .foregroundColor(.oxfordBlue)
+                    .lineSpacing(2)
+
+                Text(item.content)
+                    .font(.system(size: 14))
+                    .foregroundColor(.darkText)
+                    .lineSpacing(3)
+                    .lineLimit(3)
             }
 
-            Text(item.title)
-                .font(.system(size: 17, weight: .semibold, design: .serif))
-                .foregroundColor(.oxfordBlue)
-                .lineSpacing(2)
-
-            Text(item.content)
-                .font(.system(size: 14))
-                .foregroundColor(.darkText)
-                .lineSpacing(3)
-                .lineLimit(3)
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.cambridgeBlue)
+                .padding(.top, 4)
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
