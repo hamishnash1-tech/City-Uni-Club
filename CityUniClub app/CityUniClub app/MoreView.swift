@@ -41,22 +41,26 @@ struct MoreView: View {
                         }
 
                         // RECIPROCAL CLUBS - Button to Page
-                        reciprocalClubsButton
-                            .onTapGesture {
-                                showReciprocalClubs = true
-                            }
-                            .navigationDestination(isPresented: $showReciprocalClubs) {
-                                ReciprocalClubsView()
-                            }
+                        Button {
+                            showReciprocalClubs = true
+                        } label: {
+                            reciprocalClubsButton
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .navigationDestination(isPresented: $showReciprocalClubs) {
+                            ReciprocalClubsView()
+                        }
 
                         // CLUB NEWS - Button to Page
-                        clubNewsButton
-                            .onTapGesture {
-                                showClubNews = true
-                            }
-                            .navigationDestination(isPresented: $showClubNews) {
-                                ClubNewsView()
-                            }
+                        Button {
+                            showClubNews = true
+                        } label: {
+                            clubNewsButton
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                        .navigationDestination(isPresented: $showClubNews) {
+                            ClubNewsView()
+                        }
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 100)
@@ -96,13 +100,13 @@ struct MoreView: View {
                     .disabled(true)
 
                     Label("Open in Maps", systemImage: "map.fill")
-                        .font(.system(size: 11, weight: .medium))
+                        .font(.system(size: 14, weight: .semibold))
                         .foregroundColor(.oxfordBlue)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 5)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 9)
                         .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 6))
-                        .padding(8)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .padding(10)
                 }
             }
             .buttonStyle(.plain)

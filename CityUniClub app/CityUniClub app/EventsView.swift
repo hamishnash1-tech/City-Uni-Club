@@ -523,28 +523,40 @@ struct EventCard: View {
                 Divider()
                     .background(Color.gray.opacity(0.2))
 
-                // Book Tickets Button
-                Button(action: onBook) {
+                if event.isTba {
                     HStack {
                         Spacer()
-                        Image(systemName: "ticket.fill")
-                            .font(.system(size: 16))
-                        Text("Book Tickets")
-                            .font(.system(size: 16, weight: .semibold))
+                        Text("Bookings open when date is confirmed")
+                            .font(.system(size: 13))
+                            .foregroundColor(.secondaryText)
+                            .multilineTextAlignment(.center)
                         Spacer()
                     }
-                    .foregroundColor(.white)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color.oxfordBlue)
-                    )
+                    .padding(.vertical, 10)
+                } else {
+                    // Book Tickets Button
+                    Button(action: onBook) {
+                        HStack {
+                            Spacer()
+                            Image(systemName: "ticket.fill")
+                                .font(.system(size: 16))
+                            Text("Book Tickets")
+                                .font(.system(size: 16, weight: .semibold))
+                            Spacer()
+                        }
+                        .foregroundColor(.white)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.oxfordBlue)
+                        )
+                    }
+                    .scaleEffect(isHovered ? 0.98 : 1.0)
+                    .animation(.spring(response: 0.3), value: isHovered)
+                    .onLongPressGesture(minimumDuration: .infinity, maximumDistance: .infinity, pressing: { pressing in
+                        isHovered = pressing
+                    }, perform: { })
                 }
-                .scaleEffect(isHovered ? 0.98 : 1.0)
-                .animation(.spring(response: 0.3), value: isHovered)
-                .onLongPressGesture(minimumDuration: .infinity, maximumDistance: .infinity, pressing: { pressing in
-                    isHovered = pressing
-                }, perform: { })
             }
             .padding(16)
         }

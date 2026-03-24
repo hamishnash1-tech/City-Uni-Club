@@ -4,7 +4,6 @@ struct MembershipProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authManager: AuthManager
     @State private var showingLogoutAlert = false
-    @State private var showingEditProfile = false
 
     var member: Member? {
         authManager.currentMember
@@ -27,12 +26,6 @@ struct MembershipProfileView: View {
         }
         .navigationTitle("")
         .navigationBarHidden(true)
-        .sheet(isPresented: $showingEditProfile) {
-            if let member = member {
-                EditProfileView(member: member)
-                    .environmentObject(authManager)
-            }
-        }
         .alert("Logout", isPresented: $showingLogoutAlert) {
             Button("Cancel", role: .cancel) {}
             Button("Logout", role: .destructive) {
@@ -54,14 +47,6 @@ struct MembershipProfileView: View {
                     .foregroundColor(.oxfordBlue)
 
                 Spacer()
-
-                Button {
-                    showingEditProfile = true
-                } label: {
-                    Text("Edit")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(.cambridgeBlue)
-                }
             }
 
             VStack(spacing: 0) {
