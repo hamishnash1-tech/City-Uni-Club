@@ -312,7 +312,7 @@ export default function MembersPage() {
         <DialogContent>
           {formError && <Alert severity="error" sx={{ mb: 2, mt: 1 }}>{formError}</Alert>}
           <Grid container spacing={2} sx={{ mt: 0.5 }}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 label="Full Name"
                 value={form.full_name}
@@ -322,7 +322,7 @@ export default function MembersPage() {
                 placeholder="John Smith"
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 label="First Name"
                 value={form.first_name}
@@ -332,7 +332,7 @@ export default function MembersPage() {
                 placeholder="John"
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 label="Email"
                 type="email"
@@ -343,7 +343,7 @@ export default function MembersPage() {
                 placeholder="john@example.com"
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 label="Phone Number"
                 value={form.phone_number}
@@ -352,7 +352,7 @@ export default function MembersPage() {
                 placeholder="+44 7700 900000"
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 select
                 label="Membership Type"
@@ -366,7 +366,7 @@ export default function MembersPage() {
                 ))}
               </TextField>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 label="Member Since"
                 type="date"
@@ -377,7 +377,7 @@ export default function MembersPage() {
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 label="Member Until"
                 type="date"
@@ -388,7 +388,7 @@ export default function MembersPage() {
                 helperText="Leave blank if ongoing"
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <TextField
                 label="Temporary Password"
                 type="password"
@@ -399,7 +399,7 @@ export default function MembersPage() {
                 helperText="The member will use this to log in for the first time"
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <FormControlLabel
                 control={
                   <Checkbox
