@@ -184,6 +184,7 @@ struct LoginView: View {
                         .foregroundColor(.cambridgeBlue)
                 }
                 .padding(.horizontal, 30)
+                .frame(maxWidth: 400)
 
                 Spacer()
 

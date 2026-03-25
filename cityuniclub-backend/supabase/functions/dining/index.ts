@@ -73,7 +73,7 @@ serve(async (req: Request) => {
         })
       }
 
-      const { reservation_id, guest_count } = await req.json()
+      const { reservation_id, guest_count, table_preference } = await req.json()
       if (!reservation_id) {
         return new Response(JSON.stringify({ error: 'Missing reservation_id' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -173,6 +173,20 @@ serve(async (req: Request) => {
             `,
           })
         }
+
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200
+        })
+      }
+
+      // Update notes
+      if (table_preference !== undefined) {
+        const { error: updateError } = await supabase
+          .from('dining_reservations')
+          .update({ table_preference: table_preference || null })
+          .eq('id', reservation_id)
+        if (updateError) throw updateError
 
         return new Response(JSON.stringify({ success: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },

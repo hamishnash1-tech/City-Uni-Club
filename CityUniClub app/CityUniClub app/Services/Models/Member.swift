@@ -13,7 +13,7 @@ struct Member: Codable, Identifiable {
     let fullName: String?
     let firstName: String?
     let phoneNumber: String?
-    let membershipNumber: String?
+    let membershipNumber: Int?
     let membershipType: String?
     let memberSince: String?
     let memberUntil: String?

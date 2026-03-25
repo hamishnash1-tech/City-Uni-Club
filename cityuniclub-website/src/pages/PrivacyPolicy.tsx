@@ -43,41 +43,23 @@ export const PrivacyPolicy: React.FC = () => (
 
       <section>
         <h2 className="font-serif text-ivory text-lg font-normal mb-3">4. Data Retention</h2>
-        <p>We retain your personal data for as long as your membership is active and for a period of seven years thereafter, or as otherwise required by law. Reservation and transaction records are retained for six years in accordance with financial record-keeping obligations.</p>
+        <p>We retain your personal data for as long as your membership is active and for a reasonable period thereafter, or as otherwise required by law. Reservation and transaction records are retained in accordance with applicable financial record-keeping obligations.</p>
+        <p className="mt-2">To exercise your UK GDPR rights, please contact the Club Secretary.</p>
       </section>
 
       <section>
         <h2 className="font-serif text-ivory text-lg font-normal mb-3">5. Third-Party Services</h2>
-        <p>We use third-party infrastructure providers to host this portal and process data on our behalf under appropriate data processing agreements. Data is stored on servers within the European Economic Area. We do not transfer your personal data outside the UK or EEA without appropriate safeguards.</p>
+        <p>We use third-party service providers to host this portal and process data on our behalf under appropriate data processing agreements. Data is stored on servers within the European Economic Area. We do not transfer your personal data outside the UK or EEA without appropriate safeguards.</p>
       </section>
 
       <section>
         <h2 className="font-serif text-ivory text-lg font-normal mb-3">6. Security</h2>
-        <p>We implement appropriate technical and organisational measures to protect your personal data against unauthorised access, loss, or disclosure. All data in transit is encrypted via HTTPS. Access to member data is restricted to authorised Club staff.</p>
+        <p>We implement appropriate technical and organisational measures to protect your personal data against unauthorised access, loss, or disclosure. All data in transit is encrypted via HTTPS. Access to member data is restricted to authorised Club staff and trusted third parties where necessary for the operation of Club services.</p>
       </section>
 
       <section>
-        <h2 className="font-serif text-ivory text-lg font-normal mb-3">7. Your Rights</h2>
-        <p className="mb-2">Under UK GDPR, you have the following rights:</p>
-        <ul className="list-disc list-inside space-y-1 text-ivory/70 ml-2">
-          <li><strong className="text-ivory/90">Access:</strong> request a copy of the personal data we hold about you</li>
-          <li><strong className="text-ivory/90">Rectification:</strong> request correction of inaccurate data</li>
-          <li><strong className="text-ivory/90">Erasure:</strong> request deletion of your data where there is no legal basis for retention</li>
-          <li><strong className="text-ivory/90">Restriction:</strong> request that we limit processing of your data</li>
-          <li><strong className="text-ivory/90">Portability:</strong> receive your data in a structured, machine-readable format</li>
-          <li><strong className="text-ivory/90">Objection:</strong> object to processing based on legitimate interests</li>
-        </ul>
-        <p className="mt-2">To exercise any of these rights, please contact the Club Secretary. We will respond within 30 days.</p>
-      </section>
-
-      <section>
-        <h2 className="font-serif text-ivory text-lg font-normal mb-3">8. Complaints</h2>
-        <p>If you are dissatisfied with how we handle your personal data, you have the right to lodge a complaint with the Information Commissioner's Office (ICO) at <span className="text-cambridge-light">ico.org.uk</span> or by calling 0303 123 1113.</p>
-      </section>
-
-      <section>
-        <h2 className="font-serif text-ivory text-lg font-normal mb-3">9. Changes to This Policy</h2>
-        <p>We may update this Privacy Policy from time to time. Material changes will be communicated to members by email. The current version is always available on this page.</p>
+        <h2 className="font-serif text-ivory text-lg font-normal mb-3">7. Changes to This Policy</h2>
+        <p>We may update this Privacy Policy from time to time. Material changes will be communicated to members.</p>
       </section>
 
     </div>

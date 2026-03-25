@@ -31,12 +31,17 @@ export const TermsAndConditions: React.FC = () => (
       </section>
 
       <section>
-        <h2 className="font-serif text-ivory text-lg font-normal mb-3">3. Letters of Introduction</h2>
+        <h2 className="font-serif text-ivory text-lg font-normal mb-3">3. Allergies & Dietary Requirements</h2>
+        <p>Members and guests with food allergies, intolerances, or other dietary requirements must contact the Club Secretary and kitchen directly prior to dining. The Club cannot guarantee an allergen-free environment. Bookings made through this portal do not constitute notification of dietary requirements.</p>
+      </section>
+
+      <section>
+        <h2 className="font-serif text-ivory text-lg font-normal mb-3">4. Letters of Introduction</h2>
         <p>Letters of Introduction to reciprocal clubs are issued at the sole discretion of the Club Secretary. Issuance of a Letter of Introduction does not guarantee admission to any reciprocal club. The Club accepts no liability for any refusal of entry, costs incurred, or loss suffered in connection with a visit to a reciprocal club.</p>
       </section>
 
       <section>
-        <h2 className="font-serif text-ivory text-lg font-normal mb-3">4. Intellectual Property</h2>
+        <h2 className="font-serif text-ivory text-lg font-normal mb-3">5. Intellectual Property</h2>
         <p className="mb-2">All content, design, software, and materials on this portal — including but not limited to text, graphics, logos, icons, and source code — are the exclusive property of the City University Club or its licensors and are protected by applicable copyright and intellectual property laws.</p>
         <p className="mb-2">You may not, without the prior written consent of the Club:</p>
         <ul className="list-disc list-inside space-y-1 text-ivory/70 ml-2">
@@ -49,17 +54,17 @@ export const TermsAndConditions: React.FC = () => (
       </section>
 
       <section>
-        <h2 className="font-serif text-ivory text-lg font-normal mb-3">5. Limitation of Liability</h2>
+        <h2 className="font-serif text-ivory text-lg font-normal mb-3">6. Limitation of Liability</h2>
         <p>To the fullest extent permitted by law, the City University Club shall not be liable for any direct, indirect, incidental, special, or consequential damages arising out of or in connection with your use of this portal or its services. The Club's aggregate liability in any circumstances shall not exceed the annual membership subscription paid by the member in the relevant membership year.</p>
       </section>
 
       <section>
-        <h2 className="font-serif text-ivory text-lg font-normal mb-3">6. Governing Law</h2>
+        <h2 className="font-serif text-ivory text-lg font-normal mb-3">7. Governing Law</h2>
         <p>These Terms and Conditions are governed by and construed in accordance with the laws of England and Wales. Any disputes shall be subject to the exclusive jurisdiction of the courts of England and Wales.</p>
       </section>
 
       <section>
-        <h2 className="font-serif text-ivory text-lg font-normal mb-3">7. Changes to These Terms</h2>
+        <h2 className="font-serif text-ivory text-lg font-normal mb-3">8. Changes to These Terms</h2>
         <p>The Club reserves the right to amend these Terms and Conditions at any time. Continued use of the portal following notification of changes constitutes acceptance of the revised terms.</p>
       </section>
 
