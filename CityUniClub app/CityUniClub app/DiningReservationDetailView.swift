@@ -7,7 +7,9 @@ struct DiningReservationDetailView: View {
     @Binding var item: DiningBookingItem
 
     @State private var pendingGuestCount: Int = 0
+    @State private var pendingNotes: String = ""
     @State private var isUpdating = false
+    @State private var isSavingNotes = false
     @State private var isCancelling = false
     @State private var showCancelAlert = false
     @State private var errorMessage: String? = nil
@@ -131,6 +133,60 @@ struct DiningReservationDetailView: View {
                             .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.1), lineWidth: 1))
                         }
 
+                        // Notes section
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("NOTES")
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundColor(.white.opacity(0.5))
+                                .kerning(1)
+
+                            VStack(spacing: 10) {
+                                ZStack(alignment: .topLeading) {
+                                    if pendingNotes.isEmpty {
+                                        Text("Dietary requirements, seating preferences, etc.")
+                                            .font(.system(size: 14))
+                                            .foregroundColor(.white.opacity(0.3))
+                                            .padding(.top, 8)
+                                            .padding(.leading, 4)
+                                    }
+                                    TextEditor(text: $pendingNotes)
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white)
+                                        .scrollContentBackground(.hidden)
+                                        .frame(minHeight: 80)
+                                        .onChange(of: pendingNotes) { newValue in
+                                            if newValue.count > DiningBookingItem.maxNotesLength {
+                                                pendingNotes = String(newValue.prefix(DiningBookingItem.maxNotesLength))
+                                            }
+                                        }
+                                }
+
+                                Button {
+                                    Task { await saveNotes() }
+                                } label: {
+                                    HStack {
+                                        Spacer()
+                                        if isSavingNotes {
+                                            ProgressView().tint(.oxfordBlue).scaleEffect(0.85)
+                                        } else {
+                                            Text("Save Notes")
+                                                .font(.system(size: 14, weight: .semibold))
+                                                .foregroundColor(.oxfordBlue)
+                                        }
+                                        Spacer()
+                                    }
+                                    .padding(.vertical, 12)
+                                    .background(Color.cambridgeBlue)
+                                    .cornerRadius(10)
+                                }
+                                .disabled(isSavingNotes)
+                            }
+                            .padding(16)
+                            .background(Color.white.opacity(0.06))
+                            .cornerRadius(14)
+                            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                        }
+
                         // Cancel section
                         VStack(alignment: .leading, spacing: 10) {
                             Text("RESERVATION")
@@ -183,7 +239,10 @@ struct DiningReservationDetailView: View {
         .navigationTitle("Reservation")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .onAppear { pendingGuestCount = item.guestCount }
+        .onAppear {
+            pendingGuestCount = item.guestCount
+            pendingNotes = item.specialRequests ?? ""
+        }
         .alert("Cancel Reservation", isPresented: $showCancelAlert) {
             Button("Cancel Reservation", role: .destructive) {
                 Task { await cancelReservation() }
@@ -248,6 +307,39 @@ struct DiningReservationDetailView: View {
         let ampm = h < 12 ? "AM" : "PM"
         let hour = h % 12 == 0 ? 12 : h % 12
         return String(format: "%d:%02d %@", hour, m, ampm)
+    }
+
+    private func saveNotes() async {
+        guard let token = authManager.getAuthToken(),
+              let url = URL(string: "\(APIConfiguration.baseURL)/dining") else { return }
+        isSavingNotes = true
+        errorMessage = nil
+        defer { isSavingNotes = false }
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(token, forHTTPHeaderField: "x-session-token")
+        let notesValue = pendingNotes.trimmingCharacters(in: .whitespacesAndNewlines)
+        var body: [String: Any] = ["reservation_id": item.id]
+        body["special_requests"] = notesValue.isEmpty ? NSNull() : notesValue
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            guard let http = response as? HTTPURLResponse else { return }
+            if (200...299).contains(http.statusCode) {
+                await MainActor.run {
+                    item.specialRequests = notesValue.isEmpty ? nil : notesValue
+                    successMessage = "Notes saved."
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) { successMessage = nil }
+            } else {
+                let msg = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])
+                    .flatMap { $0["error"] as? String } ?? "Failed to save notes."
+                await MainActor.run { errorMessage = msg }
+            }
+        } catch {
+            await MainActor.run { errorMessage = "Network error. Please try again." }
+        }
     }
 
     private func requestGuestCountChange() async {

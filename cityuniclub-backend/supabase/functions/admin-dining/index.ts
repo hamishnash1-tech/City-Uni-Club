@@ -87,13 +87,13 @@ serve(async (req) => {
     }
 
     if (req.method === 'PATCH') {
-      const { id, status, guest_count } = await req.json()
+      const { id, status, guest_count, special_requests } = await req.json()
       if (!id) throw new Error('Missing id')
 
       // Fetch current reservation for audit
       const { data: current } = await supabase
         .from('dining_reservations')
-        .select('status, guest_count')
+        .select('status, guest_count, special_requests')
         .eq('id', id)
         .single()
 
@@ -118,6 +118,12 @@ serve(async (req) => {
           previousValue.status = current?.status
           newValue.status = 'pending'
         }
+      }
+      if (special_requests !== undefined) {
+        updates.special_requests = special_requests || null
+        action = action ? `${action},notes_updated` : 'notes_updated'
+        previousValue.special_requests = (current as any)?.special_requests ?? null
+        newValue.special_requests = special_requests || null
       }
 
       if (Object.keys(updates).length === 0) throw new Error('Nothing to update')

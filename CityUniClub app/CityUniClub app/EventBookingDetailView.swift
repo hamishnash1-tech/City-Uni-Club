@@ -8,7 +8,9 @@ struct EventBookingDetailView: View {
     @Environment(\.dismiss) var dismiss
 
     @State private var pendingGuestCount: Int
+    @State private var pendingNotes: String
     @State private var isUpdating = false
+    @State private var isSavingNotes = false
     @State private var isCancelling = false
     @State private var showCancelAlert = false
     @State private var errorMessage: String? = nil
@@ -16,10 +18,13 @@ struct EventBookingDetailView: View {
 
     private let apiService = APIService.shared
 
+    private static let maxNotesLength = 256
+
     init(event: Event, onUpdated: @escaping () -> Void) {
         self.event = event
         self.onUpdated = onUpdated
         self._pendingGuestCount = State(initialValue: event.myBooking?.guestCount ?? 1)
+        self._pendingNotes = State(initialValue: event.myBooking?.specialRequests ?? "")
     }
 
     var body: some View {
@@ -105,6 +110,60 @@ struct EventBookingDetailView: View {
                                 }
                                 .disabled(isUpdating)
                             }
+                        }
+                        .padding(16)
+                        .background(Color.white.opacity(0.06))
+                        .cornerRadius(14)
+                        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                    }
+
+                    // Notes section
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("NOTES")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(.white.opacity(0.5))
+                            .kerning(1)
+
+                        VStack(spacing: 10) {
+                            ZStack(alignment: .topLeading) {
+                                if pendingNotes.isEmpty {
+                                    Text("Dietary requirements, seating preferences, etc.")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white.opacity(0.3))
+                                        .padding(.top, 8)
+                                        .padding(.leading, 4)
+                                }
+                                TextEditor(text: $pendingNotes)
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.white)
+                                    .scrollContentBackground(.hidden)
+                                    .frame(minHeight: 80)
+                                    .onChange(of: pendingNotes) { newValue in
+                                        if newValue.count > Self.maxNotesLength {
+                                            pendingNotes = String(newValue.prefix(Self.maxNotesLength))
+                                        }
+                                    }
+                            }
+
+                            Button {
+                                Task { await saveNotes() }
+                            } label: {
+                                HStack {
+                                    Spacer()
+                                    if isSavingNotes {
+                                        ProgressView().tint(.oxfordBlue).scaleEffect(0.85)
+                                    } else {
+                                        Text("Save Notes")
+                                            .font(.system(size: 14, weight: .semibold))
+                                            .foregroundColor(.oxfordBlue)
+                                    }
+                                    Spacer()
+                                }
+                                .padding(.vertical, 12)
+                                .background(Color.cambridgeBlue)
+                                .cornerRadius(10)
+                            }
+                            .disabled(isSavingNotes)
                         }
                         .padding(16)
                         .background(Color.white.opacity(0.06))
@@ -208,6 +267,23 @@ struct EventBookingDetailView: View {
             .padding(.vertical, 4)
             .background(bg)
             .cornerRadius(6)
+    }
+
+    private func saveNotes() async {
+        guard let booking = event.myBooking else { return }
+        isSavingNotes = true
+        errorMessage = nil
+        defer { isSavingNotes = false }
+        let notesValue = pendingNotes.trimmingCharacters(in: .whitespacesAndNewlines)
+        do {
+            try await apiService.updateEventNotes(bookingId: booking.id, specialRequests: notesValue.isEmpty ? nil : notesValue)
+            await MainActor.run {
+                successMessage = "Notes saved."
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { successMessage = nil }
+        } catch {
+            await MainActor.run { errorMessage = "Failed to save notes. Please try again." }
+        }
     }
 
     private func requestGuestCountChange() async {

@@ -31,6 +31,10 @@ import {
   InputLabel,
   Collapse,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -302,6 +306,12 @@ export default function EventDetailPage() {
   }
 
   const [expandedAuditRows, setExpandedAuditRows] = useState<Set<string>>(new Set())
+  const [pendingAction, setPendingAction] = useState<{
+    type: 'status' | 'guest_count'
+    booking: Booking
+    newStatus?: string
+    newGuestCount?: number
+  } | null>(null)
 
   const toggleAuditRow = (id: string) => {
     setExpandedAuditRows(prev => {
@@ -334,14 +344,24 @@ export default function EventDetailPage() {
     }
   }
 
-  const handleDeleteBooking = async (bookingId: string) => {
-    if (!confirm('Cancel this booking?')) return
-    await handleUpdateBooking(bookingId, { status: 'cancelled' })
+  const handleDeleteBooking = (booking: Booking) => {
+    setPendingAction({ type: 'status', booking, newStatus: 'cancelled' })
+  }
+
+  const executePendingAction = async () => {
+    if (!pendingAction) return
+    const { type, booking, newStatus, newGuestCount } = pendingAction
+    setPendingAction(null)
+    if (type === 'guest_count') {
+      await handleUpdateBooking(booking.id, { guest_count: newGuestCount })
+    } else {
+      await handleUpdateBooking(booking.id, { status: newStatus })
+    }
   }
 
   const memberBookings = bookings.filter(b => b.member_id)
   const nonMemberBookings = bookings.filter(b => !b.member_id)
-  const totalTickets = bookings.reduce((sum, b) => sum + b.guest_count, 0)
+  const totalTickets = bookings.filter(b => b.status === 'confirmed').reduce((sum, b) => sum + b.guest_count, 0)
   const totalRevenue = bookings.reduce((sum, b) => sum + (b.total_price ?? 0), 0)
 
   if (loading) return <Container maxWidth="lg" sx={{ mt: 4 }}><LinearProgress /></Container>
@@ -668,9 +688,9 @@ export default function EventDetailPage() {
                         {!isMember && <TableCell>{b.guest_phone ?? '—'}</TableCell>}
                         <TableCell>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                            <IconButton size="small" disabled={b.guest_count <= 1} onClick={() => handleUpdateBooking(b.id, { guest_count: b.guest_count - 1 })}>−</IconButton>
+                            <IconButton size="small" disabled={b.guest_count <= 1} onClick={() => setPendingAction({ type: 'guest_count', booking: b, newGuestCount: b.guest_count - 1 })}>−</IconButton>
                             <Typography variant="body2" sx={{ minWidth: 20, textAlign: 'center' }}>{b.guest_count}</Typography>
-                            <IconButton size="small" onClick={() => handleUpdateBooking(b.id, { guest_count: b.guest_count + 1 })}>+</IconButton>
+                            <IconButton size="small" onClick={() => setPendingAction({ type: 'guest_count', booking: b, newGuestCount: b.guest_count + 1 })}>+</IconButton>
                           </Box>
                         </TableCell>
                         <TableCell sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.special_requests ?? '—'}</TableCell>
@@ -681,21 +701,21 @@ export default function EventDetailPage() {
                           <Box sx={{ display: 'flex', gap: 0.5 }}>
                             {b.status === 'pending' && (
                               <Tooltip title="Confirm">
-                                <IconButton size="small" color="success" onClick={() => handleUpdateBooking(b.id, { status: 'confirmed' })}>
+                                <IconButton size="small" color="success" onClick={() => setPendingAction({ type: 'status', booking: b, newStatus: 'confirmed' })}>
                                   <CheckCircleIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
                             )}
                             {b.status !== 'cancelled' && (
                               <Tooltip title="Cancel">
-                                <IconButton size="small" color="error" onClick={() => handleDeleteBooking(b.id)}>
+                                <IconButton size="small" color="error" onClick={() => handleDeleteBooking(b)}>
                                   <CancelIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
                             )}
                             {b.status === 'cancelled' && (
                               <Tooltip title="Uncancel">
-                                <IconButton size="small" color="warning" onClick={() => handleUpdateBooking(b.id, { status: 'pending' })}>
+                                <IconButton size="small" color="warning" onClick={() => setPendingAction({ type: 'status', booking: b, newStatus: 'pending' })}>
                                   <RestoreIcon fontSize="small" />
                                 </IconButton>
                               </Tooltip>
@@ -743,6 +763,35 @@ export default function EventDetailPage() {
           </TableContainer>
         </Box>
       ))}
+      {/* Confirmation Dialog */}
+      <Dialog open={!!pendingAction} onClose={() => setPendingAction(null)} maxWidth="xs" fullWidth>
+        <DialogTitle>Confirm Action</DialogTitle>
+        <DialogContent>
+          {pendingAction && (() => {
+            const b = pendingAction.booking
+            const name = b.members?.full_name || b.guest_name || '—'
+            const email = b.members?.email || b.guest_email || '—'
+            const actionLabel = pendingAction.type === 'guest_count'
+              ? `Update guest count to ${pendingAction.newGuestCount}`
+              : pendingAction.newStatus === 'confirmed' ? 'Confirm booking'
+              : pendingAction.newStatus === 'cancelled' ? 'Cancel booking'
+              : 'Uncancel booking'
+            return (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
+                <Typography variant="body2"><strong>Action:</strong> {actionLabel}</Typography>
+                <Typography variant="body2"><strong>Date:</strong> {formatDate(event?.event_date ?? null)}</Typography>
+                <Typography variant="body2"><strong>Name:</strong> {name}</Typography>
+                <Typography variant="body2"><strong>Email:</strong> {email}</Typography>
+                <Typography variant="body2"><strong>Guests:</strong> {pendingAction.type === 'guest_count' ? `${b.guest_count} → ${pendingAction.newGuestCount}` : b.guest_count}</Typography>
+              </Box>
+            )
+          })()}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPendingAction(null)}>Cancel</Button>
+          <Button variant="contained" onClick={executePendingAction}>Confirm</Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   )
 }

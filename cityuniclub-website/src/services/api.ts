@@ -282,7 +282,7 @@ export const api = {
     const response = await fetch(`${API_BASE}/dining`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'x-session-token': token },
-      body: JSON.stringify({ reservation_id: reservationId, table_preference: notes }),
+      body: JSON.stringify({ reservation_id: reservationId, special_requests: notes }),
     })
     if (!response.ok) {
       const error = await response.json()

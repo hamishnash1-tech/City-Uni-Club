@@ -22,7 +22,7 @@ export const Dining: React.FC = () => {
     time: '',
     meal_type: 'Lunch' as 'Breakfast' | 'Lunch',
     guest_count: 2,
-    table_preference: '',
+    special_requests: '',
 
     guest_name: '',
     guest_email: '',
@@ -64,7 +64,7 @@ export const Dining: React.FC = () => {
       const notes: Record<string, string> = {}
       dining.forEach((r: any) => {
         counts[r.id] = r.guest_count
-        notes[r.id] = r.table_preference ?? ''
+        notes[r.id] = r.special_requests ?? r.table_preference ?? ''
       })
       setLocalCounts(counts)
       setLocalNotes(notes)
@@ -115,7 +115,7 @@ export const Dining: React.FC = () => {
     setUpdatingNotes(id)
     try {
       await api.updateDiningNotes(token, id, notes)
-      setReservations(prev => prev.map(r => r.id === id ? { ...r, table_preference: notes } : r))
+      setReservations(prev => prev.map(r => r.id === id ? { ...r, special_requests: notes } : r))
     } catch (e: any) {
       setReservationsError(e.message)
     } finally {
@@ -148,13 +148,13 @@ export const Dining: React.FC = () => {
         reservation_time: formData.time,
         meal_type: formData.meal_type,
         guest_count: formData.guest_count,
-        table_preference: formData.table_preference || undefined,
+        special_requests: formData.special_requests || undefined,
 
         guest_name: !token ? formData.guest_name : undefined,
         guest_email: !token ? formData.guest_email : undefined,
       })
       setShowSuccess(true)
-      setFormData({ date: '', time: '', meal_type: 'Lunch', guest_count: 2, table_preference: '', guest_name: '', guest_email: '' })
+      setFormData({ date: '', time: '', meal_type: 'Lunch', guest_count: 2, special_requests: '', guest_name: '', guest_email: '' })
       setTimeout(() => setShowSuccess(false), 4000)
     } catch (e: any) {
       setError(e.message || 'Failed to submit reservation. Please try again.')
@@ -298,7 +298,7 @@ export const Dining: React.FC = () => {
                           {new Date(r.reservation_date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                         </p>
                         <p className="text-sm text-ink-mid mt-0.5">{r.meal_type} · {r.reservation_time}</p>
-                        {r.table_preference && <p className="text-xs text-ink-light mt-0.5 italic">{r.table_preference}</p>}
+                        {(r.special_requests || r.table_preference) && <p className="text-xs text-ink-light mt-0.5 italic">{r.special_requests || r.table_preference}</p>}
                       </div>
                       <span className={`label-caps text-xs px-2 py-1 rounded ${
                         r.status === 'confirmed' ? 'bg-green-100 text-green-700' :
@@ -615,8 +615,8 @@ export const Dining: React.FC = () => {
               <label className="label-caps text-ink-light block mb-2">Notes</label>
               <input
                 type="text"
-                value={formData.table_preference}
-                onChange={(e) => setFormData({ ...formData, table_preference: e.target.value })}
+                value={formData.special_requests}
+                onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
                 className="club-input"
                 placeholder="Dietary requirements, table preference, seating requests, etc."
               />

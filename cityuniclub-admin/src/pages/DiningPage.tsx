@@ -25,6 +25,7 @@ import {
   CircularProgress,
   Collapse,
   Tooltip,
+  TextField,
 } from '@mui/material'
 import RestaurantIcon from '@mui/icons-material/Restaurant'
 import CoffeeIcon from '@mui/icons-material/Coffee'
@@ -38,6 +39,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
 import RestoreIcon from '@mui/icons-material/Restore'
 import HistoryIcon from '@mui/icons-material/History'
+import EditIcon from '@mui/icons-material/Edit'
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import { useAuth } from '../context/AuthContext'
@@ -140,6 +142,15 @@ export default function DiningPage() {
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
   const [expandedAuditRows, setExpandedAuditRows] = useState<Set<string>>(new Set())
+  const [editingGuestCount, setEditingGuestCount] = useState<{ id: string; value: number } | null>(null)
+  const [editingNotes, setEditingNotes] = useState<{ id: string; value: string } | null>(null)
+  const [pendingAction, setPendingAction] = useState<{
+    type: 'status' | 'guest_count'
+    id: string
+    newStatus?: string
+    newGuestCount?: number
+    reservation: DiningReservation
+  } | null>(null)
 
   const toggleAuditRow = (id: string) => {
     setExpandedAuditRows(prev => {
@@ -183,24 +194,71 @@ export default function DiningPage() {
     fetchReservations()
   }, [fetchReservations])
 
-  const handleUpdateStatus = async (id: string, status: string) => {
+  const confirmAndUpdateGuestCount = (reservation: DiningReservation, guest_count: number) => {
+    setPendingAction({ type: 'guest_count', id: reservation.id, newGuestCount: guest_count, reservation })
+  }
+
+  const confirmAndUpdateStatus = (reservation: DiningReservation, status: string) => {
+    setPendingAction({ type: 'status', id: reservation.id, newStatus: status, reservation })
+  }
+
+  const executePendingAction = async () => {
+    if (!pendingAction) return
+    const { type, id, newStatus, newGuestCount } = pendingAction
+    setPendingAction(null)
+    try {
+      if (type === 'guest_count') {
+        const res = await fetch(`${FUNCTIONS_URL}/admin-dining`, {
+          method: 'PATCH',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ id, guest_count: newGuestCount })
+        })
+        if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to update guest count') }
+        const now = new Date().toISOString()
+        setReservations(prev => prev.map(r => {
+          if (r.id !== id) return r
+          const entry: AuditEntry = { action: 'guest_count_updated', previous_value: { guest_count: r.guest_count }, new_value: { guest_count: newGuestCount }, performed_by_admin_email: user?.email ?? null, performed_at: now }
+          return { ...r, guest_count: newGuestCount!, audit_log: [entry, ...(r.audit_log ?? [])] }
+        }))
+        setEditingGuestCount(null)
+        setStatusMessage(`Guest count updated to ${newGuestCount}`)
+      } else {
+        const res = await fetch(`${FUNCTIONS_URL}/admin-dining`, {
+          method: 'PATCH',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ id, status: newStatus })
+        })
+        if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to update status') }
+        const now = new Date().toISOString()
+        setReservations(prev => prev.map(r => {
+          if (r.id !== id) return r
+          const entry: AuditEntry = { action: `status_changed_to_${newStatus}`, previous_value: { status: r.status }, new_value: { status: newStatus }, performed_by_admin_email: user?.email ?? null, performed_at: now }
+          return { ...r, status: newStatus as DiningReservation['status'], audit_log: [entry, ...(r.audit_log ?? [])] }
+        }))
+        setStatusMessage(`Reservation ${newStatus}`)
+      }
+      setTimeout(() => setStatusMessage(null), 3000)
+    } catch (e: any) {
+      setError(e.message)
+    }
+  }
+
+  const handleUpdateNotes = async (id: string, special_requests: string) => {
     try {
       const res = await fetch(`${FUNCTIONS_URL}/admin-dining`, {
         method: 'PATCH',
         headers: getAuthHeaders(),
-        body: JSON.stringify({ id, status })
+        body: JSON.stringify({ id, special_requests: special_requests || null })
       })
-      if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || 'Failed to update status')
-      }
+      if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to update notes') }
       const now = new Date().toISOString()
       setReservations(prev => prev.map(r => {
         if (r.id !== id) return r
-        const entry: AuditEntry = { action: `status_changed_to_${status}`, previous_value: { status: r.status }, new_value: { status }, performed_by_admin_email: user?.email ?? null, performed_at: now }
-        return { ...r, status: status as DiningReservation['status'], audit_log: [entry, ...(r.audit_log ?? [])] }
+        const entry: AuditEntry = { action: 'notes_updated', previous_value: { special_requests: r.special_requests ?? null }, new_value: { special_requests: special_requests || null }, performed_by_admin_email: user?.email ?? null, performed_at: now }
+        return { ...r, special_requests: special_requests || undefined, audit_log: [entry, ...(r.audit_log ?? [])] }
       }))
-      setStatusMessage(`Reservation ${status}`)
+      setEditingNotes(null)
+      setStatusMessage('Notes updated')
       setTimeout(() => setStatusMessage(null), 3000)
     } catch (e: any) {
       setError(e.message)
@@ -217,14 +275,18 @@ export default function DiningPage() {
   }, [reservations])
 
   const dateStats = useMemo(() => {
-    const stats: Record<string, { totalBookings: number; totalGuests: number; breakfast: number; lunch: number }> = {}
+    const stats: Record<string, { totalBookings: number; totalGuests: number; breakfast: number; lunch: number; confirmed: number; pending: number; cancelled: number }> = {}
     availableDates.forEach(({ date }) => {
-      const dateReservations = (reservationsByDate[date] || []).filter(r => r.status !== 'cancelled')
+      const all = reservationsByDate[date] || []
+      const active = all.filter(r => r.status !== 'cancelled')
       stats[date] = {
-        totalBookings: dateReservations.length,
-        totalGuests: dateReservations.reduce((sum, r) => sum + r.guest_count, 0),
-        breakfast: dateReservations.filter(r => r.meal_type === 'Breakfast').length,
-        lunch: dateReservations.filter(r => r.meal_type === 'Lunch').length
+        totalBookings: active.length,
+        totalGuests: active.reduce((sum, r) => sum + r.guest_count, 0),
+        breakfast: active.filter(r => r.meal_type === 'Breakfast').length,
+        lunch: active.filter(r => r.meal_type === 'Lunch').length,
+        confirmed: all.filter(r => r.status === 'confirmed').length,
+        pending: all.filter(r => r.status === 'pending').length,
+        cancelled: all.filter(r => r.status === 'cancelled').length,
       }
     })
     return stats
@@ -276,6 +338,7 @@ export default function DiningPage() {
   const selectedDateInfo = availableDates.find(d => d.date === selectedDate)
   const memberReservations = selectedDateReservations.filter(r => r.member_id !== null && r.status !== 'cancelled')
   const nonMemberReservations = selectedDateReservations.filter(r => r.member_id === null && r.status !== 'cancelled')
+  const cancelledReservations = selectedDateReservations.filter(r => r.status === 'cancelled')
 
   if (loading) {
     return (
@@ -388,6 +451,20 @@ export default function DiningPage() {
                       </Typography>
                     </Grid>
                   </Grid>
+
+                  {hasBookings && (
+                    <Box sx={{ display: 'flex', gap: 1, mt: 1.5, flexWrap: 'wrap' }}>
+                      {stats.confirmed > 0 && (
+                        <Chip label={`${stats.confirmed} confirmed`} size="small" color="success" variant="outlined" />
+                      )}
+                      {stats.pending > 0 && (
+                        <Chip label={`${stats.pending} pending`} size="small" color="warning" variant="outlined" />
+                      )}
+                      {stats.cancelled > 0 && (
+                        <Chip label={`${stats.cancelled} cancelled`} size="small" color="error" variant="outlined" />
+                      )}
+                    </Box>
+                  )}
                 </CardContent>
 
                 <CardActions>
@@ -444,7 +521,7 @@ export default function DiningPage() {
                           <TableCell>Email</TableCell>
                           <TableCell>Meal</TableCell>
                           <TableCell>Guests</TableCell>
-                          <TableCell>Table</TableCell>
+                          <TableCell>Notes</TableCell>
                           <TableCell>Status</TableCell>
                           <TableCell>Actions</TableCell>
                         </TableRow>
@@ -491,11 +568,54 @@ export default function DiningPage() {
                                   <TableCell>
                                     <Chip label={reservation.meal_type} size="small" color={getMealTypeColor(reservation.meal_type) as any} />
                                   </TableCell>
-                                  <TableCell>{reservation.guest_count}</TableCell>
                                   <TableCell>
-                                    <Typography variant="body2" sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                      {reservation.table_preference || '—'}
-                                    </Typography>
+                                    {editingGuestCount?.id === reservation.id ? (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <TextField
+                                          type="number"
+                                          size="small"
+                                          value={editingGuestCount.value}
+                                          onChange={e => setEditingGuestCount({ id: reservation.id, value: Math.max(1, Math.min(20, Number(e.target.value))) })}
+                                          inputProps={{ min: 1, max: 20 }}
+                                          sx={{ width: 64 }}
+                                          autoFocus
+                                        />
+                                        <Button size="small" variant="contained" onClick={() => confirmAndUpdateGuestCount(reservation, editingGuestCount!.value)}>Save</Button>
+                                        <Button size="small" onClick={() => setEditingGuestCount(null)}>Cancel</Button>
+                                      </Box>
+                                    ) : (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        {reservation.guest_count}
+                                        <IconButton size="small" onClick={() => setEditingGuestCount({ id: reservation.id, value: reservation.guest_count })}>
+                                          <EditIcon sx={{ fontSize: 14 }} />
+                                        </IconButton>
+                                      </Box>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    {editingNotes?.id === reservation.id ? (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <TextField
+                                          size="small"
+                                          value={editingNotes.value}
+                                          onChange={e => setEditingNotes({ id: reservation.id, value: e.target.value.slice(0, 256) })}
+                                          inputProps={{ maxLength: 256 }}
+                                          sx={{ width: 200 }}
+                                          autoFocus
+                                        />
+                                        <Button size="small" variant="contained" onClick={() => handleUpdateNotes(reservation.id, editingNotes.value)}>Save</Button>
+                                        <Button size="small" onClick={() => setEditingNotes(null)}>Cancel</Button>
+                                      </Box>
+                                    ) : (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <Typography variant="body2" sx={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                          {reservation.special_requests || reservation.table_preference || '—'}
+                                        </Typography>
+                                        <IconButton size="small" onClick={() => setEditingNotes({ id: reservation.id, value: reservation.special_requests || reservation.table_preference || '' })}>
+                                          <EditIcon sx={{ fontSize: 14 }} />
+                                        </IconButton>
+                                      </Box>
+                                    )}
                                   </TableCell>
                                   <TableCell>
                                     <Chip label={reservation.status} size="small" color={getStatusColor(reservation.status) as any} />
@@ -503,17 +623,17 @@ export default function DiningPage() {
                                   <TableCell>
                                     <Box sx={{ display: 'flex', gap: 0.5 }}>
                                       {reservation.status === 'pending' && (
-                                        <IconButton size="small" color="success" onClick={() => handleUpdateStatus(reservation.id, 'confirmed')} title="Confirm">
+                                        <IconButton size="small" color="success" onClick={() => confirmAndUpdateStatus(reservation, 'confirmed')} title="Confirm">
                                           <CheckCircleIcon fontSize="small" />
                                         </IconButton>
                                       )}
                                       {(reservation.status === 'pending' || reservation.status === 'confirmed') && (
-                                        <IconButton size="small" color="error" onClick={() => handleUpdateStatus(reservation.id, 'cancelled')} title="Cancel">
+                                        <IconButton size="small" color="error" onClick={() => confirmAndUpdateStatus(reservation, 'cancelled')} title="Cancel">
                                           <CancelIcon fontSize="small" />
                                         </IconButton>
                                       )}
                                       {reservation.status === 'cancelled' && (
-                                        <IconButton size="small" color="warning" onClick={() => handleUpdateStatus(reservation.id, 'pending')} title="Uncancel">
+                                        <IconButton size="small" color="warning" onClick={() => confirmAndUpdateStatus(reservation, 'pending')} title="Uncancel">
                                           <RestoreIcon fontSize="small" />
                                         </IconButton>
                                       )}
@@ -558,7 +678,7 @@ export default function DiningPage() {
                           <TableCell>Guest</TableCell>
                           <TableCell>Meal</TableCell>
                           <TableCell>Guests</TableCell>
-                          <TableCell>Special Requests</TableCell>
+                          <TableCell>Notes</TableCell>
                           <TableCell>Status</TableCell>
                           <TableCell>Actions</TableCell>
                         </TableRow>
@@ -603,11 +723,49 @@ export default function DiningPage() {
                                   <TableCell>
                                     <Chip label={reservation.meal_type} size="small" color={getMealTypeColor(reservation.meal_type) as any} />
                                   </TableCell>
-                                  <TableCell>{reservation.guest_count}</TableCell>
                                   <TableCell>
-                                    <Typography variant="body2" sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                      {reservation.special_requests || '—'}
-                                    </Typography>
+                                    {editingGuestCount?.id === reservation.id ? (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <TextField
+                                          type="number"
+                                          size="small"
+                                          value={editingGuestCount.value}
+                                          onChange={e => setEditingGuestCount({ id: reservation.id, value: Math.max(1, Math.min(20, Number(e.target.value))) })}
+                                          inputProps={{ min: 1, max: 20 }}
+                                          sx={{ width: 64 }}
+                                          autoFocus
+                                        />
+                                        <Button size="small" variant="contained" onClick={() => confirmAndUpdateGuestCount(reservation, editingGuestCount!.value)}>Save</Button>
+                                        <Button size="small" onClick={() => setEditingGuestCount(null)}>Cancel</Button>
+                                      </Box>
+                                    ) : (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        {reservation.guest_count}
+                                        <IconButton size="small" onClick={() => setEditingGuestCount({ id: reservation.id, value: reservation.guest_count })}>
+                                          <EditIcon sx={{ fontSize: 14 }} />
+                                        </IconButton>
+                                      </Box>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    {editingNotes?.id === reservation.id ? (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <TextField size="small" value={editingNotes.value}
+                                          onChange={e => setEditingNotes({ id: reservation.id, value: e.target.value.slice(0, 256) })}
+                                          inputProps={{ maxLength: 256 }} sx={{ width: 200 }} autoFocus />
+                                        <Button size="small" variant="contained" onClick={() => handleUpdateNotes(reservation.id, editingNotes.value)}>Save</Button>
+                                        <Button size="small" onClick={() => setEditingNotes(null)}>Cancel</Button>
+                                      </Box>
+                                    ) : (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <Typography variant="body2" sx={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                          {reservation.special_requests || reservation.table_preference || '—'}
+                                        </Typography>
+                                        <IconButton size="small" onClick={() => setEditingNotes({ id: reservation.id, value: reservation.special_requests || reservation.table_preference || '' })}>
+                                          <EditIcon sx={{ fontSize: 14 }} />
+                                        </IconButton>
+                                      </Box>
+                                    )}
                                   </TableCell>
                                   <TableCell>
                                     <Chip label={reservation.status} size="small" color={getStatusColor(reservation.status) as any} />
@@ -615,17 +773,17 @@ export default function DiningPage() {
                                   <TableCell>
                                     <Box sx={{ display: 'flex', gap: 0.5 }}>
                                       {reservation.status === 'pending' && (
-                                        <IconButton size="small" color="success" onClick={() => handleUpdateStatus(reservation.id, 'confirmed')} title="Confirm">
+                                        <IconButton size="small" color="success" onClick={() => confirmAndUpdateStatus(reservation, 'confirmed')} title="Confirm">
                                           <CheckCircleIcon fontSize="small" />
                                         </IconButton>
                                       )}
                                       {(reservation.status === 'pending' || reservation.status === 'confirmed') && (
-                                        <IconButton size="small" color="error" onClick={() => handleUpdateStatus(reservation.id, 'cancelled')} title="Cancel">
+                                        <IconButton size="small" color="error" onClick={() => confirmAndUpdateStatus(reservation, 'cancelled')} title="Cancel">
                                           <CancelIcon fontSize="small" />
                                         </IconButton>
                                       )}
                                       {reservation.status === 'cancelled' && (
-                                        <IconButton size="small" color="warning" onClick={() => handleUpdateStatus(reservation.id, 'pending')} title="Uncancel">
+                                        <IconButton size="small" color="warning" onClick={() => confirmAndUpdateStatus(reservation, 'pending')} title="Uncancel">
                                           <RestoreIcon fontSize="small" />
                                         </IconButton>
                                       )}
@@ -649,11 +807,152 @@ export default function DiningPage() {
                   </TableContainer>
                 )}
               </Box>
+
+              {/* Cancelled Bookings */}
+              {cancelledReservations.length > 0 && (
+                <Box sx={{ mt: 4 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                    <CancelIcon color="error" fontSize="small" />
+                    <Typography variant="h6" color="error">Cancelled ({cancelledReservations.length})</Typography>
+                  </Box>
+                  <TableContainer>
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell width={32} />
+                          <TableCell>Time</TableCell>
+                          <TableCell>Name</TableCell>
+                          <TableCell>Email</TableCell>
+                          <TableCell>Meal</TableCell>
+                          <TableCell>Guests</TableCell>
+                          <TableCell>Notes</TableCell>
+                          <TableCell>Actions</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {cancelledReservations
+                          .sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))
+                          .map((reservation) => {
+                            const isExpanded = expandedAuditRows.has(reservation.id)
+                            const hasAudit = reservation.audit_log?.length > 0
+                            return (
+                              <>
+                                <TableRow key={reservation.id} sx={{ opacity: 0.6 }}>
+                                  <TableCell>
+                                    {hasAudit && (
+                                      <Tooltip title="View history">
+                                        <IconButton size="small" onClick={() => toggleAuditRow(reservation.id)}>
+                                          {isExpanded ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                      {getMealTypeIcon(reservation.meal_type)}
+                                      {formatTime(reservation.reservation_time)}
+                                    </Box>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Typography variant="body2">
+                                      {reservation.members?.full_name || reservation.guest_name || '—'}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Typography variant="caption" color="textSecondary">
+                                      {reservation.members?.email || reservation.guest_email || '—'}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Chip label={reservation.meal_type} size="small" color={getMealTypeColor(reservation.meal_type) as any} />
+                                  </TableCell>
+                                  <TableCell>{reservation.guest_count}</TableCell>
+                                  <TableCell>
+                                    {editingNotes?.id === reservation.id ? (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <TextField
+                                          size="small"
+                                          value={editingNotes.value}
+                                          onChange={e => setEditingNotes({ id: reservation.id, value: e.target.value.slice(0, 256) })}
+                                          inputProps={{ maxLength: 256 }}
+                                          sx={{ width: 200 }}
+                                          autoFocus
+                                        />
+                                        <Button size="small" variant="contained" onClick={() => handleUpdateNotes(reservation.id, editingNotes.value)}>Save</Button>
+                                        <Button size="small" onClick={() => setEditingNotes(null)}>Cancel</Button>
+                                      </Box>
+                                    ) : (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <Typography variant="body2" sx={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                          {reservation.special_requests || reservation.table_preference || '—'}
+                                        </Typography>
+                                        <IconButton size="small" onClick={() => setEditingNotes({ id: reservation.id, value: reservation.special_requests || reservation.table_preference || '' })}>
+                                          <EditIcon sx={{ fontSize: 14 }} />
+                                        </IconButton>
+                                      </Box>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Button size="small" variant="outlined" color="warning" onClick={() => confirmAndUpdateStatus(reservation, 'pending')}>
+                                      Uncancel
+                                    </Button>
+                                  </TableCell>
+                                </TableRow>
+                                {hasAudit && (
+                                  <TableRow key={`${reservation.id}-audit`}>
+                                    <TableCell colSpan={8} sx={{ py: 0, bgcolor: 'grey.50' }}>
+                                      <Collapse in={isExpanded} unmountOnExit>
+                                        <AuditLog entries={reservation.audit_log} />
+                                      </Collapse>
+                                    </TableCell>
+                                  </TableRow>
+                                )}
+                              </>
+                            )
+                          })}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                </Box>
+              )}
             </Box>
           )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDayDialog}>Close</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={!!pendingAction} onClose={() => setPendingAction(null)} maxWidth="xs" fullWidth>
+        <DialogTitle>Confirm Action</DialogTitle>
+        <DialogContent>
+          {pendingAction && (() => {
+            const r = pendingAction.reservation
+            const name = r.members?.full_name || r.guest_name || '—'
+            const email = r.members?.email || r.guest_email || '—'
+            const date = new Date(r.reservation_date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+            const time = formatTime(r.reservation_time)
+            const actionLabel = pendingAction.type === 'guest_count'
+              ? `Update guest count to ${pendingAction.newGuestCount}`
+              : pendingAction.newStatus === 'confirmed' ? 'Confirm reservation'
+              : pendingAction.newStatus === 'cancelled' ? 'Cancel reservation'
+              : 'Uncancel reservation'
+            return (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
+                <Typography variant="body2"><strong>Action:</strong> {actionLabel}</Typography>
+                <Typography variant="body2"><strong>Date:</strong> {date}</Typography>
+                <Typography variant="body2"><strong>Time:</strong> {time}</Typography>
+                <Typography variant="body2"><strong>Name:</strong> {name}</Typography>
+                <Typography variant="body2"><strong>Email:</strong> {email}</Typography>
+                <Typography variant="body2"><strong>Guests:</strong> {pendingAction.type === 'guest_count' ? `${r.guest_count} → ${pendingAction.newGuestCount}` : r.guest_count}</Typography>
+              </Box>
+            )
+          })()}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setPendingAction(null)}>Cancel</Button>
+          <Button variant="contained" onClick={executePendingAction}>Confirm</Button>
         </DialogActions>
       </Dialog>
 
