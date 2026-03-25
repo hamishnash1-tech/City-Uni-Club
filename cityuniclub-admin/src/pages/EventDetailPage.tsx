@@ -143,6 +143,8 @@ export default function EventDetailPage() {
   const [editTitle, setEditTitle] = useState('')
   const [editingDescription, setEditingDescription] = useState(false)
   const [editDescription, setEditDescription] = useState('')
+  const [editingPrice, setEditingPrice] = useState(false)
+  const [editPrice, setEditPrice] = useState('')
 
   // Asset rename
   const [renamingAssetId, setRenamingAssetId] = useState<string | null>(null)
@@ -159,6 +161,9 @@ export default function EventDetailPage() {
 
   // Visibility
   const [savingVisibility, setSavingVisibility] = useState(false)
+
+  // Notes editing
+  const [editingNotes, setEditingNotes] = useState<{ id: string; value: string } | null>(null)
 
   // Store the UUID separately for mutations (URL uses slug)
   const [eventUuid, setEventUuid] = useState<string | null>(null)
@@ -216,6 +221,20 @@ export default function EventDetailPage() {
       setError(e.message)
     }
     setEditingDescription(false)
+  }
+
+  const handleSavePrice = async () => {
+    const parsed = editPrice.trim() === '' ? null : parseFloat(editPrice)
+    if (parsed !== null && (isNaN(parsed) || parsed < 0)) { setError('Invalid price'); return }
+    if (parsed === (event?.price_per_person ?? null)) { setEditingPrice(false); return }
+    try {
+      await patch({ price_per_person: parsed })
+      setEvent(e => e ? { ...e, price_per_person: parsed } : e)
+      setSuccess('Price updated')
+    } catch (e: any) {
+      setError(e.message)
+    }
+    setEditingPrice(false)
   }
 
   const handleToggleVisibility = async () => {
@@ -307,10 +326,11 @@ export default function EventDetailPage() {
 
   const [expandedAuditRows, setExpandedAuditRows] = useState<Set<string>>(new Set())
   const [pendingAction, setPendingAction] = useState<{
-    type: 'status' | 'guest_count'
+    type: 'status' | 'guest_count' | 'notes'
     booking: Booking
     newStatus?: string
     newGuestCount?: number
+    newNotes?: string
   } | null>(null)
 
   const toggleAuditRow = (id: string) => {
@@ -350,19 +370,42 @@ export default function EventDetailPage() {
 
   const executePendingAction = async () => {
     if (!pendingAction) return
-    const { type, booking, newStatus, newGuestCount } = pendingAction
+    const { type, booking, newStatus, newGuestCount, newNotes } = pendingAction
     setPendingAction(null)
     if (type === 'guest_count') {
       await handleUpdateBooking(booking.id, { guest_count: newGuestCount })
+    } else if (type === 'notes') {
+      try {
+        const res = await fetch(`${FUNCTIONS_URL}/admin-events`, {
+          method: 'PATCH',
+          headers: authHeaders,
+          body: JSON.stringify({ booking_id: booking.id, special_requests: newNotes || null }),
+        })
+        if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
+        const now = new Date().toISOString()
+        setBookings(prev => prev.map(b => {
+          if (b.id !== booking.id) return b
+          const entry: AuditEntry = { booking_id: booking.id, action: 'notes_updated', previous_value: { special_requests: b.special_requests }, new_value: { special_requests: newNotes || null }, performed_by_admin_email: user?.email ?? null, performed_at: now }
+          return { ...b, special_requests: newNotes || null, audit_log: [entry, ...b.audit_log] }
+        }))
+        setSuccess('Notes updated')
+      } catch (e: any) {
+        setError(e.message)
+      }
     } else {
       await handleUpdateBooking(booking.id, { status: newStatus })
     }
   }
 
-  const memberBookings = bookings.filter(b => b.member_id)
-  const nonMemberBookings = bookings.filter(b => !b.member_id)
+  const activeBookings = bookings.filter(b => b.status !== 'cancelled')
+  const cancelledBookings = bookings.filter(b => b.status === 'cancelled')
+  const memberBookings = activeBookings.filter(b => b.member_id)
+  const nonMemberBookings = activeBookings.filter(b => !b.member_id)
+  const cancelledMemberBookings = cancelledBookings.filter(b => b.member_id)
+  const cancelledNonMemberBookings = cancelledBookings.filter(b => !b.member_id)
   const totalTickets = bookings.filter(b => b.status === 'confirmed').reduce((sum, b) => sum + b.guest_count, 0)
-  const totalRevenue = bookings.reduce((sum, b) => sum + (b.total_price ?? 0), 0)
+  const confirmedRevenue = bookings.filter(b => b.status === 'confirmed').reduce((sum, b) => sum + (b.total_price ?? 0), 0)
+  const pendingRevenue = bookings.filter(b => b.status === 'pending').reduce((sum, b) => sum + (b.total_price ?? 0), 0)
 
   if (loading) return <Container maxWidth="lg" sx={{ mt: 4 }}><LinearProgress /></Container>
 
@@ -430,17 +473,38 @@ export default function EventDetailPage() {
                 </Box>
               </Box>
             </Grid>
-            {event.price_per_person != null && (
-              <Grid size={{ xs: 12, sm: 6, md: 3 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <AttachMoneyIcon color="action" />
-                  <Box>
-                    <Typography variant="body2" color="textSecondary">Price per person</Typography>
-                    <Typography variant="body1" fontWeight={500}>£{event.price_per_person}</Typography>
-                  </Box>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <AttachMoneyIcon color="action" />
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Price per person</Typography>
+                  {editingPrice ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <TextField
+                        size="small"
+                        value={editPrice}
+                        onChange={e => setEditPrice(e.target.value)}
+                        inputProps={{ inputMode: 'decimal', style: { width: 80 } }}
+                        placeholder="e.g. 45.00"
+                        autoFocus
+                        onKeyDown={e => { if (e.key === 'Enter') handleSavePrice(); if (e.key === 'Escape') setEditingPrice(false) }}
+                      />
+                      <IconButton size="small" color="success" onClick={handleSavePrice}><CheckIcon fontSize="small" /></IconButton>
+                      <IconButton size="small" onClick={() => setEditingPrice(false)}><CloseIcon fontSize="small" /></IconButton>
+                    </Box>
+                  ) : (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <Typography variant="body1" fontWeight={500}>
+                        {event.price_per_person != null ? `£${event.price_per_person}` : 'Free / TBA'}
+                      </Typography>
+                      <IconButton size="small" onClick={() => { setEditPrice(event.price_per_person?.toString() ?? ''); setEditingPrice(true) }}>
+                        <EditIcon sx={{ fontSize: 14 }} />
+                      </IconButton>
+                    </Box>
+                  )}
                 </Box>
-              </Grid>
-            )}
+              </Box>
+            </Grid>
             <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <PeopleIcon color="action" />
@@ -455,7 +519,10 @@ export default function EventDetailPage() {
                 <AttachMoneyIcon color="success" />
                 <Box>
                   <Typography variant="body2" color="textSecondary">Revenue</Typography>
-                  <Typography variant="body1" fontWeight={500} color="success.main">£{totalRevenue.toFixed(2)}</Typography>
+                  <Typography variant="body1" fontWeight={500} color="success.main">
+                    £{confirmedRevenue.toFixed(2)}
+                    {pendingRevenue > 0 && <Typography component="span" variant="body2" color="text.secondary"> (£{pendingRevenue.toFixed(2)} pending)</Typography>}
+                  </Typography>
                 </Box>
               </Box>
             </Grid>
@@ -654,7 +721,7 @@ export default function EventDetailPage() {
                   {isMember && <TableCell>Membership No.</TableCell>}
                   {!isMember && <TableCell>Phone</TableCell>}
                   <TableCell>Tickets</TableCell>
-                  <TableCell>Special Requests</TableCell>
+                  <TableCell>Notes</TableCell>
                   <TableCell>Status</TableCell>
                   <TableCell>Actions</TableCell>
                 </TableRow>
@@ -678,12 +745,7 @@ export default function EventDetailPage() {
                           )}
                         </TableCell>
                         <TableCell>{isMember ? (b.members?.full_name ?? '—') : (b.guest_name ?? '—')}</TableCell>
-                        <TableCell>
-                          {isMember
-                            ? (b.members?.email ?? '—')
-                            : (b.guest_email ?? '—')
-                          }
-                        </TableCell>
+                        <TableCell>{isMember ? (b.members?.email ?? '—') : (b.guest_email ?? '—')}</TableCell>
                         {isMember && <TableCell>{b.members?.membership_number ?? '—'}</TableCell>}
                         {!isMember && <TableCell>{b.guest_phone ?? '—'}</TableCell>}
                         <TableCell>
@@ -693,9 +755,28 @@ export default function EventDetailPage() {
                             <IconButton size="small" onClick={() => setPendingAction({ type: 'guest_count', booking: b, newGuestCount: b.guest_count + 1 })}>+</IconButton>
                           </Box>
                         </TableCell>
-                        <TableCell sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.special_requests ?? '—'}</TableCell>
                         <TableCell>
-                          <Chip label={b.status} size="small" color={b.status === 'confirmed' ? 'success' : b.status === 'cancelled' ? 'error' : 'warning'} />
+                          {editingNotes?.id === b.id ? (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <TextField size="small" value={editingNotes.value}
+                                onChange={e => setEditingNotes({ id: b.id, value: e.target.value.slice(0, 256) })}
+                                inputProps={{ maxLength: 256 }} sx={{ width: 200 }} autoFocus />
+                              <Button size="small" variant="contained" onClick={() => { setPendingAction({ type: 'notes', booking: b, newNotes: editingNotes.value }); setEditingNotes(null) }}>Save</Button>
+                              <Button size="small" onClick={() => setEditingNotes(null)}>Cancel</Button>
+                            </Box>
+                          ) : (
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                              <Typography variant="body2" sx={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {b.special_requests || '—'}
+                              </Typography>
+                              <IconButton size="small" onClick={() => setEditingNotes({ id: b.id, value: b.special_requests || '' })}>
+                                <EditIcon sx={{ fontSize: 14 }} />
+                              </IconButton>
+                            </Box>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Chip label={b.status} size="small" color={b.status === 'confirmed' ? 'success' : 'warning'} />
                         </TableCell>
                         <TableCell>
                           <Box sx={{ display: 'flex', gap: 0.5 }}>
@@ -706,20 +787,11 @@ export default function EventDetailPage() {
                                 </IconButton>
                               </Tooltip>
                             )}
-                            {b.status !== 'cancelled' && (
-                              <Tooltip title="Cancel">
-                                <IconButton size="small" color="error" onClick={() => handleDeleteBooking(b)}>
-                                  <CancelIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            )}
-                            {b.status === 'cancelled' && (
-                              <Tooltip title="Uncancel">
-                                <IconButton size="small" color="warning" onClick={() => setPendingAction({ type: 'status', booking: b, newStatus: 'pending' })}>
-                                  <RestoreIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            )}
+                            <Tooltip title="Cancel">
+                              <IconButton size="small" color="error" onClick={() => handleDeleteBooking(b)}>
+                                <CancelIcon fontSize="small" />
+                              </IconButton>
+                            </Tooltip>
                           </Box>
                         </TableCell>
                       </TableRow>
@@ -763,6 +835,105 @@ export default function EventDetailPage() {
           </TableContainer>
         </Box>
       ))}
+
+      {/* Cancelled Bookings */}
+      {cancelledBookings.length > 0 && (
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h6" gutterBottom sx={{ color: 'text.secondary' }}>
+            Cancelled Bookings ({cancelledBookings.length})
+          </Typography>
+          {[
+            { list: cancelledMemberBookings, isMember: true },
+            { list: cancelledNonMemberBookings, isMember: false },
+          ].filter(({ list }) => list.length > 0).map(({ list, isMember }) => (
+            <TableContainer key={isMember ? 'cm' : 'cnm'} component={Paper} sx={{ mb: 2, opacity: 0.85 }}>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell width={32} />
+                    <TableCell>{isMember ? 'Member' : 'Guest'}</TableCell>
+                    <TableCell>Email</TableCell>
+                    {isMember && <TableCell>Membership No.</TableCell>}
+                    {!isMember && <TableCell>Phone</TableCell>}
+                    <TableCell>Tickets</TableCell>
+                    <TableCell>Notes</TableCell>
+                    <TableCell>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {list.map(b => {
+                    const isExpanded = expandedAuditRows.has(b.id)
+                    const hasAudit = b.audit_log?.length > 0
+                    return (
+                      <>
+                        <TableRow key={b.id} hover>
+                          <TableCell>
+                            {hasAudit && (
+                              <Tooltip title="View history">
+                                <IconButton size="small" onClick={() => toggleAuditRow(b.id)}>
+                                  {isExpanded ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                          </TableCell>
+                          <TableCell>{isMember ? (b.members?.full_name ?? '—') : (b.guest_name ?? '—')}</TableCell>
+                          <TableCell>{isMember ? (b.members?.email ?? '—') : (b.guest_email ?? '—')}</TableCell>
+                          {isMember && <TableCell>{b.members?.membership_number ?? '—'}</TableCell>}
+                          {!isMember && <TableCell>{b.guest_phone ?? '—'}</TableCell>}
+                          <TableCell>{b.guest_count}</TableCell>
+                          <TableCell>
+                            <Typography variant="body2" sx={{ maxWidth: 180, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                              {b.special_requests || '—'}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>
+                            <Button size="small" variant="outlined" color="warning" startIcon={<RestoreIcon />}
+                              onClick={() => setPendingAction({ type: 'status', booking: b, newStatus: 'pending' })}>
+                              Uncancel
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                        {hasAudit && (
+                          <TableRow key={`${b.id}-audit`}>
+                            <TableCell colSpan={8} sx={{ py: 0, bgcolor: 'grey.50' }}>
+                              <Collapse in={isExpanded} unmountOnExit>
+                                <Box sx={{ py: 1.5, px: 2 }}>
+                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                                    <HistoryIcon fontSize="small" color="action" />
+                                    <Typography variant="caption" fontWeight={600} color="textSecondary">Audit History</Typography>
+                                  </Box>
+                                  {b.audit_log.map((entry, i) => (
+                                    <Box key={i} sx={{ display: 'flex', gap: 2, mb: 0.5, alignItems: 'baseline' }}>
+                                      <Typography variant="caption" color="textSecondary" sx={{ minWidth: 140 }}>
+                                        {new Date(entry.performed_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                      </Typography>
+                                      <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                        {entry.action.replace(/_/g, ' ')}
+                                      </Typography>
+                                      {entry.previous_value && entry.new_value && (
+                                        <Typography variant="caption" color="textSecondary">
+                                          {Object.keys(entry.new_value).map(k => `${k}: ${entry.previous_value![k]} → ${entry.new_value![k]}`).join(', ')}
+                                        </Typography>
+                                      )}
+                                      {entry.performed_by_admin_email && (
+                                        <Typography variant="caption" color="textSecondary">· {entry.performed_by_admin_email}</Typography>
+                                      )}
+                                    </Box>
+                                  ))}
+                                </Box>
+                              </Collapse>
+                            </TableCell>
+                          </TableRow>
+                        )}
+                      </>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ))}
+        </Box>
+      )}
       {/* Confirmation Dialog */}
       <Dialog open={!!pendingAction} onClose={() => setPendingAction(null)} maxWidth="xs" fullWidth>
         <DialogTitle>Confirm Action</DialogTitle>
@@ -773,6 +944,7 @@ export default function EventDetailPage() {
             const email = b.members?.email || b.guest_email || '—'
             const actionLabel = pendingAction.type === 'guest_count'
               ? `Update guest count to ${pendingAction.newGuestCount}`
+              : pendingAction.type === 'notes' ? 'Update notes'
               : pendingAction.newStatus === 'confirmed' ? 'Confirm booking'
               : pendingAction.newStatus === 'cancelled' ? 'Cancel booking'
               : 'Uncancel booking'
@@ -783,6 +955,7 @@ export default function EventDetailPage() {
                 <Typography variant="body2"><strong>Name:</strong> {name}</Typography>
                 <Typography variant="body2"><strong>Email:</strong> {email}</Typography>
                 <Typography variant="body2"><strong>Guests:</strong> {pendingAction.type === 'guest_count' ? `${b.guest_count} → ${pendingAction.newGuestCount}` : b.guest_count}</Typography>
+                <Typography variant="body2"><strong>Notes:</strong> {pendingAction.type === 'notes' ? `${b.special_requests || '(none)'} → ${pendingAction.newNotes || '(none)'}` : (b.special_requests || '—')}</Typography>
               </Box>
             )
           })()}

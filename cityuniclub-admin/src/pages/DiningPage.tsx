@@ -145,10 +145,11 @@ export default function DiningPage() {
   const [editingGuestCount, setEditingGuestCount] = useState<{ id: string; value: number } | null>(null)
   const [editingNotes, setEditingNotes] = useState<{ id: string; value: string } | null>(null)
   const [pendingAction, setPendingAction] = useState<{
-    type: 'status' | 'guest_count'
+    type: 'status' | 'guest_count' | 'notes'
     id: string
     newStatus?: string
     newGuestCount?: number
+    newNotes?: string
     reservation: DiningReservation
   } | null>(null)
 
@@ -204,7 +205,7 @@ export default function DiningPage() {
 
   const executePendingAction = async () => {
     if (!pendingAction) return
-    const { type, id, newStatus, newGuestCount } = pendingAction
+    const { type, id, newStatus, newGuestCount, newNotes } = pendingAction
     setPendingAction(null)
     try {
       if (type === 'guest_count') {
@@ -222,6 +223,21 @@ export default function DiningPage() {
         }))
         setEditingGuestCount(null)
         setStatusMessage(`Guest count updated to ${newGuestCount}`)
+      } else if (type === 'notes') {
+        const res = await fetch(`${FUNCTIONS_URL}/admin-dining`, {
+          method: 'PATCH',
+          headers: getAuthHeaders(),
+          body: JSON.stringify({ id, special_requests: newNotes || null })
+        })
+        if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to update notes') }
+        const now = new Date().toISOString()
+        setReservations(prev => prev.map(r => {
+          if (r.id !== id) return r
+          const entry: AuditEntry = { action: 'notes_updated', previous_value: { special_requests: r.special_requests ?? null }, new_value: { special_requests: newNotes || null }, performed_by_admin_email: user?.email ?? null, performed_at: now }
+          return { ...r, special_requests: newNotes || undefined, audit_log: [entry, ...(r.audit_log ?? [])] }
+        }))
+        setEditingNotes(null)
+        setStatusMessage('Notes updated')
       } else {
         const res = await fetch(`${FUNCTIONS_URL}/admin-dining`, {
           method: 'PATCH',
@@ -243,26 +259,8 @@ export default function DiningPage() {
     }
   }
 
-  const handleUpdateNotes = async (id: string, special_requests: string) => {
-    try {
-      const res = await fetch(`${FUNCTIONS_URL}/admin-dining`, {
-        method: 'PATCH',
-        headers: getAuthHeaders(),
-        body: JSON.stringify({ id, special_requests: special_requests || null })
-      })
-      if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Failed to update notes') }
-      const now = new Date().toISOString()
-      setReservations(prev => prev.map(r => {
-        if (r.id !== id) return r
-        const entry: AuditEntry = { action: 'notes_updated', previous_value: { special_requests: r.special_requests ?? null }, new_value: { special_requests: special_requests || null }, performed_by_admin_email: user?.email ?? null, performed_at: now }
-        return { ...r, special_requests: special_requests || undefined, audit_log: [entry, ...(r.audit_log ?? [])] }
-      }))
-      setEditingNotes(null)
-      setStatusMessage('Notes updated')
-      setTimeout(() => setStatusMessage(null), 3000)
-    } catch (e: any) {
-      setError(e.message)
-    }
+  const handleUpdateNotes = (reservation: DiningReservation, notes: string) => {
+    setPendingAction({ type: 'notes', id: reservation.id, newNotes: notes, reservation })
   }
 
   const reservationsByDate = useMemo(() => {
@@ -603,7 +601,7 @@ export default function DiningPage() {
                                           sx={{ width: 200 }}
                                           autoFocus
                                         />
-                                        <Button size="small" variant="contained" onClick={() => handleUpdateNotes(reservation.id, editingNotes.value)}>Save</Button>
+                                        <Button size="small" variant="contained" onClick={() => handleUpdateNotes(reservation, editingNotes.value)}>Save</Button>
                                         <Button size="small" onClick={() => setEditingNotes(null)}>Cancel</Button>
                                       </Box>
                                     ) : (
@@ -753,7 +751,7 @@ export default function DiningPage() {
                                         <TextField size="small" value={editingNotes.value}
                                           onChange={e => setEditingNotes({ id: reservation.id, value: e.target.value.slice(0, 256) })}
                                           inputProps={{ maxLength: 256 }} sx={{ width: 200 }} autoFocus />
-                                        <Button size="small" variant="contained" onClick={() => handleUpdateNotes(reservation.id, editingNotes.value)}>Save</Button>
+                                        <Button size="small" variant="contained" onClick={() => handleUpdateNotes(reservation, editingNotes.value)}>Save</Button>
                                         <Button size="small" onClick={() => setEditingNotes(null)}>Cancel</Button>
                                       </Box>
                                     ) : (
@@ -878,7 +876,7 @@ export default function DiningPage() {
                                           sx={{ width: 200 }}
                                           autoFocus
                                         />
-                                        <Button size="small" variant="contained" onClick={() => handleUpdateNotes(reservation.id, editingNotes.value)}>Save</Button>
+                                        <Button size="small" variant="contained" onClick={() => handleUpdateNotes(reservation, editingNotes.value)}>Save</Button>
                                         <Button size="small" onClick={() => setEditingNotes(null)}>Cancel</Button>
                                       </Box>
                                     ) : (
@@ -933,8 +931,10 @@ export default function DiningPage() {
             const email = r.members?.email || r.guest_email || '—'
             const date = new Date(r.reservation_date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
             const time = formatTime(r.reservation_time)
+            const currentNotes = r.special_requests || r.table_preference || null
             const actionLabel = pendingAction.type === 'guest_count'
               ? `Update guest count to ${pendingAction.newGuestCount}`
+              : pendingAction.type === 'notes' ? 'Update notes'
               : pendingAction.newStatus === 'confirmed' ? 'Confirm reservation'
               : pendingAction.newStatus === 'cancelled' ? 'Cancel reservation'
               : 'Uncancel reservation'
@@ -946,6 +946,7 @@ export default function DiningPage() {
                 <Typography variant="body2"><strong>Name:</strong> {name}</Typography>
                 <Typography variant="body2"><strong>Email:</strong> {email}</Typography>
                 <Typography variant="body2"><strong>Guests:</strong> {pendingAction.type === 'guest_count' ? `${r.guest_count} → ${pendingAction.newGuestCount}` : r.guest_count}</Typography>
+                <Typography variant="body2"><strong>Notes:</strong> {pendingAction.type === 'notes' ? `${currentNotes || '(none)'} → ${pendingAction.newNotes || '(none)'}` : (currentNotes || '—')}</Typography>
               </Box>
             )
           })()}
