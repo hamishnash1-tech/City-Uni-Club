@@ -37,9 +37,6 @@ serve(async (req) => {
     }
 
     const memberId = session.member_id
-    const oneMonthAgo = new Date()
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
-
     // Fetch event bookings with event details
     const { data: eventBookings, error: ebError } = await supabase
       .from('event_bookings')
@@ -68,7 +65,6 @@ serve(async (req) => {
       .from('dining_reservations')
       .select('id, reservation_date, reservation_time, meal_type, guest_count, status, special_requests')
       .eq('member_id', memberId)
-      .gte('reservation_date', oneMonthAgo.toISOString().split('T')[0])
       .order('reservation_date', { ascending: false })
 
     if (drError) throw drError
@@ -79,13 +75,9 @@ serve(async (req) => {
     const upcomingEvents: any[] = []
     const pastEvents: any[] = []
 
-    const oneMonthAgoDate = oneMonthAgo.toISOString().split('T')[0]
-
     for (const booking of (eventBookings ?? [])) {
       const event = (booking as any).events
       if (!event) continue
-      // Skip events that are in the past beyond one month ago (and not TBA)
-      if (!event.is_tba && event.event_date && event.event_date < oneMonthAgoDate) continue
       const entry = {
         id: booking.id,
         type: 'event' as const,

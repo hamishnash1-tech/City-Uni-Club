@@ -50,6 +50,24 @@ function BookingItem({ item }: { item: any }) {
   )
 }
 
+const PAGE_SIZE = 8
+
+function itemTimestamp(item: any): number {
+  if (item.type === 'event') {
+    if (!item.event_date || item.is_tba) return Number.NEGATIVE_INFINITY
+    const t = new Date(`${item.event_date}T00:00:00`).getTime()
+    return Number.isNaN(t) ? Number.NEGATIVE_INFINITY : t
+  }
+  const date = item.reservation_date || ''
+  const time = item.reservation_time || '00:00:00'
+  const t = new Date(`${date}T${time}`).getTime()
+  return Number.isNaN(t) ? Number.NEGATIVE_INFINITY : t
+}
+
+function sortByDateDesc(a: any, b: any) {
+  return itemTimestamp(b) - itemTimestamp(a)
+}
+
 export const Profile: React.FC = () => {
   const auth = useSelector((state: RootState) => state.auth)
   const dispatch = useDispatch()
@@ -65,6 +83,8 @@ export const Profile: React.FC = () => {
 
   const [bookings, setBookings] = useState<{ upcoming: any[]; past: any[] } | null>(null)
   const [bookingsLoading, setBookingsLoading] = useState(true)
+  const [diningPage, setDiningPage] = useState(1)
+  const [eventPage, setEventPage] = useState(1)
 
   useEffect(() => {
     const token = localStorage.getItem('authToken')
@@ -75,10 +95,33 @@ export const Profile: React.FC = () => {
       .finally(() => setBookingsLoading(false))
   }, [])
 
+  useEffect(() => {
+    setDiningPage(1)
+    setEventPage(1)
+  }, [bookings])
+
   if (!member) {
     navigate('/login')
     return null
   }
+
+  const allBookings = [...(bookings?.upcoming ?? []), ...(bookings?.past ?? [])]
+  const diningBookings = allBookings.filter((item) => item.type === 'dining').sort(sortByDateDesc)
+  const eventBookings = allBookings.filter((item) => item.type === 'event').sort(sortByDateDesc)
+
+  const diningPageCount = Math.max(1, Math.ceil(diningBookings.length / PAGE_SIZE))
+  const eventPageCount = Math.max(1, Math.ceil(eventBookings.length / PAGE_SIZE))
+
+  const diningStart = (diningPage - 1) * PAGE_SIZE
+  const eventStart = (eventPage - 1) * PAGE_SIZE
+
+  const diningPageItems = diningBookings.slice(diningStart, diningStart + PAGE_SIZE)
+  const eventPageItems = eventBookings.slice(eventStart, eventStart + PAGE_SIZE)
+
+  const canPrevDining = diningPage > 1
+  const canNextDining = diningPage < diningPageCount
+  const canPrevEvent = eventPage > 1
+  const canNextEvent = eventPage < eventPageCount
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -136,34 +179,85 @@ export const Profile: React.FC = () => {
           </div>
         </div>
 
-        {/* Bookings */}
+        {/* Dining Bookings */}
         <div className="club-card p-6 space-y-5">
-          <h2 className="font-serif text-oxford-blue font-normal text-lg">My Bookings</h2>
+          <h2 className="font-serif text-oxford-blue font-normal text-lg">My Dining Bookings</h2>
 
           {bookingsLoading ? (
             <p className="text-sm text-ink-light">Loading…</p>
           ) : (
             <>
-              {/* Upcoming */}
-              <div>
-                <h3 className="label-caps text-ink-light mb-3">Upcoming</h3>
-                {bookings?.upcoming.length === 0 ? (
-                  <p className="text-sm text-ink-light">No upcoming bookings.</p>
-                ) : (
+              {diningBookings.length === 0 ? (
+                <p className="text-sm text-ink-light">No dining bookings found.</p>
+              ) : (
+                <>
                   <div>
-                    {bookings?.upcoming.map(item => <BookingItem key={item.id} item={item} />)}
+                    {diningPageItems.map(item => <BookingItem key={item.id} item={item} />)}
                   </div>
-                )}
-              </div>
+                  {diningPageCount > 1 && (
+                    <div className="flex items-center justify-between pt-3 border-t border-cambridge/10">
+                      <button
+                        type="button"
+                        className="btn-outline-navy px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => setDiningPage((p) => Math.max(1, p - 1))}
+                        disabled={!canPrevDining}
+                      >
+                        Previous
+                      </button>
+                      <p className="text-xs text-ink-light">Page {diningPage} of {diningPageCount}</p>
+                      <button
+                        type="button"
+                        className="btn-outline-navy px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => setDiningPage((p) => Math.min(diningPageCount, p + 1))}
+                        disabled={!canNextDining}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </div>
 
-              {/* Past (last month) */}
-              {(bookings?.past.length ?? 0) > 0 && (
-                <div className="border-t border-cambridge/10 pt-5">
-                  <h3 className="label-caps text-ink-light mb-3">Recent (last month)</h3>
+        {/* Event Bookings */}
+        <div className="club-card p-6 space-y-5">
+          <h2 className="font-serif text-oxford-blue font-normal text-lg">My Event Bookings</h2>
+
+          {bookingsLoading ? (
+            <p className="text-sm text-ink-light">Loading…</p>
+          ) : (
+            <>
+              {eventBookings.length === 0 ? (
+                <p className="text-sm text-ink-light">No event bookings found.</p>
+              ) : (
+                <>
                   <div>
-                    {bookings?.past.map(item => <BookingItem key={item.id} item={item} />)}
+                    {eventPageItems.map(item => <BookingItem key={item.id} item={item} />)}
                   </div>
-                </div>
+                  {eventPageCount > 1 && (
+                    <div className="flex items-center justify-between pt-3 border-t border-cambridge/10">
+                      <button
+                        type="button"
+                        className="btn-outline-navy px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => setEventPage((p) => Math.max(1, p - 1))}
+                        disabled={!canPrevEvent}
+                      >
+                        Previous
+                      </button>
+                      <p className="text-xs text-ink-light">Page {eventPage} of {eventPageCount}</p>
+                      <button
+                        type="button"
+                        className="btn-outline-navy px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => setEventPage((p) => Math.min(eventPageCount, p + 1))}
+                        disabled={!canNextEvent}
+                      >
+                        Next
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </>
           )}
