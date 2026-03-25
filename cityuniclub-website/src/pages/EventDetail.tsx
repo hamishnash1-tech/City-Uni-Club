@@ -398,6 +398,15 @@ export const EventDetail: React.FC = () => {
                 </div>
               ) : (
                 <>
+                  <div className="flex gap-3 rounded border border-cambridge/30 bg-cambridge/10 px-4 py-3">
+                    <svg className="w-4 h-4 text-cambridge-muted flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div className="text-xs text-ink leading-relaxed space-y-1">
+                      <p>You are booking as a guest. Your booking won't be confirmed until reviewed by the Club.</p>
+                      <p>If you're a member, <Link to="/login" className="text-cambridge-blue underline">sign in</Link> to book with your membership.</p>
+                    </div>
+                  </div>
                   <div>
                     <label className="label-caps text-ink-light block mb-2">Your Name *</label>
                     <input
@@ -456,8 +465,18 @@ export const EventDetail: React.FC = () => {
                   onChange={e => setSpecialRequests(e.target.value)}
                   className="club-input"
                   rows={3}
-                  placeholder="Dietary requirements, seating preferences, etc."
+                  placeholder="Dietary requirements, seating preferences, accessibility needs, etc."
                 />
+                {['lunch', 'dinner', 'lunch_dinner'].includes(event.event_type) && (
+                  <div className="flex gap-3 rounded border border-amber-300 bg-amber-50 px-4 py-3 mt-2">
+                    <svg className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-xs text-amber-800 leading-relaxed">
+                      Members or guests with food allergies must contact the Club Secretary directly before making a booking.
+                    </p>
+                  </div>
+                )}
               </div>
 
               {submitError && (

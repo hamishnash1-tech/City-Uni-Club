@@ -152,12 +152,12 @@ serve(async (req: Request) => {
 
     // PATCH: update a booking (status or guest_count)
     if (req.method === 'PATCH') {
-      const { booking_id, status, guest_count } = await req.json()
+      const { booking_id, status, guest_count, special_requests } = await req.json()
       if (!booking_id) return new Response(JSON.stringify({ error: 'Missing booking_id' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
       const { data: current } = await db
         .from('event_bookings')
-        .select('status, guest_count, guest_email, guest_name, member_id, event_id, events(title, event_date, price_per_person), members(email, full_name)')
+        .select('status, guest_count, special_requests, guest_email, guest_name, member_id, event_id, events(title, event_date, price_per_person), members(email, full_name)')
         .eq('id', booking_id)
         .single()
 
@@ -179,6 +179,12 @@ serve(async (req: Request) => {
         action = action ? `${action},guest_count_updated` : 'guest_count_updated'
         previousValue.guest_count = current?.guest_count
         newValue.guest_count = guest_count
+      }
+      if (special_requests !== undefined) {
+        updates.special_requests = special_requests || null
+        action = action ? `${action},notes_updated` : 'notes_updated'
+        previousValue.special_requests = (current as any)?.special_requests ?? null
+        newValue.special_requests = special_requests || null
       }
 
       if (Object.keys(updates).length === 0) return new Response(JSON.stringify({ error: 'Nothing to update' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })

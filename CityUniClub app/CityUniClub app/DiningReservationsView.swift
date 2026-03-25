@@ -7,6 +7,9 @@ struct DiningBookingItem: Identifiable {
     let reservationTime: String
     var guestCount: Int
     var status: String
+    var specialRequests: String?
+
+    static let maxNotesLength = 256
 }
 
 struct DiningReservationsView: View {
@@ -173,6 +176,7 @@ struct DiningReservationsView: View {
                 let id: String; let type: String
                 let reservation_date: String?; let reservation_time: String?
                 let meal_type: String?; let guest_count: Int; let status: String
+                let special_requests: String?
             }
             struct RawResponse: Decodable { let upcoming: [RawItem]; let past: [RawItem] }
             let decoded = try JSONDecoder().decode(RawResponse.self, from: data)
@@ -182,7 +186,8 @@ struct DiningReservationsView: View {
                       let time = item.reservation_time,
                       let meal = item.meal_type else { return nil }
                 return DiningBookingItem(id: item.id, mealType: meal, reservationDate: date,
-                                         reservationTime: time, guestCount: item.guest_count, status: item.status)
+                                         reservationTime: time, guestCount: item.guest_count,
+                                         status: item.status, specialRequests: item.special_requests)
             }
             await MainActor.run {
                 upcoming = decoded.upcoming.compactMap(toDiningItem)

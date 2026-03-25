@@ -8,6 +8,7 @@ struct EventReservationItem: Identifiable {
     let isTba: Bool
     var guestCount: Int
     var status: String
+    var specialRequests: String?
 
     func toEvent() -> Event {
         Event(
@@ -22,7 +23,7 @@ struct EventReservationItem: Identifiable {
             maxCapacity: nil,
             isTba: isTba,
             isActive: true,
-            myBooking: EventMyBooking(id: id, status: status, guestCount: guestCount)
+            myBooking: EventMyBooking(id: id, status: status, guestCount: guestCount, specialRequests: specialRequests)
         )
     }
 }
@@ -199,6 +200,7 @@ struct EventReservationsView: View {
                 let is_tba: Bool?
                 let guest_count: Int
                 let status: String
+                let special_requests: String?
             }
             struct RawResponse: Decodable { let upcoming: [RawItem]; let past: [RawItem] }
 
@@ -213,7 +215,8 @@ struct EventReservationsView: View {
                     eventDate: item.event_date,
                     isTba: item.is_tba ?? (item.event_date == nil),
                     guestCount: item.guest_count,
-                    status: item.status
+                    status: item.status,
+                    specialRequests: item.special_requests
                 )
             }
 

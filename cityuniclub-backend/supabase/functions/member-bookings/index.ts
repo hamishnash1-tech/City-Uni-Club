@@ -45,6 +45,7 @@ serve(async (req) => {
         guest_count,
         total_price,
         status,
+        special_requests,
         created_at,
         events (
           id,
@@ -63,7 +64,7 @@ serve(async (req) => {
     // Fetch dining reservations
     const { data: diningReservations, error: drError } = await supabase
       .from('dining_reservations')
-      .select('id, reservation_date, reservation_time, meal_type, guest_count, status, special_requests')
+      .select('id, reservation_date, reservation_time, meal_type, guest_count, table_preference, status, special_requests')
       .eq('member_id', memberId)
       .order('reservation_date', { ascending: false })
 
@@ -87,7 +88,9 @@ serve(async (req) => {
         is_tba: event.is_tba,
         guest_count: booking.guest_count,
         total_price: booking.total_price,
+        price_per_person: event.price_per_person,
         status: booking.status,
+        special_requests: booking.special_requests,
         booked_at: booking.created_at,
       }
       if (event.is_tba || !event.event_date || event.event_date >= today) {
@@ -110,6 +113,7 @@ serve(async (req) => {
         reservation_time: res.reservation_time,
         meal_type: res.meal_type,
         guest_count: res.guest_count,
+        table_preference: res.table_preference,
         status: res.status,
         special_requests: res.special_requests,
       }

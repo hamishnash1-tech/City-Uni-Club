@@ -42,6 +42,7 @@ function BookingItem({ item }: { item: any }) {
               ? (item.is_tba ? 'Date TBA' : formatDate(item.event_date))
               : `${formatDate(item.reservation_date)} · ${formatTime(item.reservation_time)}`}
             {' · '}{item.guest_count} {item.guest_count === 1 ? 'guest' : 'guests'}
+            {isEvent && item.price_per_person > 0 && ` · £${item.price_per_person}/person`}
           </p>
         </div>
         {statusBadge(item.status)}

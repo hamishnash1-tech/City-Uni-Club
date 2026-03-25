@@ -94,11 +94,17 @@ struct DiningView: View {
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.secondaryText)
                 
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        ForEach(-1..<15) { day in
-                            datePickerButton(day: day)
+                ScrollViewReader { proxy in
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(-1..<15) { day in
+                                datePickerButton(day: day)
+                                    .id(day)
+                            }
                         }
+                    }
+                    .onAppear {
+                        proxy.scrollTo(0, anchor: .leading)
                     }
                 }
             }

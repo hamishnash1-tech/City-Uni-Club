@@ -93,7 +93,7 @@ serve(async (req: Request) => {
         })
       }
 
-      const { booking_id, guest_count } = await req.json()
+      const { booking_id, guest_count, special_requests } = await req.json()
       if (!booking_id) {
         return new Response(JSON.stringify({ error: 'Missing booking_id' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400,
@@ -175,6 +175,24 @@ serve(async (req: Request) => {
             `,
           })
         }
+
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200,
+        })
+      }
+
+      // Update special requests
+      if (special_requests !== undefined) {
+        if (special_requests && special_requests.length > 256) {
+          return new Response(JSON.stringify({ error: 'Notes must be 256 characters or fewer' }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400,
+          })
+        }
+        const { error: updateError } = await supabase
+          .from('event_bookings')
+          .update({ special_requests: special_requests || null })
+          .eq('id', booking_id)
+        if (updateError) throw updateError
 
         return new Response(JSON.stringify({ success: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200,

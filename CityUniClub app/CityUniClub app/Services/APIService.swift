@@ -324,6 +324,29 @@ class APIService {
         }
     }
     
+    func updateEventNotes(bookingId: String, specialRequests: String?) async throws {
+        guard let url = URL(string: "\(APIConfiguration.baseURL)/event-bookings") else {
+            throw APIError.invalidURL
+        }
+        guard let token = authToken else { throw APIError.unauthorized }
+
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "PATCH"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue(token, forHTTPHeaderField: "x-session-token")
+        var body: [String: Any] = ["booking_id": bookingId]
+        body["special_requests"] = specialRequests as Any
+        urlRequest.httpBody = try JSONSerialization.data(withJSONObject: body)
+
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        guard let http = response as? HTTPURLResponse else { throw APIError.noData }
+        guard (200...299).contains(http.statusCode) else {
+            let msg = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])
+                .flatMap { $0["error"] as? String } ?? "Update failed"
+            throw APIError.httpError(statusCode: http.statusCode, message: msg)
+        }
+    }
+
     func changeEventGuestCount(bookingId: String, guestCount: Int) async throws {
         guard let url = URL(string: "\(APIConfiguration.baseURL)/event-bookings") else {
             throw APIError.invalidURL

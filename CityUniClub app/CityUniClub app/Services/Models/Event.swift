@@ -11,11 +11,13 @@ struct EventMyBooking: Codable {
     let id: String
     let status: String
     let guestCount: Int
+    let specialRequests: String?
 
     enum CodingKeys: String, CodingKey {
         case id
         case status
         case guestCount = "guest_count"
+        case specialRequests = "special_requests"
     }
 }
 

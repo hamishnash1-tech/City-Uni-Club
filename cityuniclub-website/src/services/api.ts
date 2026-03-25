@@ -278,6 +278,18 @@ export const api = {
     }
   },
 
+  async updateDiningNotes(token: string, reservationId: string, notes: string): Promise<void> {
+    const response = await fetch(`${API_BASE}/dining`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-session-token': token },
+      body: JSON.stringify({ reservation_id: reservationId, special_requests: notes }),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to update notes')
+    }
+  },
+
   async updateDiningGuestCount(token: string, reservationId: string, guestCount: number): Promise<void> {
     const response = await fetch(`${API_BASE}/dining`, {
       method: 'PATCH',

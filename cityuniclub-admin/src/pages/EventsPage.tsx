@@ -70,7 +70,7 @@ export default function EventsPage() {
 
   const generateSlug = (title: string, date: string, shortId?: number) => {
     const datePart = date || 'tba'
-    const titlePart = title.trim().split(/\s+/).slice(0, 4).join(' ')
+    const titlePart = title.trim()
       .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
     const idPart = shortId ?? ''
     return `${datePart}-${titlePart}${idPart ? `-${idPart}` : ''}`
