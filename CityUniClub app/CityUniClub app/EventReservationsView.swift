@@ -51,12 +51,12 @@ struct EventReservationsView: View {
                             .foregroundColor(.white.opacity(0.7))
                             .padding(.top, 60)
                     } else if upcoming.isEmpty && past.isEmpty {
-                        Text("No event reservations found.")
+                        Text("No event bookings found.")
                             .font(.system(size: 14))
                             .foregroundColor(.white.opacity(0.7))
                             .padding(.top, 60)
                     } else {
-                        reservationSection(title: "Upcoming", items: $upcoming, emptyMessage: "No upcoming reservations.")
+                        reservationSection(title: "Upcoming", items: $upcoming, emptyMessage: "No upcoming bookings.")
                         if !past.isEmpty {
                             reservationSection(title: "Recent", items: $past, emptyMessage: nil)
                         }
@@ -66,12 +66,16 @@ struct EventReservationsView: View {
                 .padding(.top, 20)
                 .padding(.bottom, 40)
             }
-            .refreshable { await loadReservations() }
+            .scrollBounceBehavior(.always, axes: .vertical)
+            .refreshable {
+                print("[EventBookings] Pull-to-refresh triggered")
+                await loadReservations(trigger: "pull_to_refresh")
+            }
         }
-        .navigationTitle("My Reservations")
+        .navigationTitle("My Bookings")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .task { await loadReservations() }
+        .task { await loadReservations(trigger: "initial_load") }
     }
 
     private func reservationSection(title: String, items: Binding<[EventReservationItem]>, emptyMessage: String?) -> some View {
@@ -169,10 +173,12 @@ struct EventReservationsView: View {
         return f.string(from: date)
     }
 
-    private func loadReservations() async {
+    private func loadReservations(trigger: String = "unknown") async {
+        print("[EventBookings] load start (\(trigger))")
         guard let token = authManager.getAuthToken(),
               let url = URL(string: "\(APIConfiguration.baseURL)/member-bookings") else {
-            await MainActor.run { errorMessage = "Unable to load reservations."; isLoading = false }
+            print("[EventBookings] load aborted (\(trigger)): missing token or URL")
+            await MainActor.run { errorMessage = "Unable to load bookings."; isLoading = false }
             return
         }
 
@@ -202,7 +208,7 @@ struct EventReservationsView: View {
                 guard item.type == "event" else { return nil }
                 return EventReservationItem(
                     id: item.id,
-                    title: item.title ?? "Event Reservation",
+                    title: item.title ?? "Event Booking",
                     eventType: item.event_type ?? "special",
                     eventDate: item.event_date,
                     isTba: item.is_tba ?? (item.event_date == nil),
@@ -216,9 +222,13 @@ struct EventReservationsView: View {
                 past = decoded.past.compactMap(toEventItem)
                 isLoading = false
             }
+            let upcomingEventCount = decoded.upcoming.filter { $0.type == "event" }.count
+            let pastEventCount = decoded.past.filter { $0.type == "event" }.count
+            print("[EventBookings] load success (\(trigger)): upcoming=\(upcomingEventCount) past=\(pastEventCount)")
         } catch {
+            print("[EventBookings] load failed (\(trigger)): \(error.localizedDescription)")
             await MainActor.run {
-                errorMessage = "Failed to load reservations."
+                errorMessage = "Failed to load bookings."
                 isLoading = false
             }
         }

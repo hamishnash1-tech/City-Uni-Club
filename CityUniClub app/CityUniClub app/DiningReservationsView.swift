@@ -49,13 +49,17 @@ struct DiningReservationsView: View {
                     .padding(.top, 20)
                     .padding(.bottom, 40)
                 }
-                .refreshable { await loadReservations() }
+                .scrollBounceBehavior(.always, axes: .vertical)
+                .refreshable {
+                    print("[DiningReservations] Pull-to-refresh triggered")
+                    await loadReservations(trigger: "pull_to_refresh")
+                }
             }
         }
         .navigationTitle("My Reservations")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .task { await loadReservations() }
+        .task { await loadReservations(trigger: "initial_load") }
     }
 
     private func reservationSection(title: String, items: Binding<[DiningBookingItem]>, emptyMessage: String?) -> some View {
@@ -151,9 +155,11 @@ struct DiningReservationsView: View {
         return String(format: "%d:%02d %@", hour, m, ampm)
     }
 
-    private func loadReservations() async {
+    private func loadReservations(trigger: String = "unknown") async {
+        print("[DiningReservations] load start (\(trigger))")
         guard let token = authManager.getAuthToken(),
               let url = URL(string: "\(APIConfiguration.baseURL)/member-bookings") else {
+            print("[DiningReservations] load aborted (\(trigger)): missing token or URL")
             await MainActor.run { errorMessage = "Unable to load reservations."; isLoading = false }
             return
         }
@@ -183,7 +189,11 @@ struct DiningReservationsView: View {
                 past = decoded.past.compactMap(toDiningItem)
                 isLoading = false
             }
+            let upcomingDiningCount = decoded.upcoming.filter { $0.type == "dining" }.count
+            let pastDiningCount = decoded.past.filter { $0.type == "dining" }.count
+            print("[DiningReservations] load success (\(trigger)): upcoming=\(upcomingDiningCount) past=\(pastDiningCount)")
         } catch {
+            print("[DiningReservations] load failed (\(trigger)): \(error.localizedDescription)")
             await MainActor.run { errorMessage = "Failed to load reservations."; isLoading = false }
         }
     }

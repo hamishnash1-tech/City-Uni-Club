@@ -41,7 +41,7 @@ struct EventsView: View {
                         HStack {
                             Image(systemName: "calendar.badge.clock")
                                 .font(.system(size: 16))
-                            Text("My Reservations")
+                            Text("My Bookings")
                                 .font(.system(size: 14, weight: .semibold))
                             Spacer()
                             Image(systemName: "chevron.right")
