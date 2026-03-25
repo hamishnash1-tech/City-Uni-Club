@@ -7,6 +7,18 @@
 
 import Foundation
 
+struct EventMyBooking: Codable {
+    let id: String
+    let status: String
+    let guestCount: Int
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case status
+        case guestCount = "guest_count"
+    }
+}
+
 struct Event: Codable, Identifiable {
     let id: String
     let title: String
@@ -19,7 +31,8 @@ struct Event: Codable, Identifiable {
     let maxCapacity: Int?
     let isTba: Bool
     let isActive: Bool
-    
+    let myBooking: EventMyBooking?
+
     enum CodingKeys: String, CodingKey {
         case id
         case title
@@ -32,6 +45,7 @@ struct Event: Codable, Identifiable {
         case maxCapacity = "max_capacity"
         case isTba = "is_tba"
         case isActive = "is_active"
+        case myBooking = "my_booking"
     }
     
     var displayDate: String {
@@ -46,6 +60,14 @@ struct Event: Codable, Identifiable {
         return eventDate
     }
     
+    var isPast: Bool {
+        guard let dateString = eventDate, !isTba else { return false }
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        guard let date = f.date(from: dateString) else { return false }
+        return date < Calendar.current.startOfDay(for: Date())
+    }
+
     var displayDateTime: String {
         switch eventType {
         case "lunch":       return "\(displayDate) · 12:30 PM"
@@ -59,7 +81,7 @@ struct Event: Codable, Identifiable {
 struct EventBooking: Codable, Identifiable {
     let id: String
     let eventId: String
-    let memberId: String
+    let memberId: String?
     let mealOption: String?
     let guestCount: Int
     let specialRequests: String?

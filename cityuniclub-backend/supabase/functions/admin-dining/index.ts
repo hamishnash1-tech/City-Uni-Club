@@ -57,25 +57,88 @@ serve(async (req) => {
       if (to) query = query.lte('reservation_date', to)
 
       const { data, error } = await query
-
       if (error) throw error
 
-      return new Response(JSON.stringify({ reservations: data }), {
+      // Fetch audit log for these reservations
+      const ids = (data ?? []).map((r: any) => r.id)
+      let auditByBooking: Record<string, any[]> = {}
+      if (ids.length > 0) {
+        const { data: auditData } = await supabase
+          .from('booking_audit_log')
+          .select('booking_id, action, previous_value, new_value, performed_by_admin_email, performed_at')
+          .eq('booking_type', 'dining')
+          .in('booking_id', ids)
+          .order('performed_at', { ascending: false })
+        for (const entry of auditData ?? []) {
+          if (!auditByBooking[entry.booking_id]) auditByBooking[entry.booking_id] = []
+          auditByBooking[entry.booking_id].push(entry)
+        }
+      }
+
+      const reservations = (data ?? []).map((r: any) => ({
+        ...r,
+        audit_log: auditByBooking[r.id] ?? [],
+      }))
+
+      return new Response(JSON.stringify({ reservations }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200
       })
     }
 
     if (req.method === 'PATCH') {
-      const { id, status } = await req.json()
-      if (!id || !status) throw new Error('Missing id or status')
+      const { id, status, guest_count } = await req.json()
+      if (!id) throw new Error('Missing id')
+
+      // Fetch current reservation for audit
+      const { data: current } = await supabase
+        .from('dining_reservations')
+        .select('status, guest_count')
+        .eq('id', id)
+        .single()
+
+      const updates: Record<string, any> = {}
+      let action = ''
+      const previousValue: Record<string, any> = {}
+      const newValue: Record<string, any> = {}
+
+      if (status !== undefined) {
+        updates.status = status
+        action = `status_changed_to_${status}`
+        previousValue.status = current?.status
+        newValue.status = status
+      }
+      if (guest_count !== undefined) {
+        updates.guest_count = guest_count
+        updates.status = 'pending'
+        action = action ? `${action},guest_count_updated` : 'guest_count_updated'
+        previousValue.guest_count = current?.guest_count
+        newValue.guest_count = guest_count
+        if (status === undefined) {
+          previousValue.status = current?.status
+          newValue.status = 'pending'
+        }
+      }
+
+      if (Object.keys(updates).length === 0) throw new Error('Nothing to update')
 
       const { error } = await supabase
         .from('dining_reservations')
-        .update({ status })
+        .update(updates)
         .eq('id', id)
 
       if (error) throw error
+
+      // Write audit log
+      await supabase.from('booking_audit_log').insert({
+        booking_type: 'dining',
+        booking_id: id,
+        action,
+        previous_value: previousValue,
+        new_value: newValue,
+        performed_by_admin_id: user.id,
+        performed_by_admin_email: user.email,
+      })
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

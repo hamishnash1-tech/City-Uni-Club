@@ -52,6 +52,11 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true)
   const [openDialog, setOpenDialog] = useState(false)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
+  const [showPast, setShowPast] = useState(false)
+  const [pastEvents, setPastEvents] = useState<Event[]>([])
+  const [pastLoading, setPastLoading] = useState(false)
+  const [pastPage, setPastPage] = useState(0)
+  const [pastTotal, setPastTotal] = useState(0)
   
   // Form state
   const [formData, setFormData] = useState({
@@ -93,6 +98,31 @@ export default function EventsPage() {
       })
       .catch(() => { setError('Failed to load events'); setLoading(false) })
   }, [])
+
+  const fetchPastEvents = async (page: number) => {
+    setPastLoading(true)
+    try {
+      const res = await fetch(`${ADMIN_EVENTS_URL}?past=true&past_page=${page}`, { headers: authHeaders })
+      const json = await res.json()
+      const mapped = (json.events ?? []).map((e: any) => ({
+        id: e.id, short_id: e.short_id, slug: e.slug, title: e.title,
+        event_date: e.event_date, event_type: e.event_type,
+        description: e.description ?? '', price: e.price_per_person ?? null,
+      }))
+      setPastEvents(mapped)
+      setPastTotal(json.total ?? 0)
+      setPastPage(page)
+    } catch {
+      setError('Failed to load past events')
+    } finally {
+      setPastLoading(false)
+    }
+  }
+
+  const handleTogglePast = () => {
+    if (!showPast && pastEvents.length === 0) fetchPastEvents(0)
+    setShowPast(p => !p)
+  }
 
   const handleOpenDialog = (event?: Event) => {
     if (event) {
@@ -307,6 +337,69 @@ export default function EventsPage() {
           </Grid>
         ))}
       </Grid>
+
+      {/* Past Events Toggle */}
+      <Box sx={{ mt: 4 }}>
+        <Button
+          variant="text"
+          onClick={handleTogglePast}
+          sx={{ mb: 2 }}
+        >
+          {showPast ? '▲ Hide Past Events' : '▼ Show Past Events'}
+          {pastTotal > 0 && ` (${pastTotal})`}
+        </Button>
+
+        {showPast && (
+          <>
+            {pastLoading && <LinearProgress sx={{ mb: 2 }} />}
+            <Grid container spacing={3}>
+              {pastEvents.map((event) => (
+                <Grid size={{ xs: 12, sm: 6, md: 4 }} key={event.id}>
+                  <Card
+                    sx={{
+                      height: '100%',
+                      cursor: 'pointer',
+                      opacity: 0.75,
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                      '&:hover': { transform: 'translateY(-4px)', boxShadow: 6, opacity: 1 }
+                    }}
+                    onClick={() => navigate(`/events/${event.slug}`)}
+                  >
+                    <CardContent>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                        <Chip label={getEventTypeLabel(event.event_type)} color={getEventTypeColor(event.event_type)} size="small" />
+                        <Box>
+                          <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleOpenDialog(event) }}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton size="small" onClick={(e) => { e.stopPropagation(); handleDelete(event.id) }} color="error">
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Box>
+                      </Box>
+                      <Typography variant="h6" gutterBottom>{event.title}</Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <EventIcon fontSize="small" color="action" />
+                        <Typography variant="body2">{formatDate(event.event_date)}</Typography>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+
+            {pastTotal > 50 && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 3 }}>
+                <Button disabled={pastPage === 0} onClick={() => fetchPastEvents(pastPage - 1)}>← Previous</Button>
+                <Typography variant="body2" sx={{ alignSelf: 'center' }}>
+                  Page {pastPage + 1} of {Math.ceil(pastTotal / 50)}
+                </Typography>
+                <Button disabled={(pastPage + 1) * 50 >= pastTotal} onClick={() => fetchPastEvents(pastPage + 1)}>Next →</Button>
+              </Box>
+            )}
+          </>
+        )}
+      </Box>
 
       {/* Create/Edit Event Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>

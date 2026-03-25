@@ -29,6 +29,8 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Collapse,
+  Tooltip,
 } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import DeleteIcon from '@mui/icons-material/Delete'
@@ -42,6 +44,12 @@ import UploadFileIcon from '@mui/icons-material/UploadFile'
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import ImageIcon from '@mui/icons-material/Image'
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile'
+import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import CancelIcon from '@mui/icons-material/Cancel'
+import RestoreIcon from '@mui/icons-material/Restore'
+import HistoryIcon from '@mui/icons-material/History'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 
 const ASSET_TYPES = ['Menu', 'Details', 'Location', 'Programme', 'Other']
 
@@ -55,10 +63,19 @@ interface EventAsset {
   created_at: string
 }
 
+interface AuditEntry {
+  booking_id: string
+  action: string
+  previous_value: Record<string, any> | null
+  new_value: Record<string, any> | null
+  performed_by_admin_email: string | null
+  performed_at: string
+}
+
 interface Booking {
   id: string
   member_id: string | null
-  member_email: string | null
+  guest_email: string | null
   guest_name: string | null
   guest_phone: string | null
   guest_count: number
@@ -67,6 +84,7 @@ interface Booking {
   total_price: number | null
   created_at: string
   members: { full_name: string; email: string; membership_number: string } | null
+  audit_log: AuditEntry[]
 }
 
 interface EventDetails {
@@ -106,7 +124,7 @@ function AssetIcon({ mimeType }: { mimeType: string | null }) {
 export default function EventDetailPage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
-  const { sessionToken } = useAuth()
+  const { sessionToken, user } = useAuth()
   const authHeaders = { 'Authorization': `Bearer ${sessionToken}`, 'Content-Type': 'application/json' }
 
   const [event, setEvent] = useState<EventDetails | null>(null)
@@ -283,10 +301,42 @@ export default function EventDetailPage() {
     setRenamingAssetId(null)
   }
 
+  const [expandedAuditRows, setExpandedAuditRows] = useState<Set<string>>(new Set())
+
+  const toggleAuditRow = (id: string) => {
+    setExpandedAuditRows(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  const handleUpdateBooking = async (bookingId: string, updates: { status?: string; guest_count?: number }) => {
+    try {
+      const res = await fetch(`${FUNCTIONS_URL}/admin-events`, {
+        method: 'PATCH',
+        headers: authHeaders,
+        body: JSON.stringify({ booking_id: bookingId, ...updates }),
+      })
+      if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
+      const now = new Date().toISOString()
+      setBookings(prev => prev.map(b => {
+        if (b.id !== bookingId) return b
+        const updated = { ...b, ...updates }
+        const entries: AuditEntry[] = []
+        if (updates.status) entries.push({ booking_id: bookingId, action: `status_changed_to_${updates.status}`, previous_value: { status: b.status }, new_value: { status: updates.status }, performed_by_admin_email: user?.email ?? null, performed_at: now })
+        if (updates.guest_count !== undefined) entries.push({ booking_id: bookingId, action: 'guest_count_updated', previous_value: { guest_count: b.guest_count }, new_value: { guest_count: updates.guest_count }, performed_by_admin_email: user?.email ?? null, performed_at: now })
+        return { ...updated, audit_log: [...entries, ...b.audit_log] }
+      }))
+      setSuccess(updates.status ? `Booking ${updates.status}` : 'Guest count updated')
+    } catch (e: any) {
+      setError(e.message)
+    }
+  }
+
   const handleDeleteBooking = async (bookingId: string) => {
     if (!confirm('Cancel this booking?')) return
-    setBookings(bookings.filter(b => b.id !== bookingId))
-    setSuccess('Booking cancelled')
+    await handleUpdateBooking(bookingId, { status: 'cancelled' })
   }
 
   const memberBookings = bookings.filter(b => b.member_id)
@@ -567,71 +617,132 @@ export default function EventDetailPage() {
         </CardContent>
       </Card>
 
-      {/* Member Bookings */}
-      <Typography variant="h6" gutterBottom>Member Bookings ({memberBookings.length})</Typography>
-      <TableContainer component={Paper} sx={{ mb: 4 }}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Membership No.</TableCell>
-              <TableCell>Tickets</TableCell>
-              <TableCell>Special Requests</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {memberBookings.length === 0 ? (
-              <TableRow><TableCell colSpan={7} align="center"><Typography color="textSecondary" sx={{ py: 2 }}>No member bookings</Typography></TableCell></TableRow>
-            ) : memberBookings.map(b => (
-              <TableRow key={b.id}>
-                <TableCell>{b.members?.full_name ?? '—'}</TableCell>
-                <TableCell>{b.members?.email ? <a href={`mailto:${b.members.email}`}>{b.members.email}</a> : '—'}</TableCell>
-                <TableCell>{b.members?.membership_number ?? '—'}</TableCell>
-                <TableCell>{b.guest_count}</TableCell>
-                <TableCell>{b.special_requests ?? '—'}</TableCell>
-                <TableCell><Chip label={b.status} size="small" color={b.status === 'confirmed' ? 'success' : 'warning'} /></TableCell>
-                <TableCell><IconButton size="small" color="error" onClick={() => handleDeleteBooking(b.id)}><DeleteIcon fontSize="small" /></IconButton></TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Non-Member Bookings */}
-      <Typography variant="h6" gutterBottom>Non-Member Bookings ({nonMemberBookings.length})</Typography>
-      <TableContainer component={Paper}>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell>Tickets</TableCell>
-              <TableCell>Special Requests</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {nonMemberBookings.length === 0 ? (
-              <TableRow><TableCell colSpan={7} align="center"><Typography color="textSecondary" sx={{ py: 2 }}>No non-member bookings</Typography></TableCell></TableRow>
-            ) : nonMemberBookings.map(b => (
-              <TableRow key={b.id}>
-                <TableCell>{b.guest_name ?? '—'}</TableCell>
-                <TableCell>{b.member_email ? <a href={`mailto:${b.member_email}`}>{b.member_email}</a> : '—'}</TableCell>
-                <TableCell>{b.guest_phone ?? '—'}</TableCell>
-                <TableCell>{b.guest_count}</TableCell>
-                <TableCell>{b.special_requests ?? '—'}</TableCell>
-                <TableCell><Chip label={b.status} size="small" color={b.status === 'confirmed' ? 'success' : 'warning'} /></TableCell>
-                <TableCell><IconButton size="small" color="error" onClick={() => handleDeleteBooking(b.id)}><DeleteIcon fontSize="small" /></IconButton></TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {/* Bookings */}
+      {[
+        { label: 'Member Bookings', list: memberBookings, isMember: true },
+        { label: 'Non-Member Bookings', list: nonMemberBookings, isMember: false },
+      ].map(({ label, list, isMember }) => (
+        <Box key={label} sx={{ mb: 4 }}>
+          <Typography variant="h6" gutterBottom>{label} ({list.length})</Typography>
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell width={32} />
+                  <TableCell>{isMember ? 'Member' : 'Guest'}</TableCell>
+                  <TableCell>Email</TableCell>
+                  {isMember && <TableCell>Membership No.</TableCell>}
+                  {!isMember && <TableCell>Phone</TableCell>}
+                  <TableCell>Tickets</TableCell>
+                  <TableCell>Special Requests</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Actions</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {list.length === 0 ? (
+                  <TableRow><TableCell colSpan={8} align="center"><Typography color="textSecondary" sx={{ py: 2 }}>No bookings</Typography></TableCell></TableRow>
+                ) : list.map(b => {
+                  const isExpanded = expandedAuditRows.has(b.id)
+                  const hasAudit = b.audit_log?.length > 0
+                  return (
+                    <>
+                      <TableRow key={b.id} hover>
+                        <TableCell>
+                          {hasAudit && (
+                            <Tooltip title="View history">
+                              <IconButton size="small" onClick={() => toggleAuditRow(b.id)}>
+                                {isExpanded ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+                              </IconButton>
+                            </Tooltip>
+                          )}
+                        </TableCell>
+                        <TableCell>{isMember ? (b.members?.full_name ?? '—') : (b.guest_name ?? '—')}</TableCell>
+                        <TableCell>
+                          {isMember
+                            ? (b.members?.email ?? '—')
+                            : (b.guest_email ?? '—')
+                          }
+                        </TableCell>
+                        {isMember && <TableCell>{b.members?.membership_number ?? '—'}</TableCell>}
+                        {!isMember && <TableCell>{b.guest_phone ?? '—'}</TableCell>}
+                        <TableCell>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <IconButton size="small" disabled={b.guest_count <= 1} onClick={() => handleUpdateBooking(b.id, { guest_count: b.guest_count - 1 })}>−</IconButton>
+                            <Typography variant="body2" sx={{ minWidth: 20, textAlign: 'center' }}>{b.guest_count}</Typography>
+                            <IconButton size="small" onClick={() => handleUpdateBooking(b.id, { guest_count: b.guest_count + 1 })}>+</IconButton>
+                          </Box>
+                        </TableCell>
+                        <TableCell sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.special_requests ?? '—'}</TableCell>
+                        <TableCell>
+                          <Chip label={b.status} size="small" color={b.status === 'confirmed' ? 'success' : b.status === 'cancelled' ? 'error' : 'warning'} />
+                        </TableCell>
+                        <TableCell>
+                          <Box sx={{ display: 'flex', gap: 0.5 }}>
+                            {b.status === 'pending' && (
+                              <Tooltip title="Confirm">
+                                <IconButton size="small" color="success" onClick={() => handleUpdateBooking(b.id, { status: 'confirmed' })}>
+                                  <CheckCircleIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                            {b.status !== 'cancelled' && (
+                              <Tooltip title="Cancel">
+                                <IconButton size="small" color="error" onClick={() => handleDeleteBooking(b.id)}>
+                                  <CancelIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                            {b.status === 'cancelled' && (
+                              <Tooltip title="Uncancel">
+                                <IconButton size="small" color="warning" onClick={() => handleUpdateBooking(b.id, { status: 'pending' })}>
+                                  <RestoreIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                          </Box>
+                        </TableCell>
+                      </TableRow>
+                      {hasAudit && (
+                        <TableRow key={`${b.id}-audit`}>
+                          <TableCell colSpan={8} sx={{ py: 0, bgcolor: 'grey.50' }}>
+                            <Collapse in={isExpanded} unmountOnExit>
+                              <Box sx={{ py: 1.5, px: 2 }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+                                  <HistoryIcon fontSize="small" color="action" />
+                                  <Typography variant="caption" fontWeight={600} color="textSecondary">Audit History</Typography>
+                                </Box>
+                                {b.audit_log.map((entry, i) => (
+                                  <Box key={i} sx={{ display: 'flex', gap: 2, mb: 0.5, alignItems: 'baseline' }}>
+                                    <Typography variant="caption" color="textSecondary" sx={{ minWidth: 140 }}>
+                                      {new Date(entry.performed_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                    </Typography>
+                                    <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+                                      {entry.action.replace(/_/g, ' ')}
+                                    </Typography>
+                                    {entry.previous_value && entry.new_value && (
+                                      <Typography variant="caption" color="textSecondary">
+                                        {Object.keys(entry.new_value).map(k => `${k}: ${entry.previous_value![k]} → ${entry.new_value![k]}`).join(', ')}
+                                      </Typography>
+                                    )}
+                                    {entry.performed_by_admin_email && (
+                                      <Typography variant="caption" color="textSecondary">· {entry.performed_by_admin_email}</Typography>
+                                    )}
+                                  </Box>
+                                ))}
+                              </Box>
+                            </Collapse>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </>
+                  )
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      ))}
     </Container>
   )
 }

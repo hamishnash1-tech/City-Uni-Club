@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { IconDining } from '../icons'
 import { useSelector } from 'react-redux'
 import { RootState } from '../store'
@@ -29,8 +29,74 @@ export const Dining: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState<'book' | 'menu'>('book')
+  const [activeTab, setActiveTab] = useState<'book' | 'reservations' | 'menu'>('book')
   const [activeMenuTab, setActiveMenuTab] = useState<'breakfast' | 'lunch'>('breakfast')
+
+  const [reservations, setReservations] = useState<any[]>([])
+  const [reservationsLoading, setReservationsLoading] = useState(false)
+  const [reservationsError, setReservationsError] = useState('')
+  const [cancelConfirm, setCancelConfirm] = useState<string | null>(null)
+  const [cancelling, setCancelling] = useState<string | null>(null)
+  const [updatingCount, setUpdatingCount] = useState<string | null>(null)
+  const [localCounts, setLocalCounts] = useState<Record<string, number>>({})
+
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const yesterdayStr = yesterday.toISOString().split('T')[0]
+
+  const loadReservations = useCallback(async () => {
+    if (!token) return
+    setReservationsLoading(true)
+    setReservationsError('')
+    try {
+      const data = await api.getMemberBookings(token)
+      const dining = [
+        ...(data.upcoming || []).filter((b: any) => b.type === 'dining'),
+        ...(data.past || []).filter((b: any) => b.type === 'dining' && b.reservation_date >= yesterdayStr),
+      ]
+      setReservations(dining)
+      const counts: Record<string, number> = {}
+      dining.forEach((r: any) => { counts[r.id] = r.guest_count })
+      setLocalCounts(counts)
+    } catch (e: any) {
+      setReservationsError(e.message)
+    } finally {
+      setReservationsLoading(false)
+    }
+  }, [token])
+
+  useEffect(() => {
+    if (token && activeTab === 'reservations') loadReservations()
+  }, [token, activeTab, loadReservations])
+
+  const handleCancelReservation = async (id: string) => {
+    if (!token) return
+    setCancelling(id)
+    try {
+      await api.cancelDiningReservation(token, id)
+      setReservations(prev => prev.map(r => r.id === id ? { ...r, status: 'cancelled' } : r))
+    } catch (e: any) {
+      setReservationsError(e.message)
+    } finally {
+      setCancelling(null)
+      setCancelConfirm(null)
+    }
+  }
+
+  const handleUpdateGuestCount = async (id: string) => {
+    if (!token) return
+    const count = localCounts[id]
+    setUpdatingCount(id)
+    try {
+      await api.updateDiningGuestCount(token, id, count)
+      setReservations(prev => prev.map(r => r.id === id ? { ...r, guest_count: count, status: 'pending' } : r))
+    } catch (e: any) {
+      setReservationsError(e.message)
+      setLocalCounts(prev => ({ ...prev, [id]: reservations.find(r => r.id === id)?.guest_count ?? count }))
+    } finally {
+      setUpdatingCount(null)
+    }
+  }
 
   const breakfastTimes = ['09:00', '09:30', '10:00', '10:30', '11:00']
   const lunchTimes = ['12:00', '12:30', '13:00', '13:30', '14:00', '14:30']
@@ -103,29 +169,38 @@ export const Dining: React.FC = () => {
           <h1 className="font-serif text-2xl font-normal text-ivory">Dining</h1>
         </div>
 
-        <div className="relative flex max-w-xs mx-auto border border-cambridge/20 rounded-sm p-1">
-          <div
-            className="absolute top-1 bottom-1 bg-cambridge/25 rounded-sm transition-all duration-300 ease-out"
-            style={{
-              left: '4px',
-              width: 'calc(50% - 4px)',
-              transform: activeTab === 'book' ? 'translateX(0)' : 'translateX(100%)',
-            }}
-          />
-          {([
-            { id: 'book', label: 'Book a Table' },
-            { id: 'menu', label: 'Menu' },
-          ] as const).map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`relative flex-1 py-2 px-2 text-sm transition-colors duration-200 rounded-sm ${
-                activeTab === tab.id ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
-              }`}
-            >
-              <span className="label-caps">{tab.label}</span>
-            </button>
-          ))}
+        <div className="relative flex w-full max-w-sm sm:max-w-md md:max-w-2xl mx-auto border border-cambridge/20 rounded-sm p-1">
+          {(() => {
+            const tabs = [
+              { id: 'book', label: 'Book a Table' },
+              ...(token ? [{ id: 'reservations', label: 'My Reservations' }] : []),
+              { id: 'menu', label: 'Menu' },
+            ] as { id: typeof activeTab; label: string }[]
+            const activeIndex = tabs.findIndex(t => t.id === activeTab)
+            return (
+              <>
+                <div
+                  className="absolute top-1 bottom-1 bg-cambridge/25 rounded-sm transition-all duration-300 ease-out"
+                  style={{
+                    left: '4px',
+                    width: `calc(${100 / tabs.length}% - ${8 / tabs.length}px)`,
+                    transform: `translateX(${activeIndex * 100}%)`,
+                  }}
+                />
+                {tabs.map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`relative flex-1 py-2 px-2 sm:px-3 md:px-4 text-xs sm:text-sm transition-colors duration-200 rounded-sm ${
+                      activeTab === tab.id ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
+                    }`}
+                  >
+                    <span className="label-caps whitespace-nowrap">{tab.label}</span>
+                  </button>
+                ))}
+              </>
+            )
+          })()}
         </div>
       </div>
 
@@ -171,7 +246,102 @@ export const Dining: React.FC = () => {
           </div>
         )}
 
-        {activeTab === 'book' ? (
+        {activeTab === 'reservations' && token ? (
+          <div className="space-y-4 max-w-2xl mx-auto">
+            {reservationsError && (
+              <div className="text-red-300/80 text-sm border-l-2 border-red-400/60 pl-3 py-1">{reservationsError}</div>
+            )}
+            {reservationsLoading ? (
+              <div className="text-center py-10 text-ivory/50">Loading reservations...</div>
+            ) : reservations.length === 0 ? (
+              <div className="club-card p-6 text-center text-ink-mid">No dining reservations found.</div>
+            ) : (
+              reservations.map(r => {
+                const isEditable = r.status !== 'cancelled' && r.reservation_date >= yesterdayStr
+                const currentCount = localCounts[r.id] ?? r.guest_count
+                const countChanged = currentCount !== r.guest_count
+                return (
+                  <div key={r.id} className="club-card p-5">
+                    <div className="flex items-start justify-between gap-4 flex-wrap">
+                      <div>
+                        <p className="font-serif text-oxford-blue text-base">
+                          {new Date(r.reservation_date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                        </p>
+                        <p className="text-sm text-ink-mid mt-0.5">{r.meal_type} · {r.reservation_time}</p>
+                      </div>
+                      <span className={`label-caps text-xs px-2 py-1 rounded ${
+                        r.status === 'confirmed' ? 'bg-green-100 text-green-700' :
+                        r.status === 'cancelled' ? 'bg-red-100/60 text-red-600' :
+                        'bg-amber-100 text-amber-700'
+                      }`}>
+                        {r.status}
+                      </span>
+                    </div>
+
+                    {isEditable && (
+                      <div className="mt-4 pt-4 border-t border-cambridge/10">
+                        <div className="flex items-center justify-between flex-wrap gap-4">
+                          <div>
+                            <p className="label-caps text-ink-light text-xs mb-2">Number of Guests</p>
+                            <div className="flex items-center gap-3">
+                              <button
+                                onClick={() => setLocalCounts(prev => ({ ...prev, [r.id]: Math.max(1, (prev[r.id] ?? r.guest_count) - 1) }))}
+                                className="w-8 h-8 rounded border border-ivory-border hover:border-cambridge/50 flex items-center justify-center text-lg text-ink transition"
+                                disabled={updatingCount === r.id}
+                              >−</button>
+                              <span className="font-serif text-xl text-oxford-blue w-6 text-center">{currentCount}</span>
+                              <button
+                                onClick={() => setLocalCounts(prev => ({ ...prev, [r.id]: Math.min(20, (prev[r.id] ?? r.guest_count) + 1) }))}
+                                className="w-8 h-8 rounded border border-ivory-border hover:border-cambridge/50 flex items-center justify-center text-lg text-ink transition"
+                                disabled={updatingCount === r.id}
+                              >+</button>
+                              {countChanged && (
+                                <button
+                                  onClick={() => handleUpdateGuestCount(r.id)}
+                                  disabled={updatingCount === r.id}
+                                  className="ml-2 px-3 py-1.5 text-xs bg-oxford-blue text-ivory rounded hover:bg-oxford-blue/80 transition disabled:opacity-50"
+                                >
+                                  {updatingCount === r.id ? 'Requesting...' : 'Request Change'}
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          <div>
+                            {cancelConfirm === r.id ? (
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-ink-mid">Cancel this reservation?</span>
+                                <button
+                                  onClick={() => handleCancelReservation(r.id)}
+                                  disabled={cancelling === r.id}
+                                  className="px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition disabled:opacity-50"
+                                >
+                                  {cancelling === r.id ? 'Cancelling...' : 'Yes, Cancel'}
+                                </button>
+                                <button
+                                  onClick={() => setCancelConfirm(null)}
+                                  className="px-3 py-1.5 text-xs border border-ivory-border text-ink rounded hover:border-cambridge/50 transition"
+                                >Keep</button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setCancelConfirm(r.id)}
+                                className="px-3 py-1.5 text-xs border border-red-300/50 text-red-500 rounded hover:border-red-400 transition"
+                              >Cancel Reservation</button>
+                            )}
+                          </div>
+                        </div>
+                        {countChanged && (
+                          <p className="text-xs text-amber-600/80 mt-2">Changing guest count will reset your reservation to pending for re-confirmation.</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )
+              })
+            )}
+          </div>
+        ) : activeTab === 'book' ? (
           <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto">
             {/* Opening Hours */}
             <div className="club-card p-5">
@@ -268,7 +438,8 @@ export const Dining: React.FC = () => {
                   type="date"
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value, time: '' })}
-                  min={new Date().toISOString().split('T')[0]}
+                  min={new Date(Date.now() - 86400000).toISOString().split('T')[0]}
+                  max={new Date(Date.now() + 14 * 86400000).toISOString().split('T')[0]}
                   className="club-input"
                   required
                 />

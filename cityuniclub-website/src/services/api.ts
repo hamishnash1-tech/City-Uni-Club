@@ -33,6 +33,7 @@ export interface Event {
   price_per_person: number
   is_tba: boolean
   assets?: { id: string; type: string; file_url: string; file_name: string | null; mime_type: string | null }[]
+  my_booking?: { id: string; status: string; guest_count: number } | null
 }
 
 export interface ClubNews {
@@ -77,8 +78,10 @@ export const api = {
     })
   },
 
-  async getEvents(): Promise<Event[]> {
-    const response = await fetch(`${API_BASE}/events?upcoming=true`)
+  async getEvents(token?: string | null): Promise<Event[]> {
+    const headers: Record<string, string> = {}
+    if (token) headers['x-session-token'] = token
+    const response = await fetch(`${API_BASE}/events?upcoming=true`, { headers })
     if (!response.ok) throw new Error('Failed to fetch events')
     const data = await response.json()
     return data.events || []
@@ -112,11 +115,37 @@ export const api = {
     return response.json()
   },
 
-  async getEventBySlug(slug: string): Promise<Event> {
-    const response = await fetch(`${API_BASE}/events?slug=${encodeURIComponent(slug)}`)
+  async getEventBySlug(slug: string, token?: string | null): Promise<Event> {
+    const headers: Record<string, string> = {}
+    if (token) headers['x-session-token'] = token
+    const response = await fetch(`${API_BASE}/events?slug=${encodeURIComponent(slug)}`, { headers })
     if (!response.ok) throw new Error('Failed to fetch event')
     const data = await response.json()
     return data.event
+  },
+
+  async cancelEventBooking(token: string, bookingId: string): Promise<void> {
+    const response = await fetch(`${API_BASE}/event-bookings`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-session-token': token },
+      body: JSON.stringify({ booking_id: bookingId }),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to cancel booking')
+    }
+  },
+
+  async updateEventGuestCount(token: string, bookingId: string, guestCount: number): Promise<void> {
+    const response = await fetch(`${API_BASE}/event-bookings`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-session-token': token },
+      body: JSON.stringify({ booking_id: bookingId, guest_count: guestCount }),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to update booking')
+    }
   },
 
   async getNews(): Promise<ClubNews[]> {
@@ -227,6 +256,38 @@ export const api = {
     }
 
     return response.json()
+  },
+
+  async getMemberBookings(token: string): Promise<{ upcoming: any[]; past: any[] }> {
+    const response = await fetch(`${API_BASE}/member-bookings`, {
+      headers: { 'x-session-token': token },
+    })
+    if (!response.ok) throw new Error('Failed to fetch bookings')
+    return response.json()
+  },
+
+  async cancelDiningReservation(token: string, reservationId: string): Promise<void> {
+    const response = await fetch(`${API_BASE}/dining`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-session-token': token },
+      body: JSON.stringify({ reservation_id: reservationId }),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to cancel reservation')
+    }
+  },
+
+  async updateDiningGuestCount(token: string, reservationId: string, guestCount: number): Promise<void> {
+    const response = await fetch(`${API_BASE}/dining`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', 'x-session-token': token },
+      body: JSON.stringify({ reservation_id: reservationId, guest_count: guestCount }),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to update guest count')
+    }
   },
 
   async createLoiRequest(

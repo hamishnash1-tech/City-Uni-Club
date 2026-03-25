@@ -16,8 +16,15 @@ serve(async (req: Request) => {
   try {
     const { name, email, phone, message, turnstileToken } = await req.json()
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!name || !email) {
       return new Response(JSON.stringify({ error: 'Name and email are required' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+    if (!emailRegex.test(email)) {
+      return new Response(JSON.stringify({ error: 'Invalid email address' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
@@ -80,6 +87,31 @@ serve(async (req: Request) => {
 
     const data = await response.json()
     if (!response.ok) throw new Error(data.message || 'Failed to send email')
+
+    const confirmationHtml = `
+      <html>
+        <body style="font-family: Arial, sans-serif; font-size: 14px; color: #000; line-height: 1.6; max-width: 600px;">
+          <p>Dear ${name},</p>
+          <p>Thank you for your interest in becoming a member of City University Club. We have received your enquiry and will be in touch shortly.</p>
+          <p>If you have any questions in the meantime, or have not heard from us within a few days, please do not hesitate to contact our secretary directly at <a href="mailto:${CLUB_EMAIL}">${CLUB_EMAIL}</a>.</p>
+          <p>Warm regards,<br>${CLUB_NAME}</p>
+        </body>
+      </html>
+    `
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${resendApiKey}`,
+      },
+      body: JSON.stringify({
+        from: FROM_EMAIL,
+        to: [email],
+        subject: `Your membership enquiry — ${CLUB_NAME}`,
+        html: confirmationHtml,
+      }),
+    })
 
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
