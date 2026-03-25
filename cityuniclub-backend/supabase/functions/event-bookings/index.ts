@@ -102,7 +102,7 @@ serve(async (req: Request) => {
 
       const { data: booking } = await supabase
         .from('event_bookings')
-        .select('id, member_id, status, guest_count, event_id, events(price_per_person)')
+        .select('id, member_id, status, guest_count, event_id, events(title, event_date, price_per_person)')
         .eq('id', booking_id)
         .single()
 
@@ -120,10 +120,11 @@ serve(async (req: Request) => {
 
       const { data: member } = await supabase
         .from('members')
-        .select('email')
+        .select('email, full_name')
         .eq('id', session.member_id)
         .single()
       const actorEmail = member?.email ?? null
+      const actorName = member?.full_name ?? 'Member'
 
       // Update guest count (resets to pending for re-approval)
       if (guest_count !== undefined) {
@@ -151,6 +152,30 @@ serve(async (req: Request) => {
           })
         if (auditError) throw auditError
 
+        const resendKey = Deno.env.get('RESEND_API_KEY')
+        if (resendKey && actorEmail) {
+          const eventTitle = (booking as any).events?.title ?? 'Event'
+          const eventDate = formatEventDate((booking as any).events?.event_date ?? null)
+          await sendEmail(resendKey, {
+            from: FROM_EMAIL,
+            to: [actorEmail],
+            subject: `Booking updated — ${eventTitle}`,
+            html: `
+              <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;">
+                <p>Dear ${actorName},</p>
+                <p>Your booking for <strong>${eventTitle}</strong> on ${eventDate} has been updated.</p>
+                <p>Updated guests: ${guest_count}<br>Status: Pending confirmation</p>
+                <p>If you have any questions, please contact us:</p>
+                <ul>
+                  <li><strong>Phone:</strong> ${CLUB_PHONE}</li>
+                  <li><strong>Email:</strong> ${CLUB_EMAIL}</li>
+                </ul>
+                <p>Warm regards,<br>${CLUB_NAME}<br>${CLUB_ADDRESS}</p>
+              </body></html>
+            `,
+          })
+        }
+
         return new Response(JSON.stringify({ success: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200,
         })
@@ -175,6 +200,29 @@ serve(async (req: Request) => {
           performed_by_admin_email: actorEmail,
         })
       if (auditError) throw auditError
+
+      const resendKey = Deno.env.get('RESEND_API_KEY')
+      if (resendKey && actorEmail) {
+        const eventTitle = (booking as any).events?.title ?? 'Event'
+        const eventDate = formatEventDate((booking as any).events?.event_date ?? null)
+        await sendEmail(resendKey, {
+          from: FROM_EMAIL,
+          to: [actorEmail],
+          subject: `Booking cancelled — ${eventTitle}`,
+          html: `
+            <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;">
+              <p>Dear ${actorName},</p>
+              <p>Your booking for <strong>${eventTitle}</strong> on ${eventDate} has been cancelled.</p>
+              <p>If this was not expected, please contact us:</p>
+              <ul>
+                <li><strong>Phone:</strong> ${CLUB_PHONE}</li>
+                <li><strong>Email:</strong> ${CLUB_EMAIL}</li>
+              </ul>
+              <p>Warm regards,<br>${CLUB_NAME}<br>${CLUB_ADDRESS}</p>
+            </body></html>
+          `,
+        })
+      }
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200,

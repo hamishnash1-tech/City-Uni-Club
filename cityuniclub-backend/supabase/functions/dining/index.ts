@@ -2,6 +2,29 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { FROM_EMAIL, CLUB_NAME, CLUB_ADDRESS, CLUB_EMAIL, CLUB_PHONE } from '../_shared/constants.ts'
 
+function formatDiningDate(dateStr: string): string {
+  const [y, m, d] = dateStr.split('-').map(Number)
+  return new Date(y, m - 1, d).toLocaleDateString('en-GB', {
+    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+  })
+}
+
+function formatDiningTime(timeStr: string): string {
+  return timeStr.slice(0, 5)
+}
+
+async function sendEmail(resendKey: string, payload: object) {
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${resendKey}` },
+      body: JSON.stringify(payload),
+    })
+  } catch (e) {
+    console.error('Email send failed:', e)
+  }
+}
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type, Authorization, apikey, x-session-token',
@@ -61,7 +84,7 @@ serve(async (req: Request) => {
       // Verify ownership and that the date is editable (upcoming or yesterday)
       const { data: existing } = await supabase
         .from('dining_reservations')
-        .select('id, reservation_date, status, member_id')
+        .select('id, reservation_date, reservation_time, meal_type, guest_count, status, member_id')
         .eq('id', reservation_id)
         .single()
 
@@ -89,6 +112,17 @@ serve(async (req: Request) => {
         })
       }
 
+      const { data: member } = await supabase
+        .from('members')
+        .select('email, full_name')
+        .eq('id', memberId)
+        .single()
+      const actorEmail = member?.email ?? null
+      const actorName = member?.full_name ?? 'Member'
+      const formattedDate = formatDiningDate(existing.reservation_date)
+      const formattedTime = formatDiningTime(existing.reservation_time)
+      const resendKey = Deno.env.get('RESEND_API_KEY')
+
       // Update guest count (resets to pending for re-approval)
       if (guest_count !== undefined) {
         if (!Number.isInteger(guest_count) || guest_count < 1 || guest_count > 20) {
@@ -102,6 +136,44 @@ serve(async (req: Request) => {
           .update({ guest_count, status: 'pending' })
           .eq('id', reservation_id)
         if (updateError) throw updateError
+
+        const { error: auditError } = await supabase
+          .from('booking_audit_log')
+          .insert({
+            booking_type: 'dining',
+            booking_id: reservation_id,
+            action: 'member_guest_count_updated',
+            previous_value: { guest_count: existing.guest_count, status: existing.status },
+            new_value: { guest_count, status: 'pending' },
+            performed_by_admin_email: actorEmail,
+          })
+        if (auditError) throw auditError
+
+        if (resendKey && actorEmail) {
+          await sendEmail(resendKey, {
+            from: FROM_EMAIL,
+            to: [actorEmail],
+            subject: `Dining reservation updated — ${formattedDate}`,
+            html: `
+              <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;">
+                <p>Dear ${actorName},</p>
+                <p>Your dining reservation has been updated.</p>
+                <p><strong>Date:</strong> ${formattedDate}<br>
+                <strong>Time:</strong> ${formattedTime}<br>
+                <strong>Meal:</strong> ${existing.meal_type}<br>
+                <strong>Guests:</strong> ${guest_count}<br>
+                <strong>Status:</strong> Pending confirmation</p>
+                <p>If you have any questions, please contact us:</p>
+                <ul>
+                  <li><strong>Phone:</strong> ${CLUB_PHONE}</li>
+                  <li><strong>Email:</strong> ${CLUB_EMAIL}</li>
+                </ul>
+                <p>Warm regards,<br>${CLUB_NAME}<br>${CLUB_ADDRESS}</p>
+              </body></html>
+            `,
+          })
+        }
+
         return new Response(JSON.stringify({ success: true }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 200
@@ -115,6 +187,41 @@ serve(async (req: Request) => {
         .eq('id', reservation_id)
 
       if (updateError) throw updateError
+
+      const { error: auditError } = await supabase
+        .from('booking_audit_log')
+        .insert({
+          booking_type: 'dining',
+          booking_id: reservation_id,
+          action: 'member_status_changed_to_cancelled',
+          previous_value: { status: existing.status },
+          new_value: { status: 'cancelled' },
+          performed_by_admin_email: actorEmail,
+        })
+      if (auditError) throw auditError
+
+      if (resendKey && actorEmail) {
+        await sendEmail(resendKey, {
+          from: FROM_EMAIL,
+          to: [actorEmail],
+          subject: `Dining reservation cancelled — ${formattedDate}`,
+          html: `
+            <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;">
+              <p>Dear ${actorName},</p>
+              <p>Your dining reservation has been cancelled.</p>
+              <p><strong>Date:</strong> ${formattedDate}<br>
+              <strong>Time:</strong> ${formattedTime}<br>
+              <strong>Meal:</strong> ${existing.meal_type}</p>
+              <p>If this was not expected, please contact us:</p>
+              <ul>
+                <li><strong>Phone:</strong> ${CLUB_PHONE}</li>
+                <li><strong>Email:</strong> ${CLUB_EMAIL}</li>
+              </ul>
+              <p>Warm regards,<br>${CLUB_NAME}<br>${CLUB_ADDRESS}</p>
+            </body></html>
+          `,
+        })
+      }
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

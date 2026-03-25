@@ -14,6 +14,7 @@ struct EventsView: View {
     @State private var isBooking = false
     @State private var cancelTarget: Event? = nil
     @State private var isCancelling = false
+    @State private var showReservations = false
 
     private let apiService = APIService.shared
 
@@ -31,11 +32,32 @@ struct EventsView: View {
 
             VStack(spacing: 0) {
                 // Header
-                Text("Club Events")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.white)
-                    .padding(.top, 50)
-                    .padding(.bottom, 20)
+                VStack(spacing: 12) {
+                    Text("Club Events")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundColor(.white)
+
+                    Button { showReservations = true } label: {
+                        HStack {
+                            Image(systemName: "calendar.badge.clock")
+                                .font(.system(size: 16))
+                            Text("My Reservations")
+                                .font(.system(size: 14, weight: .semibold))
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .semibold))
+                                .opacity(0.7)
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(Color.white.opacity(0.15))
+                        .cornerRadius(12)
+                    }
+                    .padding(.horizontal, 20)
+                }
+                .padding(.top, 50)
+                .padding(.bottom, 16)
 
                 if isLoading {
                     ProgressView()
@@ -126,20 +148,22 @@ struct EventsView: View {
         .onAppear {
             loadEvents()
         }
+        .navigationDestination(isPresented: $showReservations) {
+            EventReservationsView()
+        }
         } // NavigationStack
     }
 
     private func cancelNoticeWarning(_ event: Event) -> String? {
-        guard let booking = event.myBooking,
+        guard event.myBooking != nil,
               let dateStr = event.eventDate else { return nil }
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd"
         guard let eventDate = f.date(from: dateStr) else { return nil }
         let hoursUntil = eventDate.timeIntervalSinceNow / 3600
-        let threshold: Double = booking.guestCount >= 5 ? 48 : 24
-        guard hoursUntil < threshold else { return nil }
-        let thresholdStr = booking.guestCount >= 5 ? "48 hours" : "24 hours"
-        return "This event is within \(thresholdStr). Cancellation may not be possible — please contact the club if you need assistance. Cancel anyway?"
+        let threshold: Double = 48
+        guard hoursUntil < threshold && hoursUntil > 0 else { return nil }
+        return "This event is within 48 hours. Cancellation may not be possible — please contact the club if you need assistance. Cancel anyway?"
     }
 
     private func doCancelEventBooking(_ event: Event) async {

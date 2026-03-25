@@ -39,6 +39,8 @@ export const Dining: React.FC = () => {
   const [cancelling, setCancelling] = useState<string | null>(null)
   const [updatingCount, setUpdatingCount] = useState<string | null>(null)
   const [localCounts, setLocalCounts] = useState<Record<string, number>>({})
+  const [manageReservationId, setManageReservationId] = useState<string | null>(null)
+  const [manageOption, setManageOption] = useState<'guest-count' | 'cancel'>('guest-count')
 
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
@@ -80,6 +82,7 @@ export const Dining: React.FC = () => {
     } finally {
       setCancelling(null)
       setCancelConfirm(null)
+      setManageReservationId(prev => prev === id ? null : prev)
     }
   }
 
@@ -260,6 +263,7 @@ export const Dining: React.FC = () => {
                 const isEditable = r.status !== 'cancelled' && r.reservation_date >= yesterdayStr
                 const currentCount = localCounts[r.id] ?? r.guest_count
                 const countChanged = currentCount !== r.guest_count
+                const showManageOptions = manageReservationId === r.id
                 return (
                   <div key={r.id} className="club-card p-5">
                     <div className="flex items-start justify-between gap-4 flex-wrap">
@@ -280,59 +284,108 @@ export const Dining: React.FC = () => {
 
                     {isEditable && (
                       <div className="mt-4 pt-4 border-t border-cambridge/10">
-                        <div className="flex items-center justify-between flex-wrap gap-4">
-                          <div>
-                            <p className="label-caps text-ink-light text-xs mb-2">Number of Guests</p>
+                        <button
+                          onClick={() => {
+                            if (showManageOptions) {
+                              setManageReservationId(null)
+                              setCancelConfirm(null)
+                            } else {
+                              setManageReservationId(r.id)
+                              setManageOption('guest-count')
+                              setCancelConfirm(null)
+                            }
+                          }}
+                          disabled={updatingCount === r.id || cancelling === r.id}
+                          className="text-sm font-medium bg-oxford-blue text-ivory px-4 py-2.5 rounded hover:bg-oxford-blue/85 transition disabled:opacity-50"
+                        >
+                          {showManageOptions ? 'Close Options' : 'Modify Reservation'}
+                        </button>
+
+                        {showManageOptions && (
+                          <div className="mt-4 space-y-4 rounded-md border border-cambridge/20 bg-ivory-warm/70 p-4">
                             <div className="flex items-center gap-3">
                               <button
-                                onClick={() => setLocalCounts(prev => ({ ...prev, [r.id]: Math.max(1, (prev[r.id] ?? r.guest_count) - 1) }))}
-                                className="w-8 h-8 rounded border border-ivory-border hover:border-cambridge/50 flex items-center justify-center text-lg text-ink transition"
-                                disabled={updatingCount === r.id}
-                              >−</button>
-                              <span className="font-serif text-xl text-oxford-blue w-6 text-center">{currentCount}</span>
+                                onClick={() => {
+                                  setManageOption('guest-count')
+                                  setCancelConfirm(null)
+                                }}
+                                disabled={updatingCount === r.id || cancelling === r.id}
+                                className={`text-xs transition ${
+                                  manageOption === 'guest-count' ? 'text-oxford-blue font-semibold' : 'text-ink-light hover:text-oxford-blue'
+                                }`}
+                              >
+                                Change Guest Count
+                              </button>
+                              <span className="h-4 w-px bg-cambridge/20" />
                               <button
-                                onClick={() => setLocalCounts(prev => ({ ...prev, [r.id]: Math.min(20, (prev[r.id] ?? r.guest_count) + 1) }))}
-                                className="w-8 h-8 rounded border border-ivory-border hover:border-cambridge/50 flex items-center justify-center text-lg text-ink transition"
-                                disabled={updatingCount === r.id}
-                              >+</button>
-                              {countChanged && (
-                                <button
-                                  onClick={() => handleUpdateGuestCount(r.id)}
-                                  disabled={updatingCount === r.id}
-                                  className="ml-2 px-3 py-1.5 text-xs bg-oxford-blue text-ivory rounded hover:bg-oxford-blue/80 transition disabled:opacity-50"
-                                >
-                                  {updatingCount === r.id ? 'Requesting...' : 'Request Change'}
-                                </button>
-                              )}
+                                onClick={() => setManageOption('cancel')}
+                                disabled={updatingCount === r.id || cancelling === r.id}
+                                className={`text-xs transition ${
+                                  manageOption === 'cancel' ? 'text-red-600 font-semibold' : 'text-ink-light hover:text-red-600'
+                                }`}
+                              >
+                                Cancel Reservation
+                              </button>
                             </div>
-                          </div>
 
-                          <div>
-                            {cancelConfirm === r.id ? (
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs text-ink-mid">Cancel this reservation?</span>
-                                <button
-                                  onClick={() => handleCancelReservation(r.id)}
-                                  disabled={cancelling === r.id}
-                                  className="px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition disabled:opacity-50"
-                                >
-                                  {cancelling === r.id ? 'Cancelling...' : 'Yes, Cancel'}
-                                </button>
-                                <button
-                                  onClick={() => setCancelConfirm(null)}
-                                  className="px-3 py-1.5 text-xs border border-ivory-border text-ink rounded hover:border-cambridge/50 transition"
-                                >Keep</button>
+                            {manageOption === 'guest-count' ? (
+                              <div>
+                                <p className="label-caps text-ink-light text-xs mb-2">Number of Guests</p>
+                                <div className="flex items-center gap-3 flex-wrap">
+                                  <button
+                                    onClick={() => setLocalCounts(prev => ({ ...prev, [r.id]: Math.max(1, (prev[r.id] ?? r.guest_count) - 1) }))}
+                                    className="w-8 h-8 rounded border border-ivory-border hover:border-cambridge/50 flex items-center justify-center text-lg text-ink transition"
+                                    disabled={updatingCount === r.id || cancelling === r.id}
+                                  >−</button>
+                                  <span className="font-serif text-xl text-oxford-blue w-6 text-center">{currentCount}</span>
+                                  <button
+                                    onClick={() => setLocalCounts(prev => ({ ...prev, [r.id]: Math.min(20, (prev[r.id] ?? r.guest_count) + 1) }))}
+                                    className="w-8 h-8 rounded border border-ivory-border hover:border-cambridge/50 flex items-center justify-center text-lg text-ink transition"
+                                    disabled={updatingCount === r.id || cancelling === r.id}
+                                  >+</button>
+                                  {countChanged && (
+                                    <button
+                                      onClick={() => handleUpdateGuestCount(r.id)}
+                                      disabled={updatingCount === r.id || cancelling === r.id}
+                                      className="ml-2 px-3 py-1.5 text-xs bg-oxford-blue text-ivory rounded hover:bg-oxford-blue/80 transition disabled:opacity-50"
+                                    >
+                                      {updatingCount === r.id ? 'Requesting...' : 'Request Change'}
+                                    </button>
+                                  )}
+                                </div>
+                                {countChanged && (
+                                  <p className="text-xs text-amber-600/80 mt-2">Changing guest count will reset your reservation to pending for re-confirmation.</p>
+                                )}
                               </div>
                             ) : (
-                              <button
-                                onClick={() => setCancelConfirm(r.id)}
-                                className="px-3 py-1.5 text-xs border border-red-300/50 text-red-500 rounded hover:border-red-400 transition"
-                              >Cancel Reservation</button>
+                              <div className="pt-3 border-t border-cambridge/10 space-y-3">
+                                {cancelConfirm === r.id ? (
+                                  <div className="space-y-3">
+                                    <p className="text-sm text-ink">Cancel this reservation?</p>
+                                    <div className="flex gap-3">
+                                      <button
+                                        onClick={() => handleCancelReservation(r.id)}
+                                        disabled={cancelling === r.id || updatingCount === r.id}
+                                        className="px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition disabled:opacity-50"
+                                      >
+                                        {cancelling === r.id ? 'Cancelling...' : 'Yes, Cancel'}
+                                      </button>
+                                      <button
+                                        onClick={() => setCancelConfirm(null)}
+                                        className="px-3 py-1.5 text-xs border border-ivory-border text-ink rounded hover:border-cambridge/50 transition"
+                                      >Keep</button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setCancelConfirm(r.id)}
+                                    disabled={updatingCount === r.id}
+                                    className="px-3 py-1.5 text-xs border border-red-300/50 text-red-500 rounded hover:border-red-400 transition disabled:opacity-50"
+                                  >Cancel Reservation</button>
+                                )}
+                              </div>
                             )}
                           </div>
-                        </div>
-                        {countChanged && (
-                          <p className="text-xs text-amber-600/80 mt-2">Changing guest count will reset your reservation to pending for re-confirmation.</p>
                         )}
                       </div>
                     )}
