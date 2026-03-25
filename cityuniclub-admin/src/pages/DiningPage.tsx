@@ -219,7 +219,7 @@ export default function DiningPage() {
   const dateStats = useMemo(() => {
     const stats: Record<string, { totalBookings: number; totalGuests: number; breakfast: number; lunch: number }> = {}
     availableDates.forEach(({ date }) => {
-      const dateReservations = reservationsByDate[date] || []
+      const dateReservations = (reservationsByDate[date] || []).filter(r => r.status !== 'cancelled')
       stats[date] = {
         totalBookings: dateReservations.length,
         totalGuests: dateReservations.reduce((sum, r) => sum + r.guest_count, 0),
@@ -274,8 +274,8 @@ export default function DiningPage() {
 
   const selectedDateReservations = selectedDate ? (reservationsByDate[selectedDate] || []) : []
   const selectedDateInfo = availableDates.find(d => d.date === selectedDate)
-  const memberReservations = selectedDateReservations.filter(r => r.member_id !== null)
-  const nonMemberReservations = selectedDateReservations.filter(r => r.member_id === null)
+  const memberReservations = selectedDateReservations.filter(r => r.member_id !== null && r.status !== 'cancelled')
+  const nonMemberReservations = selectedDateReservations.filter(r => r.member_id === null && r.status !== 'cancelled')
 
   if (loading) {
     return (

@@ -17,6 +17,7 @@ struct MembershipProfileView: View {
                 VStack(spacing: 24) {
                     profileSection
                     accountSettingsSection
+                    legalSection
                     logoutButton
                 }
                 .padding(.horizontal, 20)
@@ -71,6 +72,56 @@ struct MembershipProfileView: View {
 
             VStack(spacing: 0) {
                 settingsRow(icon: "bell.fill", label: "Notifications", value: "Enabled")
+            }
+            .padding()
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.cardWhite)
+            )
+        }
+    }
+
+    // MARK: - Legal Section
+    private var legalSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Legal")
+                .font(.system(size: 18, weight: .semibold, design: .serif))
+                .foregroundColor(.oxfordBlue)
+
+            VStack(spacing: 0) {
+                Link(destination: URL(string: "https://www.cityuniversityclub.co.uk/terms")!) {
+                    HStack(spacing: 16) {
+                        Image(systemName: "doc.text.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(.cambridgeBlue)
+                            .frame(width: 24)
+                        Text("Terms & Conditions")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.oxfordBlue)
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondaryText)
+                    }
+                    .padding(.vertical, 12)
+                }
+                Divider()
+                Link(destination: URL(string: "https://www.cityuniversityclub.co.uk/privacy")!) {
+                    HStack(spacing: 16) {
+                        Image(systemName: "lock.shield.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(.cambridgeBlue)
+                            .frame(width: 24)
+                        Text("Privacy Policy")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(.oxfordBlue)
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondaryText)
+                    }
+                    .padding(.vertical, 12)
+                }
             }
             .padding()
             .background(

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { Link } from 'react-router-dom'
 import { IconDining } from '../icons'
 import { useSelector } from 'react-redux'
 import { RootState } from '../store'
@@ -22,7 +23,7 @@ export const Dining: React.FC = () => {
     meal_type: 'Lunch' as 'Breakfast' | 'Lunch',
     guest_count: 2,
     table_preference: '',
-    special_requests: '',
+
     guest_name: '',
     guest_email: '',
   })
@@ -38,9 +39,11 @@ export const Dining: React.FC = () => {
   const [cancelConfirm, setCancelConfirm] = useState<string | null>(null)
   const [cancelling, setCancelling] = useState<string | null>(null)
   const [updatingCount, setUpdatingCount] = useState<string | null>(null)
+  const [updatingNotes, setUpdatingNotes] = useState<string | null>(null)
   const [localCounts, setLocalCounts] = useState<Record<string, number>>({})
+  const [localNotes, setLocalNotes] = useState<Record<string, string>>({})
   const [manageReservationId, setManageReservationId] = useState<string | null>(null)
-  const [manageOption, setManageOption] = useState<'guest-count' | 'cancel'>('guest-count')
+  const [manageOption, setManageOption] = useState<'guest-count' | 'notes' | 'cancel'>('guest-count')
 
   const yesterday = new Date()
   yesterday.setDate(yesterday.getDate() - 1)
@@ -58,8 +61,13 @@ export const Dining: React.FC = () => {
       ]
       setReservations(dining)
       const counts: Record<string, number> = {}
-      dining.forEach((r: any) => { counts[r.id] = r.guest_count })
+      const notes: Record<string, string> = {}
+      dining.forEach((r: any) => {
+        counts[r.id] = r.guest_count
+        notes[r.id] = r.table_preference ?? ''
+      })
       setLocalCounts(counts)
+      setLocalNotes(notes)
     } catch (e: any) {
       setReservationsError(e.message)
     } finally {
@@ -68,8 +76,8 @@ export const Dining: React.FC = () => {
   }, [token])
 
   useEffect(() => {
-    if (token && activeTab === 'reservations') loadReservations()
-  }, [token, activeTab, loadReservations])
+    if (token) loadReservations()
+  }, [token, loadReservations])
 
   const handleCancelReservation = async (id: string) => {
     if (!token) return
@@ -101,6 +109,20 @@ export const Dining: React.FC = () => {
     }
   }
 
+  const handleUpdateNotes = async (id: string) => {
+    if (!token) return
+    const notes = localNotes[id] ?? ''
+    setUpdatingNotes(id)
+    try {
+      await api.updateDiningNotes(token, id, notes)
+      setReservations(prev => prev.map(r => r.id === id ? { ...r, table_preference: notes } : r))
+    } catch (e: any) {
+      setReservationsError(e.message)
+    } finally {
+      setUpdatingNotes(null)
+    }
+  }
+
   const breakfastTimes = ['09:00', '09:30', '10:00', '10:30', '11:00']
   const lunchTimes = ['12:00', '12:30', '13:00', '13:30', '14:00', '14:30']
   const times = formData.meal_type === 'Breakfast' ? breakfastTimes : lunchTimes
@@ -127,12 +149,12 @@ export const Dining: React.FC = () => {
         meal_type: formData.meal_type,
         guest_count: formData.guest_count,
         table_preference: formData.table_preference || undefined,
-        special_requests: formData.special_requests || undefined,
+
         guest_name: !token ? formData.guest_name : undefined,
         guest_email: !token ? formData.guest_email : undefined,
       })
       setShowSuccess(true)
-      setFormData({ date: '', time: '', meal_type: 'Lunch', guest_count: 2, table_preference: '', special_requests: '', guest_name: '', guest_email: '' })
+      setFormData({ date: '', time: '', meal_type: 'Lunch', guest_count: 2, table_preference: '', guest_name: '', guest_email: '' })
       setTimeout(() => setShowSuccess(false), 4000)
     } catch (e: any) {
       setError(e.message || 'Failed to submit reservation. Please try again.')
@@ -198,7 +220,11 @@ export const Dining: React.FC = () => {
                       activeTab === tab.id ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
                     }`}
                   >
-                    <span className="label-caps whitespace-nowrap">{tab.label}</span>
+                    <span className="label-caps whitespace-nowrap">
+                      {tab.id === 'reservations' ? (
+                        <><span className="hidden sm:inline">My </span>Reservations{reservations.length > 0 ? ` (${reservations.length})` : ''}</>
+                      ) : tab.label}
+                    </span>
                   </button>
                 ))}
               </>
@@ -272,6 +298,7 @@ export const Dining: React.FC = () => {
                           {new Date(r.reservation_date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
                         </p>
                         <p className="text-sm text-ink-mid mt-0.5">{r.meal_type} · {r.reservation_time}</p>
+                        {r.table_preference && <p className="text-xs text-ink-light mt-0.5 italic">{r.table_preference}</p>}
                       </div>
                       <span className={`label-caps text-xs px-2 py-1 rounded ${
                         r.status === 'confirmed' ? 'bg-green-100 text-green-700' :
@@ -295,7 +322,7 @@ export const Dining: React.FC = () => {
                               setCancelConfirm(null)
                             }
                           }}
-                          disabled={updatingCount === r.id || cancelling === r.id}
+                          disabled={updatingCount === r.id || updatingNotes === r.id || cancelling === r.id}
                           className="text-sm font-medium bg-oxford-blue text-ivory px-4 py-2.5 rounded hover:bg-oxford-blue/85 transition disabled:opacity-50"
                         >
                           {showManageOptions ? 'Close Options' : 'Modify Reservation'}
@@ -309,7 +336,7 @@ export const Dining: React.FC = () => {
                                   setManageOption('guest-count')
                                   setCancelConfirm(null)
                                 }}
-                                disabled={updatingCount === r.id || cancelling === r.id}
+                                disabled={updatingCount === r.id || updatingNotes === r.id || cancelling === r.id}
                                 className={`text-xs transition ${
                                   manageOption === 'guest-count' ? 'text-oxford-blue font-semibold' : 'text-ink-light hover:text-oxford-blue'
                                 }`}
@@ -318,8 +345,21 @@ export const Dining: React.FC = () => {
                               </button>
                               <span className="h-4 w-px bg-cambridge/20" />
                               <button
+                                onClick={() => {
+                                  setManageOption('notes')
+                                  setCancelConfirm(null)
+                                }}
+                                disabled={updatingCount === r.id || updatingNotes === r.id || cancelling === r.id}
+                                className={`text-xs transition ${
+                                  manageOption === 'notes' ? 'text-oxford-blue font-semibold' : 'text-ink-light hover:text-oxford-blue'
+                                }`}
+                              >
+                                Update Notes
+                              </button>
+                              <span className="h-4 w-px bg-cambridge/20" />
+                              <button
                                 onClick={() => setManageOption('cancel')}
-                                disabled={updatingCount === r.id || cancelling === r.id}
+                                disabled={updatingCount === r.id || updatingNotes === r.id || cancelling === r.id}
                                 className={`text-xs transition ${
                                   manageOption === 'cancel' ? 'text-red-600 font-semibold' : 'text-ink-light hover:text-red-600'
                                 }`}
@@ -328,25 +368,44 @@ export const Dining: React.FC = () => {
                               </button>
                             </div>
 
-                            {manageOption === 'guest-count' ? (
+                            {manageOption === 'notes' ? (
+                              <div>
+                                <p className="label-caps text-ink-light text-xs mb-2">Notes</p>
+                                <input
+                                  type="text"
+                                  value={localNotes[r.id] ?? ''}
+                                  onChange={(e) => setLocalNotes(prev => ({ ...prev, [r.id]: e.target.value }))}
+                                  className="club-input w-full mb-3"
+                                  placeholder="Dietary requirements, table preference, seating requests, etc."
+                                  disabled={updatingNotes === r.id}
+                                />
+                                <button
+                                  onClick={() => handleUpdateNotes(r.id)}
+                                  disabled={updatingNotes === r.id}
+                                  className="px-3 py-1.5 text-xs bg-oxford-blue text-ivory rounded hover:bg-oxford-blue/80 transition disabled:opacity-50"
+                                >
+                                  {updatingNotes === r.id ? 'Saving...' : 'Save Notes'}
+                                </button>
+                              </div>
+                            ) : manageOption === 'guest-count' ? (
                               <div>
                                 <p className="label-caps text-ink-light text-xs mb-2">Number of Guests</p>
                                 <div className="flex items-center gap-3 flex-wrap">
                                   <button
                                     onClick={() => setLocalCounts(prev => ({ ...prev, [r.id]: Math.max(1, (prev[r.id] ?? r.guest_count) - 1) }))}
                                     className="w-8 h-8 rounded border border-ivory-border hover:border-cambridge/50 flex items-center justify-center text-lg text-ink transition"
-                                    disabled={updatingCount === r.id || cancelling === r.id}
+                                    disabled={updatingCount === r.id || updatingNotes === r.id || cancelling === r.id}
                                   >−</button>
                                   <span className="font-serif text-xl text-oxford-blue w-6 text-center">{currentCount}</span>
                                   <button
                                     onClick={() => setLocalCounts(prev => ({ ...prev, [r.id]: Math.min(20, (prev[r.id] ?? r.guest_count) + 1) }))}
                                     className="w-8 h-8 rounded border border-ivory-border hover:border-cambridge/50 flex items-center justify-center text-lg text-ink transition"
-                                    disabled={updatingCount === r.id || cancelling === r.id}
+                                    disabled={updatingCount === r.id || updatingNotes === r.id || cancelling === r.id}
                                   >+</button>
                                   {countChanged && (
                                     <button
                                       onClick={() => handleUpdateGuestCount(r.id)}
-                                      disabled={updatingCount === r.id || cancelling === r.id}
+                                      disabled={updatingCount === r.id || updatingNotes === r.id || cancelling === r.id}
                                       className="ml-2 px-3 py-1.5 text-xs bg-oxford-blue text-ivory rounded hover:bg-oxford-blue/80 transition disabled:opacity-50"
                                     >
                                       {updatingCount === r.id ? 'Requesting...' : 'Request Change'}
@@ -446,9 +505,15 @@ export const Dining: React.FC = () => {
                     required
                   />
                 </div>
-                <p className="text-xs text-ink-light">
-                  Not a member? Your reservation will be pending until confirmed by the club.
-                </p>
+                <div className="flex gap-3 rounded border border-cambridge/30 bg-cambridge/10 px-4 py-3">
+                  <svg className="w-4 h-4 text-cambridge-muted flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="text-xs text-ink leading-relaxed space-y-1">
+                    <p>You are reserving as a guest. Your reservation won't be confirmed until reviewed by the Club.</p>
+                    <p>If you're a member, <Link to="/login" className="text-cambridge-blue underline">sign in</Link> to reserve with your membership.</p>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -545,28 +610,16 @@ export const Dining: React.FC = () => {
               </div>
             )}
 
-            {/* Special Requests */}
-            <div className="club-card p-5 space-y-4">
-              <div>
-                <label className="label-caps text-ink-light block mb-2">Table Preference</label>
-                <input
-                  type="text"
-                  value={formData.table_preference}
-                  onChange={(e) => setFormData({ ...formData, table_preference: e.target.value })}
-                  className="club-input"
-                  placeholder="Window seat, quiet corner, etc."
-                />
-              </div>
-              <div>
-                <label className="label-caps text-ink-light block mb-2">Special Requests</label>
-                <textarea
-                  value={formData.special_requests}
-                  onChange={(e) => setFormData({ ...formData, special_requests: e.target.value })}
-                  className="club-input"
-                  rows={3}
-                  placeholder="Dietary requirements, allergies, etc."
-                />
-              </div>
+            {/* Notes */}
+            <div className="club-card p-5">
+              <label className="label-caps text-ink-light block mb-2">Notes</label>
+              <input
+                type="text"
+                value={formData.table_preference}
+                onChange={(e) => setFormData({ ...formData, table_preference: e.target.value })}
+                className="club-input"
+                placeholder="Dietary requirements, table preference, seating requests, etc."
+              />
             </div>
 
             {error && (
@@ -574,6 +627,10 @@ export const Dining: React.FC = () => {
                 {error}
               </div>
             )}
+
+            <div className="rounded border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-800 leading-relaxed">
+              Members or guests with food allergies must contact the Club Secretary directly before making a booking.
+            </div>
 
             <button
               type="submit"
