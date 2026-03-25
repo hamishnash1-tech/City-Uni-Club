@@ -78,6 +78,7 @@ serve(async (req) => {
         user: adminUser,
         session: {
           token: sessionData.session?.access_token,
+          refresh_token: sessionData.session?.refresh_token,
           expires_at: sessionData.session?.expires_at
         }
       }),

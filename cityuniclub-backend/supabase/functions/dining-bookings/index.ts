@@ -108,11 +108,9 @@ serve(async (req: Request) => {
       })
     }
 
-    // Send email notification to secretary (if configured)
-    const resendKey = Deno.env.get('RESEND_API_KEY')
-    let email_sent = false
-
-    if (resendKey) {
+    // Email notifications disabled
+    const email_sent = false
+    if (false) {
       try {
         await fetch('https://api.resend.com/emails', {
           method: 'POST',

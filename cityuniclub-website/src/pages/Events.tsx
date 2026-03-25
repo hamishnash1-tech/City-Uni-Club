@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
+import { RootState } from '../store'
 import { IconEvents } from '../icons'
 import { api, Event as ApiEvent } from '../services/api'
 
@@ -21,16 +23,17 @@ function formatPrice(price: number): string {
 }
 
 export const Events: React.FC = () => {
+  const token = useSelector((state: RootState) => state.auth.token)
   const [events, setEvents] = useState<ApiEvent[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    api.getEvents()
+    api.getEvents(token)
       .then(setEvents)
       .catch(() => setError('Unable to load events. Please try again later.'))
       .finally(() => setLoading(false))
-  }, [])
+  }, [token])
 
   return (
     <div className="">
@@ -57,23 +60,33 @@ export const Events: React.FC = () => {
               const price = event.price_per_person > 0 ? formatPrice(event.price_per_person) : '£TBA'
               const isTba = event.is_tba || event.price_per_person === 0
 
+              const booking = event.my_booking
+              const bookingStatus = booking?.status
+
               return (
                 <Link
                   key={event.id}
                   to={`/events/${event.slug}`}
-                  className="club-card border border-cambridge/50 rounded-md overflow-hidden hover:shadow-card transition block"
+                  className={`club-card rounded-md overflow-hidden hover:shadow-card transition block ${bookingStatus ? 'border border-cambridge/70 ring-1 ring-cambridge/30' : 'border border-cambridge/50'}`}
                 >
                   {/* Event Type Badge */}
-                  <div className="bg-oxford-blue border-b border-cambridge/30 px-4 py-2.5">
+                  <div className={`border-b border-cambridge/30 px-4 py-2.5 ${bookingStatus ? 'bg-cambridge/20' : 'bg-oxford-blue'}`}>
                     <div className="flex items-center justify-between">
-                      <span className="label-caps text-cambridge-light/70">
+                      <span className={`label-caps ${bookingStatus ? 'text-oxford-blue' : 'text-cambridge-light/70'}`}>
                         {EVENT_TYPE_LABELS[event.event_type] ?? event.event_type}
                       </span>
-                      {isTba && (
-                        <span className="label-caps border border-cambridge/25 text-cambridge/60 px-2 py-0.5 rounded-sm text-xs">
-                          TBA
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {bookingStatus && (
+                          <span className="label-caps bg-cambridge/30 text-oxford-blue border border-cambridge/40 px-2 py-0.5 rounded-sm text-xs">
+                            {bookingStatus === 'confirmed' ? '✓ Booked' : bookingStatus === 'pending' ? 'Pending' : bookingStatus}
+                          </span>
+                        )}
+                        {isTba && (
+                          <span className="label-caps border border-cambridge/25 text-cambridge/60 px-2 py-0.5 rounded-sm text-xs">
+                            TBA
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -98,7 +111,7 @@ export const Events: React.FC = () => {
                       <span className={`font-serif text-xl ${price === '£TBA' ? 'text-ink-light' : 'text-oxford-blue'}`}>
                         <span className="text-cambridge-muted">£</span>{price.replace('£', '')}
                       </span>
-                      <span className="label-caps text-cambridge-muted">View & Book →</span>
+                      <span className="label-caps text-cambridge-muted">{bookingStatus ? 'Manage →' : 'View & Book →'}</span>
                     </div>
                   </div>
                 </Link>

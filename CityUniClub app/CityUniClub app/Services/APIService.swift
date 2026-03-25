@@ -214,25 +214,41 @@ class APIService {
     
     // MARK: - Events Endpoints
     
-    func getEvents(upcoming: Bool = true) async throws -> [Event] {
+    func getEvents() async throws -> [Event] {
         struct EventsResponse: Decodable {
             let events: [Event]
         }
-        
-        let response: EventsResponse = try await request(
-            endpoint: "/events",
-            method: "GET",
-            requiresAuth: false
-        )
-        
-        return response.events
+
+        guard let url = URL(string: "\(APIConfiguration.baseURL)/events") else {
+            throw APIError.invalidURL
+        }
+
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "GET"
+        if let token = authToken {
+            urlRequest.setValue(token, forHTTPHeaderField: "x-session-token")
+        }
+
+        print("[API] GET \(url.absoluteString)")
+
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+
+        guard let httpResponse = response as? HTTPURLResponse else { throw APIError.noData }
+        print("[API] \(httpResponse.statusCode) GET \(url.absoluteString)")
+        guard (200...299).contains(httpResponse.statusCode) else { throw APIError.serverError }
+
+        do {
+            return try JSONDecoder().decode(EventsResponse.self, from: data).events
+        } catch {
+            print("[API] Decode error: \(error)")
+            print("[API] Response body: \(String(data: data, encoding: .utf8) ?? "<non-utf8>")")
+            throw APIError.decodingError
+        }
     }
     
-    func bookEvent(eventId: String, memberEmail: String, mealOption: String? = nil, guestCount: Int, specialRequests: String? = nil) async throws -> EventBooking {
+    func bookEvent(eventId: String, guestCount: Int, specialRequests: String? = nil) async throws -> EventBooking {
         struct BookingRequest: Encodable {
             let event_id: String
-            let member_email: String
-            let meal_option: String?
             let guest_count: Int
             let special_requests: String?
         }
@@ -241,94 +257,94 @@ class APIService {
             let booking: EventBooking
         }
 
-        let response: BookingResponse = try await request(
-            endpoint: "/events/book",
-            method: "POST",
-            body: BookingRequest(
-                event_id: eventId,
-                member_email: memberEmail,
-                meal_option: mealOption,
-                guest_count: guestCount,
-                special_requests: specialRequests
-            ),
-            requiresAuth: false
-        )
+        guard let url = URL(string: "\(APIConfiguration.baseURL)/event-bookings") else {
+            throw APIError.invalidURL
+        }
+        guard let token = authToken else {
+            throw APIError.unauthorized
+        }
 
-        return response.booking
-    }
-    
-    func cancelBooking(bookingId: String) async throws {
-        try await requestVoid(
-            endpoint: "/events/bookings/\(bookingId)/cancel",
-            method: "PUT",
-            body: [String: String](),
-            requiresAuth: true
-        )
-    }
-    
-    // MARK: - Dining Endpoints
-    
-    func getReservations() async throws -> [DiningReservation] {
-        struct ReservationsResponse: Decodable {
-            let reservations: [DiningReservation]
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue(token, forHTTPHeaderField: "x-session-token")
+        urlRequest.httpBody = try JSONEncoder().encode(BookingRequest(
+            event_id: eventId,
+            guest_count: guestCount,
+            special_requests: specialRequests
+        ))
+
+        print("[API] POST \(url.absoluteString)")
+
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw APIError.noData
         }
-        
-        let response: ReservationsResponse = try await request(
-            endpoint: "/dining/reservations",
-            method: "GET",
-            requiresAuth: true
-        )
-        
-        return response.reservations
-    }
-    
-    func createReservation(
-        date: String,
-        time: String,
-        mealType: String,
-        guestCount: Int,
-        tablePreference: String? = nil,
-        specialRequests: String? = nil
-    ) async throws -> DiningReservation {
-        struct ReservationRequest: Encodable {
-            let reservation_date: String
-            let reservation_time: String
-            let meal_type: String
-            let guest_count: Int
-            let table_preference: String?
-            let special_requests: String?
+
+        print("[API] \(httpResponse.statusCode) POST \(url.absoluteString)")
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            let serverMsg = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])
+                .flatMap { $0["error"] as? String } ?? "Booking failed"
+            print("[API] Error body: \(String(data: data, encoding: .utf8) ?? "<non-utf8>")")
+            throw APIError.httpError(statusCode: httpResponse.statusCode, message: serverMsg)
         }
-        
-        struct ReservationResponse: Decodable {
-            let reservation: DiningReservation
+
+        do {
+            return try JSONDecoder().decode(BookingResponse.self, from: data).booking
+        } catch {
+            print("[API] Decode error: \(error)")
+            print("[API] Response body: \(String(data: data, encoding: .utf8) ?? "<non-utf8>")")
+            throw APIError.decodingError
         }
-        
-        let response: ReservationResponse = try await request(
-            endpoint: "/dining/reservations",
-            method: "POST",
-            body: ReservationRequest(
-                reservation_date: date,
-                reservation_time: time,
-                meal_type: mealType,
-                guest_count: guestCount,
-                table_preference: tablePreference,
-                special_requests: specialRequests
-            ),
-            requiresAuth: true
-        )
-        
-        return response.reservation
     }
     
-    func cancelReservation(reservationId: String) async throws {
-        try await requestVoid(
-            endpoint: "/dining/reservations/\(reservationId)",
-            method: "DELETE",
-            body: [String: String](),
-            requiresAuth: true
-        )
+    func cancelEventBooking(bookingId: String) async throws {
+        guard let url = URL(string: "\(APIConfiguration.baseURL)/event-bookings") else {
+            throw APIError.invalidURL
+        }
+        guard let token = authToken else { throw APIError.unauthorized }
+
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "PATCH"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue(token, forHTTPHeaderField: "x-session-token")
+        urlRequest.httpBody = try JSONSerialization.data(withJSONObject: ["booking_id": bookingId])
+
+        print("[API] PATCH \(url.absoluteString) cancel booking \(bookingId)")
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        guard let http = response as? HTTPURLResponse else { throw APIError.noData }
+        print("[API] \(http.statusCode) PATCH \(url.absoluteString)")
+        guard (200...299).contains(http.statusCode) else {
+            let msg = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])
+                .flatMap { $0["error"] as? String } ?? "Cancel failed"
+            print("[API] Error body: \(String(data: data, encoding: .utf8) ?? "<non-utf8>")")
+            throw APIError.httpError(statusCode: http.statusCode, message: msg)
+        }
     }
     
+    func changeEventGuestCount(bookingId: String, guestCount: Int) async throws {
+        guard let url = URL(string: "\(APIConfiguration.baseURL)/event-bookings") else {
+            throw APIError.invalidURL
+        }
+        guard let token = authToken else { throw APIError.unauthorized }
+
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "PATCH"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.setValue(token, forHTTPHeaderField: "x-session-token")
+        urlRequest.httpBody = try JSONSerialization.data(withJSONObject: ["booking_id": bookingId, "guest_count": guestCount])
+
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+        guard let http = response as? HTTPURLResponse else { throw APIError.noData }
+        guard (200...299).contains(http.statusCode) else {
+            let msg = (try? JSONSerialization.jsonObject(with: data) as? [String: Any])
+                .flatMap { $0["error"] as? String } ?? "Update failed"
+            throw APIError.httpError(statusCode: http.statusCode, message: msg)
+        }
+    }
+
     // MARK: - News Endpoints
     
     func getNews() async throws -> [ClubNews] {
@@ -438,13 +454,19 @@ class APIService {
             special_requests: specialRequests
         ))
 
-        let (_, response) = try await URLSession.shared.data(for: urlRequest)
+        print("[API] POST \(url.absoluteString)")
 
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+        let (data, response) = try await URLSession.shared.data(for: urlRequest)
+
+        guard let httpResponse = response as? HTTPURLResponse else { throw APIError.serverError }
+        print("[API] \(httpResponse.statusCode) POST \(url.absoluteString)")
+
+        guard (200...299).contains(httpResponse.statusCode) else {
+            print("[API] Error body: \(String(data: data, encoding: .utf8) ?? "<non-utf8>")")
             throw APIError.serverError
         }
     }
-    
+
     func getLoiRequests() async throws -> [LoiRequest] {
         struct LoiRequestsResponse: Decodable {
             let requests: [LoiRequest]

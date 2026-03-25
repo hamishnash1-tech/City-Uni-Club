@@ -40,14 +40,76 @@ export const EventDetail: React.FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [cancelling, setCancelling] = useState(false)
+  const [cancelError, setCancelError] = useState<string | null>(null)
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false)
+  const [pendingGuestCount, setPendingGuestCount] = useState(1)
+  const [updatingGuestCount, setUpdatingGuestCount] = useState(false)
+  const [updateError, setUpdateError] = useState<string | null>(null)
+  const [updateSuccess, setUpdateSuccess] = useState<string | null>(null)
+  const [showManageMenu, setShowManageMenu] = useState(false)
+  const [manageOption, setManageOption] = useState<'guest-count' | 'cancel'>('guest-count')
 
   useEffect(() => {
     if (!slug) return
-    api.getEventBySlug(slug)
+    api.getEventBySlug(slug, auth.token)
       .then(setEvent)
       .catch(() => setError('Event not found.'))
       .finally(() => setLoading(false))
-  }, [slug])
+  }, [slug, auth.token])
+
+  useEffect(() => {
+    if (event?.my_booking) {
+      setPendingGuestCount(event.my_booking.guest_count)
+    }
+  }, [event?.my_booking?.id, event?.my_booking?.guest_count])
+
+  const noticeWarning = (event: ApiEvent): string | null => {
+    if (!event.my_booking || event.is_tba || !event.event_date) return null
+    const eventDate = new Date(event.event_date)
+    const hoursUntil = (eventDate.getTime() - Date.now()) / (1000 * 60 * 60)
+    const threshold = event.my_booking.guest_count >= 5 ? 48 : 24
+    if (hoursUntil < threshold) {
+      return `This event is within ${threshold} hours. Cancellation may not be possible — please contact the club if you need assistance.`
+    }
+    return null
+  }
+
+  const handleUpdateGuestCount = async () => {
+    if (!event?.my_booking || !auth.token || pendingGuestCount === event.my_booking.guest_count) return
+    setUpdatingGuestCount(true)
+    setUpdateError(null)
+    setUpdateSuccess(null)
+    setCancelError(null)
+    try {
+      await api.updateEventGuestCount(auth.token, event.my_booking.id, pendingGuestCount)
+      setEvent(prev => prev ? {
+        ...prev,
+        my_booking: { ...prev.my_booking!, guest_count: pendingGuestCount, status: 'pending' },
+      } : prev)
+      setUpdateSuccess('Change requested. Booking status is now pending confirmation.')
+    } catch (err: any) {
+      setUpdateError(err.message || 'Failed to update booking.')
+    } finally {
+      setUpdatingGuestCount(false)
+    }
+  }
+
+  const handleCancel = async () => {
+    if (!event?.my_booking || !auth.token) return
+    setShowCancelConfirm(false)
+    setCancelling(true)
+    setCancelError(null)
+    setUpdateSuccess(null)
+    try {
+      await api.cancelEventBooking(auth.token, event.my_booking.id)
+      setEvent(prev => prev ? { ...prev, my_booking: { ...prev.my_booking!, status: 'cancelled' } } : prev)
+    } catch (err: any) {
+      setCancelError(err.message || 'Failed to cancel booking.')
+    } finally {
+      setCancelling(false)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -89,6 +151,7 @@ export const EventDetail: React.FC = () => {
 
   const displayDate = event.is_tba ? 'Date TBA' : formatEventDate(event.event_date)
   const price = event.price_per_person > 0 ? formatPrice(event.price_per_person) : null
+  const countChanged = !!event.my_booking && pendingGuestCount !== event.my_booking.guest_count
 
   return (
     <div className="pb-20">
@@ -162,25 +225,169 @@ export const EventDetail: React.FC = () => {
           </div>
         )}
 
-        {/* Booking form */}
-        <div className="club-card overflow-hidden">
-          <div className="bg-oxford-blue border-b border-cambridge/30 px-5 py-4">
-            <h2 className="font-serif text-ivory font-normal text-lg">Book Tickets</h2>
-          </div>
+        {/* Manage booking */}
+        {event.my_booking && event.my_booking.status !== 'cancelled' && isLoggedIn && (
+          <div className="club-card overflow-hidden">
+            <div className="bg-cambridge/15 border-b border-cambridge/20 px-5 py-4 flex items-center justify-between">
+              <div>
+                <span className="label-caps text-ink-light">Your Booking</span>
+                <p className="font-serif text-oxford-blue font-normal mt-0.5">
+                  {event.my_booking.guest_count} {event.my_booking.guest_count === 1 ? 'ticket' : 'tickets'} ·{' '}
+                  <span className={`${event.my_booking.status === 'confirmed' ? 'text-cambridge-muted' : 'text-amber-600'}`}>
+                    {event.my_booking.status === 'confirmed' ? 'Confirmed' : 'Pending confirmation'}
+                  </span>
+                </p>
+              </div>
+            </div>
+            <div className="p-5">
+              {(cancelError || updateError) && (
+                <p className="text-red-400 text-sm border-l-2 border-red-400/60 pl-3 mb-4">{cancelError || updateError}</p>
+              )}
+              {updateSuccess && (
+                <p className="text-cambridge-muted text-sm border-l-2 border-cambridge/50 pl-3 mb-4">{updateSuccess}</p>
+              )}
 
-          {event.is_tba ? (
-            <div className="p-6 text-center text-ink text-sm">
-              Bookings will open once the date is confirmed.
+              <div className="mt-1">
+                <button
+                  onClick={() => {
+                    if (showManageMenu) {
+                      setShowManageMenu(false)
+                      setShowCancelConfirm(false)
+                    } else {
+                      setShowManageMenu(true)
+                      setManageOption('guest-count')
+                      setShowCancelConfirm(false)
+                    }
+                  }}
+                  disabled={updatingGuestCount || cancelling}
+                  className="text-sm font-medium bg-oxford-blue text-ivory px-4 py-2.5 rounded hover:bg-oxford-blue/85 transition disabled:opacity-50"
+                >
+                  {showManageMenu ? 'Close Options' : 'Modify Booking'}
+                </button>
+              </div>
+
+              {showManageMenu && (
+                <div className="mt-4 space-y-5 rounded-md border border-cambridge/20 bg-ivory-warm/70 p-4 sm:p-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      onClick={() => {
+                        setManageOption('guest-count')
+                        setShowCancelConfirm(false)
+                      }}
+                      disabled={updatingGuestCount || cancelling}
+                      className={`w-full text-left text-sm font-medium px-3 py-2.5 rounded border transition ${
+                        manageOption === 'guest-count'
+                          ? 'bg-oxford-blue text-ivory border-oxford-blue'
+                          : 'text-ink border-cambridge/30 hover:border-cambridge/50 hover:text-oxford-blue'
+                      }`}
+                    >
+                      Change Guest Count
+                    </button>
+                    <button
+                      onClick={() => setManageOption('cancel')}
+                      disabled={updatingGuestCount || cancelling}
+                      className={`w-full text-left text-sm font-medium px-3 py-2.5 rounded border transition ${
+                        manageOption === 'cancel'
+                          ? 'bg-red-600 text-white border-red-600'
+                          : 'text-red-700 border-red-300/60 hover:border-red-400 hover:bg-red-50/60'
+                      }`}
+                    >
+                      Cancel Booking
+                    </button>
+                  </div>
+
+                  {manageOption === 'guest-count' ? (
+                    <div className="space-y-3">
+                      <p className="label-caps text-ink-light text-xs">Number of Tickets</p>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <button
+                          onClick={() => setPendingGuestCount(prev => Math.max(1, prev - 1))}
+                          className="w-10 h-10 rounded border border-ivory-border hover:border-cambridge/50 flex items-center justify-center text-xl text-ink transition"
+                          disabled={updatingGuestCount || cancelling || pendingGuestCount <= 1}
+                        >−</button>
+                        <span className="font-serif text-2xl text-oxford-blue w-8 text-center">{pendingGuestCount}</span>
+                        <button
+                          onClick={() => setPendingGuestCount(prev => Math.min(20, prev + 1))}
+                          className="w-10 h-10 rounded border border-ivory-border hover:border-cambridge/50 flex items-center justify-center text-xl text-ink transition"
+                          disabled={updatingGuestCount || cancelling || pendingGuestCount >= 20}
+                        >+</button>
+                      </div>
+                      {countChanged && (
+                        <button
+                          onClick={handleUpdateGuestCount}
+                          disabled={updatingGuestCount || cancelling}
+                          className="px-4 py-2 text-sm bg-oxford-blue text-ivory rounded hover:bg-oxford-blue/80 transition disabled:opacity-50"
+                        >
+                          {updatingGuestCount ? 'Requesting…' : 'Request Change'}
+                        </button>
+                      )}
+                      {countChanged && (
+                        <p className="text-xs text-amber-600/80">Changing ticket count resets your booking to pending for re-confirmation.</p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="pt-1 space-y-3">
+                      {noticeWarning(event) && (
+                        <p className="text-amber-600/80 text-xs border-l-2 border-amber-500/40 pl-3">
+                          {noticeWarning(event)}
+                        </p>
+                      )}
+                      {showCancelConfirm ? (
+                        <div className="space-y-3">
+                          <p className="text-sm text-ink">Are you sure you want to cancel this booking?</p>
+                          <div className="flex gap-3">
+                            <button
+                              onClick={handleCancel}
+                              disabled={cancelling || updatingGuestCount}
+                              className="text-sm font-medium bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition disabled:opacity-50"
+                            >
+                              {cancelling ? 'Cancelling…' : 'Yes, cancel booking'}
+                            </button>
+                            <button
+                              onClick={() => setShowCancelConfirm(false)}
+                              className="text-sm text-ink-light border border-cambridge/20 px-4 py-2 rounded hover:bg-cambridge/5 transition"
+                            >
+                              Keep booking
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setShowCancelConfirm(true)}
+                          disabled={updatingGuestCount}
+                          className="text-sm font-medium bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition disabled:opacity-50"
+                        >
+                          Cancel Booking
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          ) : showSuccess ? (
-            <div className="p-6 flex items-center gap-3 text-ink">
-              <svg className="w-5 h-5 text-cambridge flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <p className="text-sm">Booking request sent. We'll be in touch to confirm shortly.</p>
+          </div>
+        )}
+
+        {/* Booking form */}
+        {!(event.my_booking && event.my_booking.status !== 'cancelled' && isLoggedIn) && (
+          <div className="club-card overflow-hidden">
+            <div className="bg-oxford-blue border-b border-cambridge/30 px-5 py-4">
+              <h2 className="font-serif text-ivory font-normal text-lg">Book Tickets</h2>
             </div>
-          ) : (
-            <form className="p-5 space-y-4" onSubmit={handleSubmit}>
+
+            {event.is_tba ? (
+              <div className="p-6 text-center text-ink text-sm">
+                Bookings will open once the date is confirmed.
+              </div>
+            ) : showSuccess ? (
+              <div className="p-6 flex items-center gap-3 text-ink">
+                <svg className="w-5 h-5 text-cambridge flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <p className="text-sm">Booking request sent. We'll be in touch to confirm shortly.</p>
+              </div>
+            ) : (
+              <form className="p-5 space-y-4" onSubmit={handleSubmit}>
 
               {/* Member info or guest fields */}
               {isLoggedIn ? (
@@ -260,9 +467,10 @@ export const EventDetail: React.FC = () => {
               <button type="submit" className="btn-primary" disabled={submitting}>
                 {submitting ? 'Submitting…' : 'Request Booking'}
               </button>
-            </form>
-          )}
-        </div>
+              </form>
+            )}
+          </div>
+        )}
 
 
       </div>

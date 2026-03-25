@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import { AuthProvider, useAuth } from './context/AuthContext'
 import AdminLayout from './components/AdminLayout'
@@ -26,6 +26,7 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 function SessionExpiredModal() {
   const { sessionExpired, logout } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
 
   const handleSignIn = () => {
     logout()
@@ -33,7 +34,7 @@ function SessionExpiredModal() {
   }
 
   return (
-    <Dialog open={sessionExpired} disableEscapeKeyDown>
+    <Dialog open={sessionExpired && location.pathname !== '/login'} disableEscapeKeyDown>
       <DialogTitle>Session Expired</DialogTitle>
       <DialogContent>
         <Typography>Your session has expired. Please sign in again to continue.</Typography>

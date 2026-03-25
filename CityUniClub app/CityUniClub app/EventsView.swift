@@ -12,6 +12,9 @@ struct EventsView: View {
     @State private var specialRequests = ""
     @State private var showConfirmation = false
     @State private var isBooking = false
+    @State private var cancelTarget: Event? = nil
+    @State private var isCancelling = false
+    @State private var showReservations = false
 
     private let apiService = APIService.shared
 
@@ -23,16 +26,38 @@ struct EventsView: View {
     }
     
     var body: some View {
+        NavigationStack {
         ZStack {
             Color.oxfordBlue.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // Header
-                Text("Club Events")
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(.white)
-                    .padding(.top, 50)
-                    .padding(.bottom, 20)
+                VStack(spacing: 12) {
+                    Text("Club Events")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundColor(.white)
+
+                    Button { showReservations = true } label: {
+                        HStack {
+                            Image(systemName: "calendar.badge.clock")
+                                .font(.system(size: 16))
+                            Text("My Bookings")
+                                .font(.system(size: 14, weight: .semibold))
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 12, weight: .semibold))
+                                .opacity(0.7)
+                        }
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .background(Color.white.opacity(0.15))
+                        .cornerRadius(12)
+                    }
+                    .padding(.horizontal, 20)
+                }
+                .padding(.top, 50)
+                .padding(.bottom, 16)
 
                 if isLoading {
                     ProgressView()
@@ -72,7 +97,9 @@ struct EventsView: View {
                                         guestCount = 1
                                         specialRequests = ""
                                         showBookingSheet = true
-                                    }
+                                    },
+                                    onCancel: { cancelTarget = event },
+                                    onUpdated: { loadEvents() }
                                 )
                             }
                         }
@@ -98,18 +125,67 @@ struct EventsView: View {
                 }
             }
         }
+        .alert("Cancel Booking", isPresented: Binding(
+            get: { cancelTarget != nil },
+            set: { if !$0 { cancelTarget = nil } }
+        )) {
+            Button("Cancel Booking", role: .destructive) {
+                if let target = cancelTarget {
+                    Task { await doCancelEventBooking(target) }
+                }
+            }
+            Button("Keep Booking", role: .cancel) { cancelTarget = nil }
+        } message: {
+            if let event = cancelTarget {
+                let warning = cancelNoticeWarning(event)
+                if let w = warning {
+                    Text(w)
+                } else {
+                    Text("Cancel your booking for \(event.title)?")
+                }
+            }
+        }
         .onAppear {
             loadEvents()
         }
+        .navigationDestination(isPresented: $showReservations) {
+            EventReservationsView()
+        }
+        } // NavigationStack
     }
-    
+
+    private func cancelNoticeWarning(_ event: Event) -> String? {
+        guard event.myBooking != nil,
+              let dateStr = event.eventDate else { return nil }
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        guard let eventDate = f.date(from: dateStr) else { return nil }
+        let hoursUntil = eventDate.timeIntervalSinceNow / 3600
+        let threshold: Double = 48
+        guard hoursUntil < threshold && hoursUntil > 0 else { return nil }
+        return "This event is within 48 hours. Cancellation may not be possible — please contact the club if you need assistance. Cancel anyway?"
+    }
+
+    private func doCancelEventBooking(_ event: Event) async {
+        guard let booking = event.myBooking else { return }
+        isCancelling = true
+        cancelTarget = nil
+        defer { isCancelling = false }
+        do {
+            try await apiService.cancelEventBooking(bookingId: booking.id)
+            loadEvents()
+        } catch {
+            print("[Cancel] Error: \(error)")
+        }
+    }
+
     private func loadEvents() {
         isLoading = true
         showError = false
 
         Task {
             do {
-                let loadedEvents = try await apiService.getEvents(upcoming: true)
+                let loadedEvents = try await apiService.getEvents()
                 
                 // Filter out past events
                 let today = Date()
@@ -117,14 +193,6 @@ struct EventsView: View {
                 dateFormatter.dateFormat = "yyyy-MM-dd"
                 
                 let upcomingEvents = loadedEvents
-                    .filter { event in
-                        if event.isTba { return true }
-                        guard let dateString = event.eventDate,
-                              let eventDate = dateFormatter.date(from: dateString) else {
-                            return true
-                        }
-                        return eventDate >= today
-                    }
                     .sorted { a, b in
                         // TBA events always go to the end
                         let aIsTba = a.isTba || a.eventDate == nil
@@ -156,13 +224,8 @@ struct EventsView: View {
         isBooking = true
         
         do {
-            let mealOption: String? = selectedMeal?.rawValue == "Lunch (12:30 PM)" ? "lunch" : 
-                                       selectedMeal?.rawValue == "Dinner (7:00 PM)" ? "dinner" : nil
-            
             _ = try await apiService.bookEvent(
                 eventId: event.id,
-                memberEmail: authManager.currentMember?.email ?? "",
-                mealOption: mealOption,
                 guestCount: guestCount,
                 specialRequests: specialRequests.isEmpty ? nil : specialRequests
             )
@@ -459,8 +522,16 @@ enum EventType {
 struct EventCard: View {
     let event: Event
     let onBook: () -> Void
+    let onCancel: (() -> Void)?
+    let onUpdated: (() -> Void)?
 
     @State private var isHovered = false
+
+    private var bookingStatus: String? { event.myBooking?.status }
+    private var isActiveBooking: Bool {
+        guard let status = bookingStatus else { return false }
+        return status != "cancelled"
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -468,9 +539,21 @@ struct EventCard: View {
             HStack {
                 Text(eventTypeString)
                     .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.white)
+                    .foregroundColor(bookingStatus != nil ? .oxfordBlue : .white)
                 Spacer()
-                if event.isTba {
+                if let status = bookingStatus {
+                    HStack(spacing: 4) {
+                        Image(systemName: status == "confirmed" ? "checkmark.circle.fill" : "clock.fill")
+                            .font(.system(size: 10))
+                        Text(status == "confirmed" ? "Booked" : status == "pending" ? "Pending" : status.capitalized)
+                            .font(.system(size: 10, weight: .bold))
+                    }
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.oxfordBlue.opacity(0.15))
+                    .cornerRadius(4)
+                    .foregroundColor(.oxfordBlue)
+                } else if event.isTba {
                     Text("TBA")
                         .font(.system(size: 10, weight: .bold))
                         .padding(.horizontal, 8)
@@ -482,7 +565,11 @@ struct EventCard: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
-            .background(eventTypeColor)
+            .background(
+                event.isPast ? eventTypeColor.opacity(0.3)
+                : bookingStatus != nil ? Color.cambridgeBlue.opacity(0.35)
+                : eventTypeColor
+            )
 
             // Main content
             VStack(alignment: .leading, spacing: 12) {
@@ -523,7 +610,22 @@ struct EventCard: View {
                 Divider()
                     .background(Color.gray.opacity(0.2))
 
-                if event.isTba {
+                if event.isPast && isActiveBooking {
+                    NavigationLink(destination: EventBookingDetailView(event: event, onUpdated: onUpdated ?? {})) {
+                        manageBookingRow
+                    }
+                    .buttonStyle(.plain)
+                } else if event.isPast {
+                    HStack {
+                        Spacer()
+                        Text("This event has passed")
+                            .font(.system(size: 13))
+                            .foregroundColor(.secondaryText.opacity(0.7))
+                            .multilineTextAlignment(.center)
+                        Spacer()
+                    }
+                    .padding(.vertical, 10)
+                } else if event.isTba {
                     HStack {
                         Spacer()
                         Text("Bookings open when date is confirmed")
@@ -533,6 +635,11 @@ struct EventCard: View {
                         Spacer()
                     }
                     .padding(.vertical, 10)
+                } else if isActiveBooking {
+                    NavigationLink(destination: EventBookingDetailView(event: event, onUpdated: onUpdated ?? {})) {
+                        manageBookingRow
+                    }
+                    .buttonStyle(.plain)
                 } else {
                     // Book Tickets Button
                     Button(action: onBook) {
@@ -560,13 +667,31 @@ struct EventCard: View {
             }
             .padding(16)
         }
+        .background(Color.cardWhite)
+        .clipShape(RoundedRectangle(cornerRadius: 20))
+        .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 5)
+    }
+
+    private var manageBookingRow: some View {
+        HStack {
+            Spacer()
+            Image(systemName: "ticket")
+                .font(.system(size: 15))
+            Text("Manage Booking")
+                .font(.system(size: 15, weight: .medium))
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(.oxfordBlue.opacity(0.4))
+        }
+        .foregroundColor(.oxfordBlue)
+        .padding(.vertical, 12)
         .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(Color.cardWhite)
-                .shadow(color: Color.black.opacity(0.1), radius: 15, x: 0, y: 5)
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(Color.oxfordBlue.opacity(0.3), lineWidth: 1)
         )
     }
-    
+
     private var eventTypeString: String {
         switch event.eventType {
         case "lunch": return "LUNCH"

@@ -22,7 +22,9 @@ import {
   Chip,
   Divider,
   Alert,
-  CircularProgress
+  CircularProgress,
+  Collapse,
+  Tooltip,
 } from '@mui/material'
 import RestaurantIcon from '@mui/icons-material/Restaurant'
 import CoffeeIcon from '@mui/icons-material/Coffee'
@@ -34,8 +36,20 @@ import CloseIcon from '@mui/icons-material/Close'
 import PersonIcon from '@mui/icons-material/Person'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import CancelIcon from '@mui/icons-material/Cancel'
+import RestoreIcon from '@mui/icons-material/Restore'
+import HistoryIcon from '@mui/icons-material/History'
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
 import { useAuth } from '../context/AuthContext'
 import { FUNCTIONS_URL } from '../services/supabase'
+
+interface AuditEntry {
+  action: string
+  previous_value: Record<string, any> | null
+  new_value: Record<string, any> | null
+  performed_by_admin_email: string | null
+  performed_at: string
+}
 
 interface DiningReservation {
   id: string
@@ -55,6 +69,7 @@ interface DiningReservation {
     email: string
     membership_number: string
   } | null
+  audit_log: AuditEntry[]
 }
 
 // Club opening days (Tuesday=2, Wednesday=3, Thursday=4, Friday=5)
@@ -65,7 +80,7 @@ const generateAvailableDates = () => {
   const dates = []
   const today = new Date()
 
-  for (let i = 0; i < 30; i++) {
+  for (let i = -1; i < 30; i++) {
     const date = new Date(today)
     date.setDate(today.getDate() + i)
 
@@ -86,8 +101,37 @@ const generateAvailableDates = () => {
   return dates
 }
 
+function AuditLog({ entries }: { entries: AuditEntry[] }) {
+  return (
+    <Box sx={{ py: 1.5, px: 2 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mb: 1 }}>
+        <HistoryIcon fontSize="small" color="action" />
+        <Typography variant="caption" fontWeight={600} color="textSecondary">Audit History</Typography>
+      </Box>
+      {entries.map((entry, i) => (
+        <Box key={i} sx={{ display: 'flex', gap: 2, mb: 0.5, alignItems: 'baseline', flexWrap: 'wrap' }}>
+          <Typography variant="caption" color="textSecondary" sx={{ minWidth: 140 }}>
+            {new Date(entry.performed_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+          </Typography>
+          <Typography variant="caption" sx={{ fontFamily: 'monospace' }}>
+            {entry.action.replace(/_/g, ' ')}
+          </Typography>
+          {entry.previous_value && entry.new_value && (
+            <Typography variant="caption" color="textSecondary">
+              {Object.keys(entry.new_value).map(k => `${k}: ${entry.previous_value![k]} → ${entry.new_value![k]}`).join(', ')}
+            </Typography>
+          )}
+          {entry.performed_by_admin_email && (
+            <Typography variant="caption" color="textSecondary">· {entry.performed_by_admin_email}</Typography>
+          )}
+        </Box>
+      ))}
+    </Box>
+  )
+}
+
 export default function DiningPage() {
-  const { sessionToken } = useAuth()
+  const { sessionToken, user } = useAuth()
   const [reservations, setReservations] = useState<DiningReservation[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -95,6 +139,15 @@ export default function DiningPage() {
   const [openDayDialog, setOpenDayDialog] = useState(false)
   const [copiedEmail, setCopiedEmail] = useState<string | null>(null)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
+  const [expandedAuditRows, setExpandedAuditRows] = useState<Set<string>>(new Set())
+
+  const toggleAuditRow = (id: string) => {
+    setExpandedAuditRows(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
 
   const availableDates = useMemo(() => generateAvailableDates(), [])
 
@@ -141,7 +194,12 @@ export default function DiningPage() {
         const err = await res.json()
         throw new Error(err.error || 'Failed to update status')
       }
-      setReservations(prev => prev.map(r => r.id === id ? { ...r, status: status as DiningReservation['status'] } : r))
+      const now = new Date().toISOString()
+      setReservations(prev => prev.map(r => {
+        if (r.id !== id) return r
+        const entry: AuditEntry = { action: `status_changed_to_${status}`, previous_value: { status: r.status }, new_value: { status }, performed_by_admin_email: user?.email ?? null, performed_at: now }
+        return { ...r, status: status as DiningReservation['status'], audit_log: [entry, ...(r.audit_log ?? [])] }
+      }))
       setStatusMessage(`Reservation ${status}`)
       setTimeout(() => setStatusMessage(null), 3000)
     } catch (e: any) {
@@ -380,6 +438,7 @@ export default function DiningPage() {
                     <Table size="small">
                       <TableHead>
                         <TableRow>
+                          <TableCell width={32} />
                           <TableCell>Time</TableCell>
                           <TableCell>Member</TableCell>
                           <TableCell>Email</TableCell>
@@ -393,67 +452,86 @@ export default function DiningPage() {
                       <TableBody>
                         {memberReservations
                           .sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))
-                          .map((reservation) => (
-                            <TableRow key={reservation.id} hover>
-                              <TableCell>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  {getMealTypeIcon(reservation.meal_type)}
-                                  {formatTime(reservation.reservation_time)}
-                                </Box>
-                              </TableCell>
-                              <TableCell>
-                                <Typography variant="body2" fontWeight={500}>
-                                  {reservation.members?.full_name || '—'}
-                                </Typography>
-                              </TableCell>
-                              <TableCell>
-                                {reservation.members?.email ? (
-                                  <a href={`mailto:${reservation.members.email}`} style={{ textDecoration: 'none' }}>
+                          .map((reservation) => {
+                            const isExpanded = expandedAuditRows.has(reservation.id)
+                            const hasAudit = reservation.audit_log?.length > 0
+                            return (
+                              <>
+                                <TableRow key={reservation.id} hover>
+                                  <TableCell>
+                                    {hasAudit && (
+                                      <Tooltip title="View history">
+                                        <IconButton size="small" onClick={() => toggleAuditRow(reservation.id)}>
+                                          {isExpanded ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                      <MailIcon fontSize="small" color="action" />
-                                      <Typography variant="caption" color="textSecondary">
-                                        {reservation.members.email}
-                                      </Typography>
+                                      {getMealTypeIcon(reservation.meal_type)}
+                                      {formatTime(reservation.reservation_time)}
                                     </Box>
-                                  </a>
-                                ) : '—'}
-                              </TableCell>
-                              <TableCell>
-                                <Chip
-                                  label={reservation.meal_type}
-                                  size="small"
-                                  color={getMealTypeColor(reservation.meal_type) as any}
-                                />
-                              </TableCell>
-                              <TableCell>{reservation.guest_count}</TableCell>
-                              <TableCell>
-                                <Typography variant="body2" sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  {reservation.table_preference || '—'}
-                                </Typography>
-                              </TableCell>
-                              <TableCell>
-                                <Chip
-                                  label={reservation.status}
-                                  size="small"
-                                  color={getStatusColor(reservation.status) as any}
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                  {reservation.status === 'pending' && (
-                                    <IconButton size="small" color="success" onClick={() => handleUpdateStatus(reservation.id, 'confirmed')} title="Confirm">
-                                      <CheckCircleIcon fontSize="small" />
-                                    </IconButton>
-                                  )}
-                                  {(reservation.status === 'pending' || reservation.status === 'confirmed') && (
-                                    <IconButton size="small" color="error" onClick={() => handleUpdateStatus(reservation.id, 'cancelled')} title="Cancel">
-                                      <CancelIcon fontSize="small" />
-                                    </IconButton>
-                                  )}
-                                </Box>
-                              </TableCell>
-                            </TableRow>
-                          ))}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Typography variant="body2" fontWeight={500}>
+                                      {reservation.members?.full_name || '—'}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell>
+                                    {reservation.members?.email ? (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <MailIcon fontSize="small" color="action" />
+                                        <Typography variant="caption" color="textSecondary">
+                                          {reservation.members.email}
+                                        </Typography>
+                                      </Box>
+                                    ) : '—'}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Chip label={reservation.meal_type} size="small" color={getMealTypeColor(reservation.meal_type) as any} />
+                                  </TableCell>
+                                  <TableCell>{reservation.guest_count}</TableCell>
+                                  <TableCell>
+                                    <Typography variant="body2" sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                      {reservation.table_preference || '—'}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Chip label={reservation.status} size="small" color={getStatusColor(reservation.status) as any} />
+                                  </TableCell>
+                                  <TableCell>
+                                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                      {reservation.status === 'pending' && (
+                                        <IconButton size="small" color="success" onClick={() => handleUpdateStatus(reservation.id, 'confirmed')} title="Confirm">
+                                          <CheckCircleIcon fontSize="small" />
+                                        </IconButton>
+                                      )}
+                                      {(reservation.status === 'pending' || reservation.status === 'confirmed') && (
+                                        <IconButton size="small" color="error" onClick={() => handleUpdateStatus(reservation.id, 'cancelled')} title="Cancel">
+                                          <CancelIcon fontSize="small" />
+                                        </IconButton>
+                                      )}
+                                      {reservation.status === 'cancelled' && (
+                                        <IconButton size="small" color="warning" onClick={() => handleUpdateStatus(reservation.id, 'pending')} title="Uncancel">
+                                          <RestoreIcon fontSize="small" />
+                                        </IconButton>
+                                      )}
+                                    </Box>
+                                  </TableCell>
+                                </TableRow>
+                                {hasAudit && (
+                                  <TableRow key={`${reservation.id}-audit`}>
+                                    <TableCell colSpan={9} sx={{ py: 0, bgcolor: 'grey.50' }}>
+                                      <Collapse in={isExpanded} unmountOnExit>
+                                        <AuditLog entries={reservation.audit_log} />
+                                      </Collapse>
+                                    </TableCell>
+                                  </TableRow>
+                                )}
+                              </>
+                            )
+                          })}
                       </TableBody>
                     </Table>
                   </TableContainer>
@@ -475,6 +553,7 @@ export default function DiningPage() {
                     <Table size="small">
                       <TableHead>
                         <TableRow>
+                          <TableCell width={32} />
                           <TableCell>Time</TableCell>
                           <TableCell>Guest</TableCell>
                           <TableCell>Meal</TableCell>
@@ -487,63 +566,84 @@ export default function DiningPage() {
                       <TableBody>
                         {nonMemberReservations
                           .sort((a, b) => a.reservation_time.localeCompare(b.reservation_time))
-                          .map((reservation) => (
-                            <TableRow key={reservation.id} hover>
-                              <TableCell>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                  {getMealTypeIcon(reservation.meal_type)}
-                                  {formatTime(reservation.reservation_time)}
-                                </Box>
-                              </TableCell>
-                              <TableCell>
-                                <Typography variant="body2" fontWeight={500}>{reservation.guest_name || '—'}</Typography>
-                                {reservation.guest_email && (
-                                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                    <a href={`mailto:${reservation.guest_email}`} style={{ textDecoration: 'none' }}>
-                                      <Typography variant="caption" color="textSecondary">{reservation.guest_email}</Typography>
-                                    </a>
-                                    <IconButton size="small" onClick={() => handleCopyEmail(reservation.guest_email!)} title="Copy email">
-                                      <ContentCopyIcon sx={{ fontSize: 12 }} />
-                                    </IconButton>
-                                  </Box>
+                          .map((reservation) => {
+                            const isExpanded = expandedAuditRows.has(reservation.id)
+                            const hasAudit = reservation.audit_log?.length > 0
+                            return (
+                              <>
+                                <TableRow key={reservation.id} hover>
+                                  <TableCell>
+                                    {hasAudit && (
+                                      <Tooltip title="View history">
+                                        <IconButton size="small" onClick={() => toggleAuditRow(reservation.id)}>
+                                          {isExpanded ? <KeyboardArrowUpIcon fontSize="small" /> : <KeyboardArrowDownIcon fontSize="small" />}
+                                        </IconButton>
+                                      </Tooltip>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                      {getMealTypeIcon(reservation.meal_type)}
+                                      {formatTime(reservation.reservation_time)}
+                                    </Box>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Typography variant="body2" fontWeight={500}>{reservation.guest_name || '—'}</Typography>
+                                    {reservation.guest_email ? (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <Typography variant="caption" color="textSecondary">{reservation.guest_email}</Typography>
+                                        <IconButton size="small" onClick={() => handleCopyEmail(reservation.guest_email!)} title="Copy email">
+                                          <ContentCopyIcon sx={{ fontSize: 12 }} />
+                                        </IconButton>
+                                      </Box>
+                                    ) : (
+                                      <Typography variant="caption" color="textSecondary">—</Typography>
+                                    )}
+                                  </TableCell>
+                                  <TableCell>
+                                    <Chip label={reservation.meal_type} size="small" color={getMealTypeColor(reservation.meal_type) as any} />
+                                  </TableCell>
+                                  <TableCell>{reservation.guest_count}</TableCell>
+                                  <TableCell>
+                                    <Typography variant="body2" sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                      {reservation.special_requests || '—'}
+                                    </Typography>
+                                  </TableCell>
+                                  <TableCell>
+                                    <Chip label={reservation.status} size="small" color={getStatusColor(reservation.status) as any} />
+                                  </TableCell>
+                                  <TableCell>
+                                    <Box sx={{ display: 'flex', gap: 0.5 }}>
+                                      {reservation.status === 'pending' && (
+                                        <IconButton size="small" color="success" onClick={() => handleUpdateStatus(reservation.id, 'confirmed')} title="Confirm">
+                                          <CheckCircleIcon fontSize="small" />
+                                        </IconButton>
+                                      )}
+                                      {(reservation.status === 'pending' || reservation.status === 'confirmed') && (
+                                        <IconButton size="small" color="error" onClick={() => handleUpdateStatus(reservation.id, 'cancelled')} title="Cancel">
+                                          <CancelIcon fontSize="small" />
+                                        </IconButton>
+                                      )}
+                                      {reservation.status === 'cancelled' && (
+                                        <IconButton size="small" color="warning" onClick={() => handleUpdateStatus(reservation.id, 'pending')} title="Uncancel">
+                                          <RestoreIcon fontSize="small" />
+                                        </IconButton>
+                                      )}
+                                    </Box>
+                                  </TableCell>
+                                </TableRow>
+                                {hasAudit && (
+                                  <TableRow key={`${reservation.id}-audit`}>
+                                    <TableCell colSpan={8} sx={{ py: 0, bgcolor: 'grey.50' }}>
+                                      <Collapse in={isExpanded} unmountOnExit>
+                                        <AuditLog entries={reservation.audit_log} />
+                                      </Collapse>
+                                    </TableCell>
+                                  </TableRow>
                                 )}
-                              </TableCell>
-                              <TableCell>
-                                <Chip
-                                  label={reservation.meal_type}
-                                  size="small"
-                                  color={getMealTypeColor(reservation.meal_type) as any}
-                                />
-                              </TableCell>
-                              <TableCell>{reservation.guest_count}</TableCell>
-                              <TableCell>
-                                <Typography variant="body2" sx={{ maxWidth: 150, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                                  {reservation.special_requests || '—'}
-                                </Typography>
-                              </TableCell>
-                              <TableCell>
-                                <Chip
-                                  label={reservation.status}
-                                  size="small"
-                                  color={getStatusColor(reservation.status) as any}
-                                />
-                              </TableCell>
-                              <TableCell>
-                                <Box sx={{ display: 'flex', gap: 0.5 }}>
-                                  {reservation.status === 'pending' && (
-                                    <IconButton size="small" color="success" onClick={() => handleUpdateStatus(reservation.id, 'confirmed')} title="Confirm">
-                                      <CheckCircleIcon fontSize="small" />
-                                    </IconButton>
-                                  )}
-                                  {(reservation.status === 'pending' || reservation.status === 'confirmed') && (
-                                    <IconButton size="small" color="error" onClick={() => handleUpdateStatus(reservation.id, 'cancelled')} title="Cancel">
-                                      <CancelIcon fontSize="small" />
-                                    </IconButton>
-                                  )}
-                                </Box>
-                              </TableCell>
-                            </TableRow>
-                          ))}
+                              </>
+                            )
+                          })}
                       </TableBody>
                     </Table>
                   </TableContainer>
