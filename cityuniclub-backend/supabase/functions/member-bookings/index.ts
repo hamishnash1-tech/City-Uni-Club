@@ -45,6 +45,7 @@ serve(async (req) => {
         guest_count,
         total_price,
         status,
+        special_requests,
         created_at,
         events (
           id,
@@ -89,6 +90,7 @@ serve(async (req) => {
         total_price: booking.total_price,
         price_per_person: event.price_per_person,
         status: booking.status,
+        special_requests: booking.special_requests,
         booked_at: booking.created_at,
       }
       if (event.is_tba || !event.event_date || event.event_date >= today) {
