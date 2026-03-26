@@ -315,31 +315,44 @@ struct DiningView: View {
                 // LUNCH MENU - No Prices
                 menuSection(title: "🍽️ STARTERS", items: [
                     "Homemade Soup of the Day",
-                    "Chilli Garlic Pan Fried Tiger Prawns & Chorizo",
-                    "Aged Cheddar Cheese & Caramelised Red Onion Tart",
-                    "Devilled Kidneys",
-                    "Crispy Ham Hock Croquettes",
-                    "Smoked Salmon Plate"
+                    "CUC Prawn Cocktail",
+                    "Devilled Kidneys, With Toasted Sourdough",
+                    "Goats Cheese, Tomato and Spinach Tart, Dressed Salad",
+                    "Smoked Salmon Plate, Capers, Shallots, Lemon Oil, Brown Bread and Butter"
                 ])
-                
+
                 Divider().background(Color.gray.opacity(0.2))
-                
+
                 menuSection(title: "🥩 MAINS", items: [
-                    "Roast Rump of Lamb",
-                    "Pan Fried Delice of Salmon",
-                    "Confit Belly of English Pork",
-                    "Oven Roasted Free Range Chicken",
-                    "Homemade Truffle Mushroom Tortellinis",
-                    "Whole Dover Sole"
+                    "Oven Roasted Breast of Free-Range Chicken, Colcannon Potatoes, Braised Carrots, Bourguignon Sauce",
+                    "Pan Fried Fillet of Sea Bream, Herb Butter, New Potatoes, Carrot Puree, Braised Fennel, Watercress and Pernod Cream Sauce",
+                    "\"CUC\" Confit Belly of Pork, Bacon and Apple Mash, Buttered Sweetheart Cabbage, Seasonal Vegetables, Crackling, Apple Sauce and Cider Jus",
+                    "Roast Rump and Braised Lamb Shoulder Rissole, Tomato and Basil Fondue, Herb Broad Beans and Peas, Red Currant Jus",
+                    "Whole Dover Sole \"on or off the bone\", Spinach, Parsley Steamed New Potatoes, Tomato and Caper Butter Sauce",
+                    "Homemade Pasta, Wilted Spinach, Porcini Cream, Freshly Grated Parmesan Truffle Oil"
                 ])
-                
+
                 Divider().background(Color.gray.opacity(0.2))
-                
-                menuSection(title: "🧀 DESSERTS & SAVOURIES", items: [
-                    "Apricot and Pistachio Tart",
-                    "Selection of Cheeses",
-                    "Ice Creams",
-                    "Sticky Toffee Pudding"
+
+                menuSection(title: "🧀 DESSERTS & CHEESE", items: [
+                    "\"CUC\" Sticky Toffee Pudding, Vanilla Custard",
+                    "Chocolate Fondant, Vanilla Ice Cream and Chocolate Sauce",
+                    "Selection of Cheeses, Celery, Grapes and Crackers",
+                    "Selection of Ice Cream and Sorbets"
+                ])
+
+                Divider().background(Color.gray.opacity(0.2))
+
+                beverageSection(title: "🍷 DESSERT WINE", items: [
+                    ("Sauterne – Château Les Mingets 2019", "Bottle · Glass"),
+                    ("Alison Botrytis Riesling 2020", "Half Bottle"),
+                ])
+
+                Divider().background(Color.gray.opacity(0.2))
+
+                beverageSection(title: "🍷 PORT", items: [
+                    ("Quinta Da Roenda – Croft 2004", "Glass"),
+                    ("Fonseca Reserve Bin 27", "Glass"),
                 ])
             }
         }
@@ -351,6 +364,30 @@ struct DiningView: View {
                 .shadow(color: Color.black.opacity(0.08), radius: 15, x: 0, y: 8)
         )
         .padding(.horizontal, 20)
+    }
+
+    // MARK: - Beverage Section (with format label)
+    private func beverageSection(title: String, items: [(String, String)]) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text(title)
+                .font(.system(size: 16, weight: .semibold, design: .serif))
+                .foregroundColor(.oxfordBlue)
+
+            ForEach(items, id: \.0) { (name, format) in
+                HStack(alignment: .top) {
+                    Text(name)
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(.darkText)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text(format)
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.trailing)
+                }
+                .padding(.vertical, 2)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     // MARK: - Menu Section (No Prices)
