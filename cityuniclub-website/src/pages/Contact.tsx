@@ -7,7 +7,7 @@ export const Contact: React.FC = () => (
     <div className="bg-cambridge/15 pt-7 pb-6 px-4 border-b border-cambridge/20 text-center">
       <h1 className="font-serif text-2xl font-normal text-ivory">Contact</h1>
       <p className="text-ivory/60 text-sm mt-2 max-w-md mx-auto">
-        42 Crutched Friars, London EC3N 2AE
+        42 Crutched Friars, London EC3N 2AP
       </p>
     </div>
 
@@ -40,9 +40,9 @@ export const Contact: React.FC = () => (
             </svg>
             <div>
               <p>42 Crutched Friars</p>
-              <p>London EC3N 2AE</p>
+              <p>London EC3N 2AP</p>
               <a
-                href="https://maps.google.com/?q=42+Crutched+Friars,+London+EC3N+2AE"
+                href="https://maps.google.com/?q=42+Crutched+Friars,+London+EC3N+2AP"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-cambridge-muted hover:text-cambridge text-xs mt-1 inline-block transition"
@@ -84,7 +84,7 @@ export const Contact: React.FC = () => (
         <div className="rounded-sm overflow-hidden border border-cambridge/20">
           <iframe
             title="City University Club location"
-            src="https://maps.google.com/maps?q=42+Crutched+Friars,+London+EC3N+2AE&output=embed"
+            src="https://maps.google.com/maps?q=42+Crutched+Friars,+London+EC3N+2AP&output=embed"
             width="100%"
             height="320"
             style={{ border: 0, display: 'block' }}

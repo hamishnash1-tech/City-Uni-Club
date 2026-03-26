@@ -164,26 +164,43 @@ export const Dining: React.FC = () => {
   }
 
   const menuItems: MenuItem[] = [
-    { name: 'Homemade Soup of the Day', description: 'Served with crusty bread', image: '/assets/food/Starters/cuc-soup.avif', category: 'Starters' },
-    { name: 'Chilli Garlic Pan Fried Tiger Prawns & Chorizo', description: 'With crispy bread', image: '/assets/food/Starters/cuc-prawns.avif', category: 'Starters' },
-    { name: 'Aged Cheddar Cheese & Caramelised Red Onion Tart', description: 'With rocket and tomato salad', image: '/assets/food/Starters/cuc-cheese.avif', category: 'Starters' },
-    { name: 'Devilled Kidneys', description: 'On toast', image: '/assets/food/Starters/cuc-kidneys.avif', category: 'Starters' },
-    { name: 'Crispy Ham Hock Croquettes', description: 'With mustard mayo', image: '/assets/food/Starters/cuc-ham.avif', category: 'Starters' },
-    { name: 'Smoked Salmon Plate', description: 'With brown bread and butter', image: '/assets/food/Starters/cuc-salmon.avif', category: 'Starters' },
-    { name: 'Roast Rump of Lamb', description: 'With seasonal vegetables and gravy', image: '/assets/food/Mains/cuc-lamb.avif', category: 'Mains' },
-    { name: 'Pan Fried Delice of Salmon', description: 'With samphire and new potatoes', image: '/assets/food/Mains/cuc-delice.avif', category: 'Mains' },
-    { name: 'Confit Belly of English Pork', description: 'With apple sauce and mash', image: '/assets/food/Mains/cuc-pork.avif', category: 'Mains' },
-    { name: 'Oven Roasted Free Range Chicken', description: 'With seasonal vegetables', image: '/assets/food/Mains/cuc-chicken.avif', category: 'Mains' },
-    { name: 'Homemade Truffle Mushroom Tortellinis', description: 'With parmesan cream', image: '/assets/food/Mains/cuc-tortellini.avif', category: 'Mains' },
-    { name: 'Whole Dover Sole', description: 'With butter and new potatoes', image: '/assets/food/Mains/cuc-sole.avif', category: 'Mains' },
-    { name: 'Apricot and Pistachio Tart', description: 'With crème fraîche', image: '/assets/food/Pudding/cuc-tart.avif', category: 'Puddings' },
-    { name: 'Selection of Cheeses', description: 'With crackers and grapes', image: '/assets/food/Pudding/cuc-cheeses.avif', category: 'Puddings' },
-    { name: 'Ice Creams', description: 'Vanilla, chocolate or strawberry', image: '/assets/food/Pudding/cuc-ice-cream.avif', category: 'Puddings' },
+    { name: 'Homemade Soup of the Day', description: '', image: '/assets/food/Starters/cuc-soup.avif', category: 'Starters' },
+    { name: 'CUC Prawn Cocktail', description: '', image: '/assets/food/Starters/cuc-prawns.avif', category: 'Starters' },
+    { name: 'Devilled Kidneys, With Toasted Sourdough', description: '', image: '/assets/food/Starters/cuc-kidneys.avif', category: 'Starters' },
+    { name: 'Goats Cheese, Tomato and Spinach Tart, Dressed Salad', description: '', image: '/assets/food/Starters/cuc-cheese.avif', category: 'Starters' },
+    { name: 'Smoked Salmon Plate, Capers, Shallots, Lemon Oil, Brown Bread and Butter', description: '', image: '/assets/food/Starters/cuc-salmon.avif', category: 'Starters' },
+    { name: 'Oven Roasted Breast of Free-Range Chicken, Colcannon Potatoes, Braised Carrots, Bourguignon Sauce', description: '', image: '/assets/food/Mains/cuc-chicken.avif', category: 'Mains' },
+    { name: 'Pan Fried Fillet of Sea Bream, Herb Butter, New Potatoes, Carrot Puree, Braised Fennel, Watercress and Pernod Cream Sauce', description: '', image: '/assets/food/Mains/cuc-delice.avif', category: 'Mains' },
+    { name: '"CUC" Confit Belly of Pork, Bacon and Apple Mash, Buttered Sweetheart Cabbage, Seasonal Vegetables, Crackling, Apple Sauce and Cider Jus', description: '', image: '/assets/food/Mains/cuc-pork.avif', category: 'Mains' },
+    { name: 'Roast Rump and Braised Lamb Shoulder Rissole, Tomato and Basil Fondue, Herb Broad Beans and Peas, Red Currant Jus', description: '', image: '/assets/food/Mains/cuc-lamb.avif', category: 'Mains' },
+    { name: 'Whole Dover Sole "on or off the bone", Spinach, Parsley Steamed New Potatoes, Tomato and Caper Butter Sauce', description: '', image: '/assets/food/Mains/cuc-sole.avif', category: 'Mains' },
+    { name: 'Homemade Pasta, Wilted Spinach, Porcini Cream, Freshly Grated Parmesan Truffle Oil', description: '', image: '/assets/food/Mains/cuc-tortellini.avif', category: 'Mains' },
+    { name: '"CUC" Sticky Toffee Pudding, Vanilla Custard', description: '', image: '', category: 'Puddings' },
+    { name: 'Chocolate Fondant, Vanilla Ice Cream and Chocolate Sauce', description: '', image: '', category: 'Puddings' },
+    { name: 'Selection of Cheeses, Celery, Grapes and Crackers', description: '', image: '', category: 'Puddings' },
+    { name: 'Selection of Ice Cream and Sorbets', description: '', image: '', category: 'Puddings' },
   ]
 
   const starters = menuItems.filter(item => item.category === 'Starters')
   const mains = menuItems.filter(item => item.category === 'Mains')
   const puddings = menuItems.filter(item => item.category === 'Puddings')
+
+  const beverages = [
+    {
+      section: 'Dessert Wine',
+      items: [
+        { name: 'Sauterne – Château Les Mingets 2019', formats: 'Bottle · Glass' },
+        { name: 'Alison Botrytis Riesling 2020', formats: 'Half Bottle' },
+      ],
+    },
+    {
+      section: 'Port',
+      items: [
+        { name: 'Quinta Da Roenda – Croft 2004', formats: 'Glass' },
+        { name: 'Fonseca Reserve Bin 27', formats: 'Glass' },
+      ],
+    },
+  ]
 
   return (
     <div className="">
@@ -671,67 +688,43 @@ export const Dining: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-10">
-            {/* Starters */}
-            <div className="club-card overflow-hidden">
-              <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
-                <p className="label-caps text-cambridge-light/60 mb-1">First Course</p>
-                <h2 className="font-serif text-ivory text-xl font-normal">Starters</h2>
+            {[
+              { label: 'First Course', title: 'Starters', items: starters },
+              { label: 'Second Course', title: 'Main Courses', items: mains },
+              { label: 'Third Course', title: 'Desserts & Cheese', items: puddings },
+            ].map(({ label, title, items }) => (
+              <div key={title} className="club-card overflow-hidden">
+                <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
+                  <p className="label-caps text-cambridge-light/60 mb-1">{label}</p>
+                  <h2 className="font-serif text-ivory text-xl font-normal">{title}</h2>
+                </div>
+                <ul className="divide-y divide-cambridge/10 px-6 py-2">
+                  {items.map((item, index) => (
+                    <li key={index} className="py-3">
+                      <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              <div className="gold-rule mx-6"></div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6 pt-2">
-                {starters.map((item, index) => (
-                  <div key={index} className="border border-cambridge/20 rounded-sm overflow-hidden hover:shadow-card transition">
-                    <div className="h-48 overflow-hidden">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-serif text-oxford-blue font-normal mb-1">{item.name}</h3>
-                      <p className="text-sm text-ink-mid italic">{item.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            ))}
 
-            {/* Mains */}
+            {/* Beverages */}
             <div className="club-card overflow-hidden">
               <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
-                <p className="label-caps text-cambridge-light/60 mb-1">Second Course</p>
-                <h2 className="font-serif text-ivory text-xl font-normal">Main Courses</h2>
+                <h2 className="font-serif text-ivory text-xl font-normal">Beverages</h2>
               </div>
-              <div className="gold-rule mx-6"></div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6 pt-2">
-                {mains.map((item, index) => (
-                  <div key={index} className="border border-cambridge/20 rounded-sm overflow-hidden hover:shadow-card transition">
-                    <div className="h-48 overflow-hidden">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-serif text-oxford-blue font-normal mb-1">{item.name}</h3>
-                      <p className="text-sm text-ink-mid italic">{item.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Puddings */}
-            <div className="club-card overflow-hidden">
-              <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
-                <p className="label-caps text-cambridge-light/60 mb-1">Third Course</p>
-                <h2 className="font-serif text-ivory text-xl font-normal">Desserts</h2>
-              </div>
-              <div className="gold-rule mx-6"></div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-4 sm:p-6 pt-2">
-                {puddings.map((item, index) => (
-                  <div key={index} className="border border-cambridge/20 rounded-sm overflow-hidden hover:shadow-card transition">
-                    <div className="h-48 overflow-hidden">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-serif text-oxford-blue font-normal mb-1">{item.name}</h3>
-                      <p className="text-sm text-ink-mid italic">{item.description}</p>
-                    </div>
+              <div className="px-6 py-4 space-y-6">
+                {beverages.map(({ section, items }) => (
+                  <div key={section}>
+                    <p className="font-serif text-oxford-blue text-base font-semibold mb-3">{section}</p>
+                    <ul className="divide-y divide-cambridge/10">
+                      {items.map((item, i) => (
+                        <li key={i} className="py-3 flex justify-between items-baseline gap-4">
+                          <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
+                          <span className="text-sm text-ink-mid whitespace-nowrap">{item.formats}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 ))}
               </div>
