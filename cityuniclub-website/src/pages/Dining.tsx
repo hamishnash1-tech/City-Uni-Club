@@ -7,8 +7,6 @@ import { api } from '../services/api'
 
 interface MenuItem {
   name: string
-  description: string
-  image: string
   category: string
 }
 
@@ -164,21 +162,21 @@ export const Dining: React.FC = () => {
   }
 
   const menuItems: MenuItem[] = [
-    { name: 'Homemade Soup of the Day', description: '', image: '/assets/food/Starters/cuc-soup.avif', category: 'Starters' },
-    { name: 'CUC Prawn Cocktail', description: '', image: '/assets/food/Starters/cuc-prawns.avif', category: 'Starters' },
-    { name: 'Devilled Kidneys, With Toasted Sourdough', description: '', image: '/assets/food/Starters/cuc-kidneys.avif', category: 'Starters' },
-    { name: 'Goats Cheese, Tomato and Spinach Tart, Dressed Salad', description: '', image: '/assets/food/Starters/cuc-cheese.avif', category: 'Starters' },
-    { name: 'Smoked Salmon Plate, Capers, Shallots, Lemon Oil, Brown Bread and Butter', description: '', image: '/assets/food/Starters/cuc-salmon.avif', category: 'Starters' },
-    { name: 'Oven Roasted Breast of Free-Range Chicken, Colcannon Potatoes, Braised Carrots, Bourguignon Sauce', description: '', image: '/assets/food/Mains/cuc-chicken.avif', category: 'Mains' },
-    { name: 'Pan Fried Fillet of Sea Bream, Herb Butter, New Potatoes, Carrot Puree, Braised Fennel, Watercress and Pernod Cream Sauce', description: '', image: '/assets/food/Mains/cuc-delice.avif', category: 'Mains' },
-    { name: '"CUC" Confit Belly of Pork, Bacon and Apple Mash, Buttered Sweetheart Cabbage, Seasonal Vegetables, Crackling, Apple Sauce and Cider Jus', description: '', image: '/assets/food/Mains/cuc-pork.avif', category: 'Mains' },
-    { name: 'Roast Rump and Braised Lamb Shoulder Rissole, Tomato and Basil Fondue, Herb Broad Beans and Peas, Red Currant Jus', description: '', image: '/assets/food/Mains/cuc-lamb.avif', category: 'Mains' },
-    { name: 'Whole Dover Sole "on or off the bone", Spinach, Parsley Steamed New Potatoes, Tomato and Caper Butter Sauce', description: '', image: '/assets/food/Mains/cuc-sole.avif', category: 'Mains' },
-    { name: 'Homemade Pasta, Wilted Spinach, Porcini Cream, Freshly Grated Parmesan Truffle Oil', description: '', image: '/assets/food/Mains/cuc-tortellini.avif', category: 'Mains' },
-    { name: '"CUC" Sticky Toffee Pudding, Vanilla Custard', description: '', image: '', category: 'Puddings' },
-    { name: 'Chocolate Fondant, Vanilla Ice Cream and Chocolate Sauce', description: '', image: '', category: 'Puddings' },
-    { name: 'Selection of Cheeses, Celery, Grapes and Crackers', description: '', image: '', category: 'Puddings' },
-    { name: 'Selection of Ice Cream and Sorbets', description: '', image: '', category: 'Puddings' },
+    { name: 'Homemade Soup of the Day', category: 'Starters' },
+    { name: 'CUC Prawn Cocktail', category: 'Starters' },
+    { name: 'Devilled Kidneys, With Toasted Sourdough', category: 'Starters' },
+    { name: 'Goats Cheese, Tomato and Spinach Tart, Dressed Salad', category: 'Starters' },
+    { name: 'Smoked Salmon Plate, Capers, Shallots, Lemon Oil, Brown Bread and Butter', category: 'Starters' },
+    { name: 'Oven Roasted Breast of Free-Range Chicken, Colcannon Potatoes, Braised Carrots, Bourguignon Sauce', category: 'Mains' },
+    { name: 'Pan Fried Fillet of Sea Bream, Herb Butter, New Potatoes, Carrot Puree, Braised Fennel, Watercress and Pernod Cream Sauce', category: 'Mains' },
+    { name: '"CUC" Confit Belly of Pork, Bacon and Apple Mash, Buttered Sweetheart Cabbage, Seasonal Vegetables, Crackling, Apple Sauce and Cider Jus', category: 'Mains' },
+    { name: 'Roast Rump and Braised Lamb Shoulder Rissole, Tomato and Basil Fondue, Herb Broad Beans and Peas, Red Currant Jus', category: 'Mains' },
+    { name: 'Whole Dover Sole "on or off the bone", Spinach, Parsley Steamed New Potatoes, Tomato and Caper Butter Sauce', category: 'Mains' },
+    { name: 'Homemade Pasta, Wilted Spinach, Porcini Cream, Freshly Grated Parmesan Truffle Oil', category: 'Mains' },
+    { name: '"CUC" Sticky Toffee Pudding, Vanilla Custard', category: 'Puddings' },
+    { name: 'Chocolate Fondant, Vanilla Ice Cream and Chocolate Sauce', category: 'Puddings' },
+    { name: 'Selection of Cheeses, Celery, Grapes and Crackers', category: 'Puddings' },
+    { name: 'Selection of Ice Cream and Sorbets', category: 'Puddings' },
   ]
 
   const starters = menuItems.filter(item => item.category === 'Starters')
