@@ -254,7 +254,7 @@ struct EditProfileView_Previews: PreviewProvider {
             fullName: "Test User",
             firstName: "Test",
             phoneNumber: "+44 7700 900123",
-            membershipNumber: "1",
+
             membershipType: "Full Membership",
             memberSince: "2024-01-01",
             memberUntil: "2025-01-01",

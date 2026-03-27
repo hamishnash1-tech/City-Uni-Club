@@ -13,7 +13,6 @@ struct Member: Codable, Identifiable {
     let fullName: String?
     let firstName: String?
     let phoneNumber: String?
-    let membershipNumber: String?
     let membershipType: String?
     let memberSince: String?
     let memberUntil: String?
@@ -25,7 +24,6 @@ struct Member: Codable, Identifiable {
         case fullName = "full_name"
         case firstName = "first_name"
         case phoneNumber = "phone_number"
-        case membershipNumber = "membership_number"
         case membershipType = "membership_type"
         case memberSince = "member_since"
         case memberUntil = "member_until"
