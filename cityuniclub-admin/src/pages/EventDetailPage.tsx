@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { FUNCTIONS_URL } from '../services/supabase'
 import { useAuth } from '../context/AuthContext'
@@ -70,8 +70,8 @@ interface EventAsset {
 interface AuditEntry {
   booking_id: string
   action: string
-  previous_value: Record<string, any> | null
-  new_value: Record<string, any> | null
+  previous_value: Record<string, unknown> | null
+  new_value: Record<string, unknown> | null
   performed_by_admin_email: string | null
   performed_at: string
 }
@@ -129,7 +129,7 @@ export default function EventDetailPage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
   const { sessionToken, user } = useAuth()
-  const authHeaders = { 'Authorization': `Bearer ${sessionToken}`, 'Content-Type': 'application/json' }
+  const authHeaders = useMemo(() => ({ 'Authorization': `Bearer ${sessionToken}`, 'Content-Type': 'application/json' }), [sessionToken])
 
   const [event, setEvent] = useState<EventDetails | null>(null)
   const [bookings, setBookings] = useState<Booking[]>([])
@@ -186,7 +186,7 @@ export default function EventDetailPage() {
       })
       .catch(() => setError('Failed to load event'))
       .finally(() => setLoading(false))
-  }, [slug, sessionToken])
+  }, [slug, sessionToken, authHeaders])
 
   const patch = async (fields: Record<string, unknown>) => {
     const res = await fetch(`${FUNCTIONS_URL}/admin-events?id=${eventUuid}`, {
@@ -204,8 +204,8 @@ export default function EventDetailPage() {
       await patch({ title: editTitle.trim() })
       setEvent(e => e ? { ...e, title: editTitle.trim() } : e)
       setSuccess('Title updated')
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     }
     setEditingTitle(false)
   }
@@ -217,22 +217,22 @@ export default function EventDetailPage() {
       await patch({ description: desc })
       setEvent(e => e ? { ...e, description: desc } : e)
       setSuccess('Description updated')
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     }
     setEditingDescription(false)
   }
 
   const handleSavePrice = async () => {
-    const parsed = editPrice.trim() === '' ? null : parseFloat(editPrice)
-    if (parsed !== null && (isNaN(parsed) || parsed < 0)) { setError('Invalid price'); return }
+    const parsed = editPrice.trim() === '' ? null : Number.parseFloat(editPrice)
+    if (parsed !== null && (Number.isNaN(parsed) || parsed < 0)) { setError('Invalid price'); return }
     if (parsed === (event?.price_per_person ?? null)) { setEditingPrice(false); return }
     try {
       await patch({ price_per_person: parsed })
       setEvent(e => e ? { ...e, price_per_person: parsed } : e)
       setSuccess('Price updated')
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     }
     setEditingPrice(false)
   }
@@ -244,8 +244,8 @@ export default function EventDetailPage() {
       await patch({ is_active: !event.is_active })
       setEvent(e => e ? { ...e, is_active: !e.is_active } : e)
       setSuccess(event.is_active ? 'Event hidden from public view' : 'Event is now visible')
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     }
     setSavingVisibility(false)
   }
@@ -283,8 +283,8 @@ export default function EventDetailPage() {
       setUploadProgress('')
       if (fileInputRef.current) fileInputRef.current.value = ''
       setSuccess(`${uploaded.length} asset${uploaded.length > 1 ? 's' : ''} uploaded`)
-    } catch (e: any) {
-      setError(e.message || 'Upload failed')
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Upload failed')
       if (uploaded.length) setAssets(prev => [...prev, ...uploaded])
     }
     setUploadingAsset(false)
@@ -301,8 +301,8 @@ export default function EventDetailPage() {
       if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
       setAssets(prev => prev.filter(a => a.id !== assetId))
       setSuccess('Asset removed')
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     }
   }
 
@@ -318,8 +318,8 @@ export default function EventDetailPage() {
       if (!res.ok) throw new Error(data.error)
       setAssets(prev => prev.map(a => a.id === assetId ? { ...a, file_name: renameValue.trim() } : a))
       setSuccess('Asset renamed')
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     }
     setRenamingAssetId(null)
   }
@@ -336,7 +336,7 @@ export default function EventDetailPage() {
   const toggleAuditRow = (id: string) => {
     setExpandedAuditRows(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) { next.delete(id) } else { next.add(id) }
       return next
     })
   }
@@ -359,8 +359,8 @@ export default function EventDetailPage() {
         return { ...updated, audit_log: [...entries, ...b.audit_log] }
       }))
       setSuccess(updates.status ? `Booking ${updates.status}` : 'Guest count updated')
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     }
   }
 
@@ -389,8 +389,8 @@ export default function EventDetailPage() {
           return { ...b, special_requests: newNotes || null, audit_log: [entry, ...b.audit_log] }
         }))
         setSuccess('Notes updated')
-      } catch (e: any) {
-        setError(e.message)
+      } catch (e: unknown) {
+        setError(e instanceof Error ? e.message : 'Unknown error')
       }
     } else {
       await handleUpdateBooking(booking.id, { status: newStatus })
@@ -804,8 +804,8 @@ export default function EventDetailPage() {
                                   <HistoryIcon fontSize="small" color="action" />
                                   <Typography variant="caption" fontWeight={600} color="textSecondary">Audit History</Typography>
                                 </Box>
-                                {b.audit_log.map((entry, i) => (
-                                  <Box key={i} sx={{ display: 'flex', gap: 2, mb: 0.5, alignItems: 'baseline' }}>
+                                {b.audit_log.map((entry) => (
+                                  <Box key={entry.performed_at} sx={{ display: 'flex', gap: 2, mb: 0.5, alignItems: 'baseline' }}>
                                     <Typography variant="caption" color="textSecondary" sx={{ minWidth: 140 }}>
                                       {new Date(entry.performed_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                     </Typography>
@@ -814,7 +814,7 @@ export default function EventDetailPage() {
                                     </Typography>
                                     {entry.previous_value && entry.new_value && (
                                       <Typography variant="caption" color="textSecondary">
-                                        {Object.keys(entry.new_value).map(k => `${k}: ${entry.previous_value![k]} → ${entry.new_value![k]}`).join(', ')}
+                                        {Object.keys(entry.new_value).map(k => `${k}: ${(entry.previous_value as Record<string, unknown>)[k]} → ${(entry.new_value as Record<string, unknown>)[k]}`).join(', ')}
                                       </Typography>
                                     )}
                                     {entry.performed_by_admin_email && (
@@ -912,7 +912,7 @@ export default function EventDetailPage() {
                                       </Typography>
                                       {entry.previous_value && entry.new_value && (
                                         <Typography variant="caption" color="textSecondary">
-                                          {Object.keys(entry.new_value).map(k => `${k}: ${entry.previous_value![k]} → ${entry.new_value![k]}`).join(', ')}
+                                          {Object.keys(entry.new_value).map(k => `${k}: ${(entry.previous_value as Record<string, unknown>)[k]} → ${(entry.new_value as Record<string, unknown>)[k]}`).join(', ')}
                                         </Typography>
                                       )}
                                       {entry.performed_by_admin_email && (

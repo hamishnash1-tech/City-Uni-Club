@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import { filterMembers } from '../utils/filterMembers'
 import {
   Box,
   Container,
@@ -93,24 +94,17 @@ export default function MembersPage() {
       if (!res.ok) throw new Error('Failed to fetch members')
       const json = await res.json()
       setMembers(json.members ?? [])
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     } finally {
       setLoading(false)
     }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchMembers() }, [sessionToken])
 
-  const filteredMembers = useMemo(() => {
-    if (!searchTerm) return members
-    const term = searchTerm.toLowerCase()
-    return members.filter(m =>
-      m.full_name?.toLowerCase().includes(term) ||
-      m.email.toLowerCase().includes(term) ||
-      m.membership_number?.toLowerCase().includes(term)
-    )
-  }, [members, searchTerm])
+  const filteredMembers = useMemo(() => filterMembers(members, searchTerm), [members, searchTerm])
 
   const paginatedMembers = useMemo(() => {
     const start = page * rowsPerPage
@@ -133,8 +127,8 @@ export default function MembersPage() {
       })
       if (!res.ok) throw new Error('Failed to update member')
       setMembers(prev => prev.map(m => m.id === id ? { ...m, is_active } : m))
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     } finally {
       setTogglingId(null)
     }
@@ -163,8 +157,8 @@ export default function MembersPage() {
       if (!res.ok) throw new Error(json.error || 'Failed to create member')
       setMembers(prev => [...prev, json.member].sort((a, b) => (a.full_name ?? '').localeCompare(b.full_name ?? '')))
       setDialogOpen(false)
-    } catch (e: any) {
-      setFormError(e.message)
+    } catch (e: unknown) {
+      setFormError(e instanceof Error ? e.message : 'Unknown error')
     } finally {
       setSubmitting(false)
     }

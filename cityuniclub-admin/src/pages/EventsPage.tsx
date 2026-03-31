@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FUNCTIONS_URL } from '../services/supabase'
 import { useAuth } from '../context/AuthContext'
@@ -45,7 +45,7 @@ const ADMIN_EVENTS_URL = `${FUNCTIONS_URL}/admin-events`
 export default function EventsPage() {
   const navigate = useNavigate()
   const { sessionToken } = useAuth()
-  const authHeaders = { 'Authorization': `Bearer ${sessionToken}`, 'Content-Type': 'application/json' }
+  const authHeaders = useMemo(() => ({ 'Authorization': `Bearer ${sessionToken}`, 'Content-Type': 'application/json' }), [sessionToken])
   const [events, setEvents] = useState<Event[]>([])
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
@@ -83,7 +83,7 @@ export default function EventsPage() {
         if (error) {
           setError('Failed to load events')
         } else {
-          setEvents((data ?? []).map((e: any) => ({
+          setEvents((data ?? []).map((e: { id: string; short_id: number; slug: string; title: string; event_date: string; event_type: Event['event_type']; description?: string; price_per_person?: number | null }) => ({
             id: e.id,
             short_id: e.short_id,
             slug: e.slug,
@@ -97,14 +97,14 @@ export default function EventsPage() {
         setLoading(false)
       })
       .catch(() => { setError('Failed to load events'); setLoading(false) })
-  }, [])
+  }, [authHeaders])
 
   const fetchPastEvents = async (page: number) => {
     setPastLoading(true)
     try {
       const res = await fetch(`${ADMIN_EVENTS_URL}?past=true&past_page=${page}`, { headers: authHeaders })
       const json = await res.json()
-      const mapped = (json.events ?? []).map((e: any) => ({
+      const mapped = (json.events ?? []).map((e: { id: string; short_id: number; slug: string; title: string; event_date: string; event_type: Event['event_type']; description?: string; price_per_person?: number | null }) => ({
         id: e.id, short_id: e.short_id, slug: e.slug, title: e.title,
         event_date: e.event_date, event_type: e.event_type,
         description: e.description ?? '', price: e.price_per_person ?? null,
@@ -173,7 +173,7 @@ export default function EventsPage() {
         event_date: formData.event_date || null,
         event_type: formData.event_type,
         description: formData.description || null,
-        price_per_person: formData.price ? parseFloat(formData.price) : null,
+        price_per_person: formData.price ? Number.parseFloat(formData.price) : null,
         is_tba: !formData.event_date || !formData.price,
       }
 

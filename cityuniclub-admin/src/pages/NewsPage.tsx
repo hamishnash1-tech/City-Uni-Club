@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback, type ReactElement } from 'react'
 import {
   Box,
   Container,
@@ -63,7 +63,7 @@ const categoryColors: Record<NewsCategory, 'primary' | 'secondary' | 'success' |
   'General': 'info',
 }
 
-const categoryIcons: Record<NewsCategory, any> = {
+const categoryIcons: Record<NewsCategory, ReactElement> = {
   'Dining': <DiningIcon fontSize="small" />,
   'Event': <EventIcon fontSize="small" />,
   'Special Event': <StarIcon fontSize="small" />,
@@ -92,12 +92,12 @@ export default function NewsPage() {
     is_active: true,
   })
 
-  const authHeaders = {
+  const authHeaders = useMemo(() => ({
     'Authorization': `Bearer ${sessionToken}`,
     'Content-Type': 'application/json',
-  }
+  }), [sessionToken])
 
-  const fetchNews = async () => {
+  const fetchNews = useCallback(async () => {
     setLoading(true)
     setError('')
     try {
@@ -105,14 +105,14 @@ export default function NewsPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to load news')
       setArticles(data.news ?? [])
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setLoading(false)
     }
-  }
+  }, [authHeaders])
 
-  useEffect(() => { fetchNews() }, [])
+  useEffect(() => { fetchNews() }, [fetchNews])
 
   const filteredArticles = useMemo(() => {
     let filtered = articles
@@ -192,8 +192,8 @@ export default function NewsPage() {
         setSuccess('Article created')
       }
       handleCloseDialog()
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setSaving(false)
     }
@@ -212,8 +212,8 @@ export default function NewsPage() {
       }
       setArticles(articles.filter(a => a.id !== id))
       setSuccess('Article deleted')
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unknown error')
     }
   }
 
@@ -227,8 +227,8 @@ export default function NewsPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to update')
       setArticles(articles.map(a => a.id === article.id ? data.article : a))
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unknown error')
     }
   }
 
