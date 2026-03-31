@@ -804,8 +804,8 @@ export default function EventDetailPage() {
                                   <HistoryIcon fontSize="small" color="action" />
                                   <Typography variant="caption" fontWeight={600} color="textSecondary">Audit History</Typography>
                                 </Box>
-                                {b.audit_log.map((entry, i) => (
-                                  <Box key={i} sx={{ display: 'flex', gap: 2, mb: 0.5, alignItems: 'baseline' }}>
+                                {b.audit_log.map((entry) => (
+                                  <Box key={entry.performed_at} sx={{ display: 'flex', gap: 2, mb: 0.5, alignItems: 'baseline' }}>
                                     <Typography variant="caption" color="textSecondary" sx={{ minWidth: 140 }}>
                                       {new Date(entry.performed_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                                     </Typography>

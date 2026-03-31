@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, type ReactElement } from 'react'
+import { useState, useMemo, useEffect, useCallback, type ReactElement } from 'react'
 import membersData from '../data/members.json'
 import { useAuth } from '../context/AuthContext'
 import { FUNCTIONS_URL } from '../services/supabase'
@@ -108,17 +108,12 @@ export default function LoiPage() {
   const [emailHistory, setEmailHistory] = useState<EmailEntry[]>([])
   const [loadingDetail, setLoadingDetail] = useState(false)
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {
-    fetchRequests()
-  }, [])
-
-  const getAuthHeaders = () => ({
+  const getAuthHeaders = useCallback(() => ({
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${sessionToken || localStorage.getItem('admin_token')}`
-  })
+  }), [sessionToken])
 
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     setLoading(true)
     try {
       const res = await fetch(ADMIN_LOI_URL, { headers: getAuthHeaders() })
@@ -144,7 +139,11 @@ export default function LoiPage() {
       setError(err instanceof Error ? err.message : 'Unknown error')
     }
     setLoading(false)
-  }
+  }, [getAuthHeaders])
+
+  useEffect(() => {
+    fetchRequests()
+  }, [fetchRequests])
 
   const handleOpenDetail = async (request: LoiRequest) => {
     setDetailRequest(request)

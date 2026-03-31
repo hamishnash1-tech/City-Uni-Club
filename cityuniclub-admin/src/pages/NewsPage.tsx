@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, type ReactNode } from 'react'
+import { useState, useEffect, useMemo, useCallback, type ReactElement } from 'react'
 import {
   Box,
   Container,
@@ -63,7 +63,7 @@ const categoryColors: Record<NewsCategory, 'primary' | 'secondary' | 'success' |
   'General': 'info',
 }
 
-const categoryIcons: Record<NewsCategory, ReactNode> = {
+const categoryIcons: Record<NewsCategory, ReactElement> = {
   'Dining': <DiningIcon fontSize="small" />,
   'Event': <EventIcon fontSize="small" />,
   'Special Event': <StarIcon fontSize="small" />,
