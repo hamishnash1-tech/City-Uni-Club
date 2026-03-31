@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react'
+import { filterMembers } from '../utils/filterMembers'
 import {
   Box,
   Container,
@@ -102,15 +103,7 @@ export default function MembersPage() {
 
   useEffect(() => { fetchMembers() }, [sessionToken])
 
-  const filteredMembers = useMemo(() => {
-    if (!searchTerm) return members
-    const term = searchTerm.toLowerCase()
-    return members.filter(m =>
-      m.full_name?.toLowerCase().includes(term) ||
-      m.email.toLowerCase().includes(term) ||
-      String(m.membership_number ?? '').toLowerCase().includes(term)
-    )
-  }, [members, searchTerm])
+  const filteredMembers = useMemo(() => filterMembers(members, searchTerm), [members, searchTerm])
 
   const paginatedMembers = useMemo(() => {
     const start = page * rowsPerPage
