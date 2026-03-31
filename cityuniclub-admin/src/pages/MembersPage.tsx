@@ -94,13 +94,14 @@ export default function MembersPage() {
       if (!res.ok) throw new Error('Failed to fetch members')
       const json = await res.json()
       setMembers(json.members ?? [])
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     } finally {
       setLoading(false)
     }
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { fetchMembers() }, [sessionToken])
 
   const filteredMembers = useMemo(() => filterMembers(members, searchTerm), [members, searchTerm])
@@ -126,8 +127,8 @@ export default function MembersPage() {
       })
       if (!res.ok) throw new Error('Failed to update member')
       setMembers(prev => prev.map(m => m.id === id ? { ...m, is_active } : m))
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     } finally {
       setTogglingId(null)
     }
@@ -156,8 +157,8 @@ export default function MembersPage() {
       if (!res.ok) throw new Error(json.error || 'Failed to create member')
       setMembers(prev => [...prev, json.member].sort((a, b) => (a.full_name ?? '').localeCompare(b.full_name ?? '')))
       setDialogOpen(false)
-    } catch (e: any) {
-      setFormError(e.message)
+    } catch (e: unknown) {
+      setFormError(e instanceof Error ? e.message : 'Unknown error')
     } finally {
       setSubmitting(false)
     }

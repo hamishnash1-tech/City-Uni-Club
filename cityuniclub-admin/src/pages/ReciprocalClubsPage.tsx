@@ -83,7 +83,7 @@ export default function ReciprocalClubsPage() {
       headers: { 'Authorization': `Bearer ${sessionToken}` }
     })
       .then(r => r.json())
-      .then(data => setRequests((data.requests || []).map((r: any) => ({
+      .then(data => setRequests((data.requests || []).map((r: { id: string; members?: { full_name?: string; email?: string }; reciprocal_clubs?: { name?: string; region?: string }; arrival_date: string; departure_date?: string; purpose: string; created_at: string; status: string }) => ({
         id: r.id,
         member_name: r.members?.full_name || 'Unknown',
         member_email: r.members?.email || '',

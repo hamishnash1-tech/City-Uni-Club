@@ -47,8 +47,8 @@ import { FUNCTIONS_URL } from '../services/supabase'
 
 interface AuditEntry {
   action: string
-  previous_value: Record<string, any> | null
-  new_value: Record<string, any> | null
+  previous_value: Record<string, unknown> | null
+  new_value: Record<string, unknown> | null
   performed_by_admin_email: string | null
   performed_at: string
 }
@@ -110,8 +110,8 @@ function AuditLog({ entries }: { entries: AuditEntry[] }) {
         <HistoryIcon fontSize="small" color="action" />
         <Typography variant="caption" fontWeight={600} color="textSecondary">Audit History</Typography>
       </Box>
-      {entries.map((entry, i) => (
-        <Box key={i} sx={{ display: 'flex', gap: 2, mb: 0.5, alignItems: 'baseline', flexWrap: 'wrap' }}>
+      {entries.map((entry) => (
+        <Box key={entry.performed_at} sx={{ display: 'flex', gap: 2, mb: 0.5, alignItems: 'baseline', flexWrap: 'wrap' }}>
           <Typography variant="caption" color="textSecondary" sx={{ minWidth: 140 }}>
             {new Date(entry.performed_at).toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
           </Typography>
@@ -120,7 +120,7 @@ function AuditLog({ entries }: { entries: AuditEntry[] }) {
           </Typography>
           {entry.previous_value && entry.new_value && (
             <Typography variant="caption" color="textSecondary">
-              {Object.keys(entry.new_value).map(k => `${k}: ${entry.previous_value![k]} → ${entry.new_value![k]}`).join(', ')}
+              {Object.keys(entry.new_value).map(k => `${k}: ${(entry.previous_value as Record<string, unknown>)[k]} → ${(entry.new_value as Record<string, unknown>)[k]}`).join(', ')}
             </Typography>
           )}
           {entry.performed_by_admin_email && (
@@ -156,17 +156,17 @@ export default function DiningPage() {
   const toggleAuditRow = (id: string) => {
     setExpandedAuditRows(prev => {
       const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
+      if (next.has(id)) { next.delete(id) } else { next.add(id) }
       return next
     })
   }
 
   const availableDates = useMemo(() => generateAvailableDates(), [])
 
-  const getAuthHeaders = () => ({
+  const getAuthHeaders = useCallback(() => ({
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${sessionToken || localStorage.getItem('admin_token')}`
-  })
+  }), [sessionToken])
 
   const fetchReservations = useCallback(async () => {
     setLoading(true)
@@ -184,12 +184,12 @@ export default function DiningPage() {
       }
       const data = await res.json()
       setReservations(data.reservations || [])
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     } finally {
       setLoading(false)
     }
-  }, [availableDates, sessionToken])
+  }, [availableDates, getAuthHeaders])
 
   useEffect(() => {
     fetchReservations()
@@ -219,7 +219,7 @@ export default function DiningPage() {
         setReservations(prev => prev.map(r => {
           if (r.id !== id) return r
           const entry: AuditEntry = { action: 'guest_count_updated', previous_value: { guest_count: r.guest_count }, new_value: { guest_count: newGuestCount }, performed_by_admin_email: user?.email ?? null, performed_at: now }
-          return { ...r, guest_count: newGuestCount!, audit_log: [entry, ...(r.audit_log ?? [])] }
+          return { ...r, guest_count: newGuestCount ?? r.guest_count, audit_log: [entry, ...(r.audit_log ?? [])] }
         }))
         setEditingGuestCount(null)
         setStatusMessage(`Guest count updated to ${newGuestCount}`)
@@ -254,8 +254,8 @@ export default function DiningPage() {
         setStatusMessage(`Reservation ${newStatus}`)
       }
       setTimeout(() => setStatusMessage(null), 3000)
-    } catch (e: any) {
-      setError(e.message)
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
     }
   }
 
@@ -265,16 +265,16 @@ export default function DiningPage() {
 
   const reservationsByDate = useMemo(() => {
     const grouped: Record<string, DiningReservation[]> = {}
-    reservations.forEach(res => {
+    for (const res of reservations) {
       if (!grouped[res.reservation_date]) grouped[res.reservation_date] = []
       grouped[res.reservation_date].push(res)
-    })
+    }
     return grouped
   }, [reservations])
 
   const dateStats = useMemo(() => {
     const stats: Record<string, { totalBookings: number; totalGuests: number; breakfast: number; lunch: number; confirmed: number; pending: number; cancelled: number }> = {}
-    availableDates.forEach(({ date }) => {
+    for (const { date } of availableDates) {
       const all = reservationsByDate[date] || []
       const active = all.filter(r => r.status !== 'cancelled')
       stats[date] = {
@@ -286,7 +286,7 @@ export default function DiningPage() {
         pending: all.filter(r => r.status === 'pending').length,
         cancelled: all.filter(r => r.status === 'cancelled').length,
       }
-    })
+    }
     return stats
   }, [availableDates, reservationsByDate])
 
@@ -310,11 +310,11 @@ export default function DiningPage() {
     return type === 'Breakfast' ? <CoffeeIcon fontSize="small" /> : <LunchDiningIcon fontSize="small" />
   }
 
-  const getMealTypeColor = (type: string) => {
+  const getMealTypeColor = (type: string): 'default' | 'primary' => {
     return type === 'Breakfast' ? 'default' : 'primary'
   }
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: string): 'success' | 'error' | 'info' | 'warning' => {
     switch (status) {
       case 'confirmed': return 'success'
       case 'cancelled': return 'error'
@@ -326,7 +326,7 @@ export default function DiningPage() {
 
   const formatTime = (timeString: string) => {
     const [hours, minutes] = timeString.split(':')
-    const hour = parseInt(hours)
+    const hour = Number.parseInt(hours)
     const ampm = hour >= 12 ? 'PM' : 'AM'
     const displayHour = hour > 12 ? hour - 12 : hour
     return `${displayHour}:${minutes} ${ampm}`
@@ -564,7 +564,7 @@ export default function DiningPage() {
                                     ) : '—'}
                                   </TableCell>
                                   <TableCell>
-                                    <Chip label={reservation.meal_type} size="small" color={getMealTypeColor(reservation.meal_type) as any} />
+                                    <Chip label={reservation.meal_type} size="small" color={getMealTypeColor(reservation.meal_type)} />
                                   </TableCell>
                                   <TableCell>
                                     {editingGuestCount?.id === reservation.id ? (
@@ -578,7 +578,7 @@ export default function DiningPage() {
                                           sx={{ width: 64 }}
                                           autoFocus
                                         />
-                                        <Button size="small" variant="contained" onClick={() => confirmAndUpdateGuestCount(reservation, editingGuestCount!.value)}>Save</Button>
+                                        <Button size="small" variant="contained" onClick={() => confirmAndUpdateGuestCount(reservation, editingGuestCount?.value ?? 1)}>Save</Button>
                                         <Button size="small" onClick={() => setEditingGuestCount(null)}>Cancel</Button>
                                       </Box>
                                     ) : (
@@ -616,7 +616,7 @@ export default function DiningPage() {
                                     )}
                                   </TableCell>
                                   <TableCell>
-                                    <Chip label={reservation.status} size="small" color={getStatusColor(reservation.status) as any} />
+                                    <Chip label={reservation.status} size="small" color={getStatusColor(reservation.status)} />
                                   </TableCell>
                                   <TableCell>
                                     <Box sx={{ display: 'flex', gap: 0.5 }}>
@@ -710,7 +710,7 @@ export default function DiningPage() {
                                     {reservation.guest_email ? (
                                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                         <Typography variant="caption" color="textSecondary">{reservation.guest_email}</Typography>
-                                        <IconButton size="small" onClick={() => handleCopyEmail(reservation.guest_email!)} title="Copy email">
+                                        <IconButton size="small" onClick={() => handleCopyEmail(reservation.guest_email ?? '')} title="Copy email">
                                           <ContentCopyIcon sx={{ fontSize: 12 }} />
                                         </IconButton>
                                       </Box>
@@ -719,7 +719,7 @@ export default function DiningPage() {
                                     )}
                                   </TableCell>
                                   <TableCell>
-                                    <Chip label={reservation.meal_type} size="small" color={getMealTypeColor(reservation.meal_type) as any} />
+                                    <Chip label={reservation.meal_type} size="small" color={getMealTypeColor(reservation.meal_type)} />
                                   </TableCell>
                                   <TableCell>
                                     {editingGuestCount?.id === reservation.id ? (
@@ -733,7 +733,7 @@ export default function DiningPage() {
                                           sx={{ width: 64 }}
                                           autoFocus
                                         />
-                                        <Button size="small" variant="contained" onClick={() => confirmAndUpdateGuestCount(reservation, editingGuestCount!.value)}>Save</Button>
+                                        <Button size="small" variant="contained" onClick={() => confirmAndUpdateGuestCount(reservation, editingGuestCount?.value ?? 1)}>Save</Button>
                                         <Button size="small" onClick={() => setEditingGuestCount(null)}>Cancel</Button>
                                       </Box>
                                     ) : (
@@ -766,7 +766,7 @@ export default function DiningPage() {
                                     )}
                                   </TableCell>
                                   <TableCell>
-                                    <Chip label={reservation.status} size="small" color={getStatusColor(reservation.status) as any} />
+                                    <Chip label={reservation.status} size="small" color={getStatusColor(reservation.status)} />
                                   </TableCell>
                                   <TableCell>
                                     <Box sx={{ display: 'flex', gap: 0.5 }}>
@@ -862,7 +862,7 @@ export default function DiningPage() {
                                     </Typography>
                                   </TableCell>
                                   <TableCell>
-                                    <Chip label={reservation.meal_type} size="small" color={getMealTypeColor(reservation.meal_type) as any} />
+                                    <Chip label={reservation.meal_type} size="small" color={getMealTypeColor(reservation.meal_type)} />
                                   </TableCell>
                                   <TableCell>{reservation.guest_count}</TableCell>
                                   <TableCell>
@@ -929,7 +929,7 @@ export default function DiningPage() {
             const r = pendingAction.reservation
             const name = r.members?.full_name || r.guest_name || '—'
             const email = r.members?.email || r.guest_email || '—'
-            const date = new Date(r.reservation_date + 'T00:00:00').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+            const date = new Date(`${r.reservation_date}T00:00:00`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
             const time = formatTime(r.reservation_time)
             const currentNotes = r.special_requests || r.table_preference || null
             const actionLabel = pendingAction.type === 'guest_count'

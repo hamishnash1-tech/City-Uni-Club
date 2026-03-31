@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, type ReactElement } from 'react'
 import membersData from '../data/members.json'
 import { useAuth } from '../context/AuthContext'
 import { FUNCTIONS_URL } from '../services/supabase'
@@ -108,6 +108,7 @@ export default function LoiPage() {
   const [emailHistory, setEmailHistory] = useState<EmailEntry[]>([])
   const [loadingDetail, setLoadingDetail] = useState(false)
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     fetchRequests()
   }, [])
@@ -123,7 +124,7 @@ export default function LoiPage() {
       const res = await fetch(ADMIN_LOI_URL, { headers: getAuthHeaders() })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to fetch')
-      setRequests((data.requests || []).map((r: any) => ({
+      setRequests((data.requests || []).map((r: { id: string; member_id: string; members?: { full_name?: string; email?: string }; club_id: string; reciprocal_clubs?: { name?: string; location?: string; region?: string; contact_email?: string }; arrival_date: string; departure_date?: string; purpose: string; status: LoiRequest['status']; created_at: string }) => ({
         id: r.id,
         member_id: r.member_id,
         member_name: r.members?.full_name || 'Unknown',
@@ -139,8 +140,8 @@ export default function LoiPage() {
         status: r.status,
         created_at: r.created_at,
       })))
-    } catch (err: any) {
-      setError(err.message)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Unknown error')
     }
     setLoading(false)
   }
@@ -153,7 +154,7 @@ export default function LoiPage() {
       const res = await fetch(`${ADMIN_LOI_URL}?id=${request.id}`, { headers: getAuthHeaders() })
       const data = await res.json()
       if (res.ok) setEmailHistory(data.emails || [])
-    } catch {}
+    } catch { /* ignore fetch error */ }
     setLoadingDetail(false)
   }
 
@@ -167,7 +168,7 @@ export default function LoiPage() {
     special_requests: ''
   })
 
-  const membersList = useMemo(() => membersData.map((m: any) => ({
+  const membersList = useMemo(() => membersData.map((m: { id: string; name: string; email: string }) => ({
     id: m.id,
     name: m.name,
     email: m.email
@@ -270,9 +271,9 @@ export default function LoiPage() {
       await fetchRequests()
       setSuccess('LOI request sent successfully!')
       handleCloseDialog()
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error sending LOI:', err)
-      setError(err.message || 'Failed to send LOI request')
+      setError(err instanceof Error ? err.message : 'Failed to send LOI request')
     } finally {
       setSending(false)
     }
@@ -329,8 +330,8 @@ export default function LoiPage() {
 
       setRequests(requests.map(r => r.id === request.id ? { ...r, status: 'sent' } : r))
       setSuccess('LOI email sent successfully!')
-    } catch (err: any) {
-      setError(err.message || 'Failed to send email')
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to send email')
     } finally {
       setSending(false)
     }
@@ -355,7 +356,7 @@ export default function LoiPage() {
   }
 
   const getStatusIcon = (status: string) => {
-    const icons: Record<string, any> = {
+    const icons: Record<string, ReactElement> = {
       pending: <PendingIcon fontSize="small" />,
       approved: <CheckCircleIcon fontSize="small" />,
       sent: <MailIcon fontSize="small" />,

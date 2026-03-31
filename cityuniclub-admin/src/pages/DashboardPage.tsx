@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Box,
   Container,
@@ -70,15 +70,15 @@ export default function DashboardPage() {
   const [todayEvents, setTodayEvents] = useState<TodayEvent[]>([])
   const [todayLoading, setTodayLoading] = useState(true)
 
-  const getToken = () => sessionToken || localStorage.getItem('admin_token')
+  const getToken = useCallback(() => sessionToken || localStorage.getItem('admin_token'), [sessionToken])
 
-  const showNotification = (title: string, body: string) => {
+  const showNotification = useCallback((title: string, body: string) => {
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(title, { body, icon: '/vite.svg' })
     }
-  }
+  }, [])
 
-  const fetchLoiRequests = async () => {
+  const fetchLoiRequests = useCallback(async () => {
     try {
       const res = await fetch(ADMIN_LOI_URL, {
         headers: { 'Authorization': `Bearer ${getToken()}` }
@@ -86,7 +86,7 @@ export default function DashboardPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
 
-      const requests: LOIRequest[] = (data.requests || []).slice(0, 10).map((req: any) => ({
+      const requests: LOIRequest[] = (data.requests || []).slice(0, 10).map((req: { id: string; members?: { full_name?: string; email?: string }; reciprocal_clubs?: { name?: string }; club_id: string; arrival_date: string; departure_date: string; purpose: string; status: string; created_at: string }) => ({
         id: req.id,
         member_name: req.members?.full_name || 'Unknown',
         member_email: req.members?.email || '',
@@ -107,9 +107,9 @@ export default function DashboardPage() {
     } finally {
       setLoiLoading(false)
     }
-  }
+  }, [getToken])
 
-  const fetchTodayStats = async () => {
+  const fetchTodayStats = useCallback(async () => {
     try {
       const res = await fetch(ADMIN_DASHBOARD_URL, {
         headers: { 'Authorization': `Bearer ${getToken()}` }
@@ -123,7 +123,7 @@ export default function DashboardPage() {
     } finally {
       setTodayLoading(false)
     }
-  }
+  }, [getToken])
 
   useEffect(() => {
     fetchLoiRequests()
@@ -153,7 +153,7 @@ export default function DashboardPage() {
       supabase.removeChannel(loiChannel)
       supabase.removeChannel(diningChannel)
     }
-  }, [])
+  }, [fetchLoiRequests, fetchTodayStats, showNotification])
 
   const handleApprove = async (id: string) => {
     await fetch(ADMIN_LOI_URL, {
