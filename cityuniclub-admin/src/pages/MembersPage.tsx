@@ -108,7 +108,7 @@ export default function MembersPage() {
     return members.filter(m =>
       m.full_name?.toLowerCase().includes(term) ||
       m.email.toLowerCase().includes(term) ||
-      m.membership_number?.toLowerCase().includes(term)
+      String(m.membership_number ?? '').toLowerCase().includes(term)
     )
   }, [members, searchTerm])
 
