@@ -1,3 +1,12 @@
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
 export const SITE_URL = 'https://www.cityuniversityclub.co.uk'
 export const CLUB_NAME = 'City University Club'
 export const CLUB_ADDRESS = '42 Crutched Friars, London EC3N 2AP'

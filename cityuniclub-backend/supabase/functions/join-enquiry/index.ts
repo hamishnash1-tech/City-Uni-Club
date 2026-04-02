@@ -1,14 +1,10 @@
 // v2
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { CLUB_NAME, CLUB_EMAIL, FROM_EMAIL } from '../_shared/constants.ts'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-}
+import { CLUB_NAME, CLUB_EMAIL, FROM_EMAIL, escapeHtml } from '../_shared/constants.ts'
+import { getCorsHeaders } from '../_shared/cors.ts'
 
 serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req)
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -61,11 +57,11 @@ serve(async (req: Request) => {
         <body style="font-family: Arial, sans-serif; font-size: 14px; color: #000; line-height: 1.6;">
           <p>A new membership enquiry has been submitted via the website.</p>
           <table style="border-collapse: collapse; width: 100%; max-width: 500px;">
-            <tr><td style="padding: 6px 12px 6px 0; font-weight: bold; white-space: nowrap;">Name</td><td style="padding: 6px 0;">${name}</td></tr>
-            <tr><td style="padding: 6px 12px 6px 0; font-weight: bold; white-space: nowrap;">Email</td><td style="padding: 6px 0;"><a href="mailto:${email}">${email}</a></td></tr>
-            ${phone ? `<tr><td style="padding: 6px 12px 6px 0; font-weight: bold; white-space: nowrap;">Phone</td><td style="padding: 6px 0;">${phone}</td></tr>` : ''}
+            <tr><td style="padding: 6px 12px 6px 0; font-weight: bold; white-space: nowrap;">Name</td><td style="padding: 6px 0;">${escapeHtml(name)}</td></tr>
+            <tr><td style="padding: 6px 12px 6px 0; font-weight: bold; white-space: nowrap;">Email</td><td style="padding: 6px 0;"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></td></tr>
+            ${phone ? `<tr><td style="padding: 6px 12px 6px 0; font-weight: bold; white-space: nowrap;">Phone</td><td style="padding: 6px 0;">${escapeHtml(phone)}</td></tr>` : ''}
           </table>
-          ${message ? `<p style="margin-top: 16px;"><strong>Message:</strong><br>${message.replace(/\n/g, '<br>')}</p>` : ''}
+          ${message ? `<p style="margin-top: 16px;"><strong>Message:</strong><br>${escapeHtml(message).replace(/\n/g, '<br>')}</p>` : ''}
         </body>
       </html>
     `
@@ -80,7 +76,7 @@ serve(async (req: Request) => {
         from: FROM_EMAIL,
         to: [CLUB_EMAIL],
         reply_to: email,
-        subject: `Membership Enquiry — ${name}`,
+        subject: `Membership Enquiry — ${escapeHtml(name)}`,
         html,
       }),
     })
@@ -91,7 +87,7 @@ serve(async (req: Request) => {
     const confirmationHtml = `
       <html>
         <body style="font-family: Arial, sans-serif; font-size: 14px; color: #000; line-height: 1.6; max-width: 600px;">
-          <p>Dear ${name},</p>
+          <p>Dear ${escapeHtml(name)},</p>
           <p>Thank you for your interest in becoming a member of City University Club. We have received your enquiry and will be in touch shortly.</p>
           <p>If you have any questions in the meantime, or have not heard from us within a few days, please do not hesitate to contact our secretary directly at <a href="mailto:${CLUB_EMAIL}">${CLUB_EMAIL}</a>.</p>
           <p>Warm regards,<br>${CLUB_NAME}</p>

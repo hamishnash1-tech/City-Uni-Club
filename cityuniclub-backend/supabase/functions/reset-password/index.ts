@@ -1,7 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import * as bcrypt from 'https://deno.land/x/bcrypt@v0.4.1/mod.ts'
-import { SITE_URL, CLUB_NAME, CLUB_EMAIL, CLUB_PHONE, FROM_EMAIL } from '../_shared/constants.ts'
+import { SITE_URL, CLUB_NAME, CLUB_EMAIL, CLUB_PHONE, FROM_EMAIL, escapeHtml } from '../_shared/constants.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -60,7 +60,7 @@ serve(async (req) => {
           html: `
             <html>
               <body style="font-family: Arial, sans-serif; font-size: 14px; color: #000; line-height: 1.6;">
-                <p>Dear ${member.first_name},</p>
+                <p>Dear ${escapeHtml(member.first_name)},</p>
                 <p>We received a request to reset your password for your ${CLUB_NAME} account.</p>
                 <p>
                   <a href="${resetLink}" style="display: inline-block; padding: 10px 20px; background-color: #002147; color: #fff; text-decoration: none; border-radius: 4px;">
@@ -72,6 +72,11 @@ serve(async (req) => {
                 <p style="margin: 0;">${CLUB_NAME}</p>
                 <p style="margin: 0;">${CLUB_EMAIL}</p>
                 <p style="margin: 0;">Tel: ${CLUB_PHONE}</p>
+                <p style="margin-top: 20px;">
+                  <a href="https://apps.apple.com/gb/app/cityuniclub-app/id6760672157" style="color: #002147; text-decoration: none;">
+                    Download our iPhone app
+                  </a>
+                </p>
               </body>
             </html>
           `,
