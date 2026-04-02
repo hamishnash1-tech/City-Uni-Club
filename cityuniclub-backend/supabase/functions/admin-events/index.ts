@@ -1,7 +1,8 @@
 // v2
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { FROM_EMAIL, CLUB_NAME, CLUB_ADDRESS, CLUB_EMAIL, CLUB_PHONE } from '../_shared/constants.ts'
+import { FROM_EMAIL, CLUB_NAME, CLUB_ADDRESS, CLUB_EMAIL, CLUB_PHONE, escapeHtml } from '../_shared/constants.ts'
+import { getCorsHeaders } from '../_shared/cors.ts'
 
 function formatEventDate(dateStr: string | null): string {
   if (!dateStr) return 'Date TBA'
@@ -23,13 +24,8 @@ async function sendEmail(resendKey: string, payload: object) {
   }
 }
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-}
-
 serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req)
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -206,20 +202,20 @@ serve(async (req: Request) => {
           let bodyContent = ''
 
           if (status === 'confirmed') {
-            subject = `Booking confirmed — ${eventTitle}`
-            bodyContent = `<p>Great news! Your booking for <strong>${eventTitle}</strong> on ${eventDate} has been confirmed.</p>
+            subject = `Booking confirmed — ${escapeHtml(eventTitle)}`
+            bodyContent = `<p>Great news! Your booking for <strong>${escapeHtml(eventTitle)}</strong> on ${escapeHtml(eventDate)} has been confirmed.</p>
               <p>Guests: ${newGuestCount}</p>`
           } else if (status === 'cancelled') {
-            subject = `Booking cancelled — ${eventTitle}`
-            bodyContent = `<p>Your booking for <strong>${eventTitle}</strong> on ${eventDate} has been cancelled.</p>
+            subject = `Booking cancelled — ${escapeHtml(eventTitle)}`
+            bodyContent = `<p>Your booking for <strong>${escapeHtml(eventTitle)}</strong> on ${escapeHtml(eventDate)} has been cancelled.</p>
               <p>If you believe this is an error or have any questions, please contact us.</p>`
           } else if (status === 'rejected') {
-            subject = `Booking not confirmed — ${eventTitle}`
-            bodyContent = `<p>Unfortunately, we are unable to confirm your booking for <strong>${eventTitle}</strong> on ${eventDate}.</p>
+            subject = `Booking not confirmed — ${escapeHtml(eventTitle)}`
+            bodyContent = `<p>Unfortunately, we are unable to confirm your booking for <strong>${escapeHtml(eventTitle)}</strong> on ${escapeHtml(eventDate)}.</p>
               <p>Please contact us if you have any questions.</p>`
           } else if (guest_count !== undefined) {
-            subject = `Booking updated — ${eventTitle}`
-            bodyContent = `<p>Your booking for <strong>${eventTitle}</strong> on ${eventDate} has been updated.</p>
+            subject = `Booking updated — ${escapeHtml(eventTitle)}`
+            bodyContent = `<p>Your booking for <strong>${escapeHtml(eventTitle)}</strong> on ${escapeHtml(eventDate)} has been updated.</p>
               <p>Updated guest count: ${guest_count}</p>`
           }
 
@@ -230,7 +226,7 @@ serve(async (req: Request) => {
               subject,
               html: `
                 <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;">
-                  <p>Dear ${recipientName},</p>
+                  <p>Dear ${escapeHtml(recipientName)},</p>
                   ${bodyContent}
                   <p>If you have any questions, please contact us:</p>
                   <ul>

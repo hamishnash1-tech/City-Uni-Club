@@ -3,17 +3,26 @@ import { Link } from 'react-router-dom'
 import { IconDining } from '../icons'
 import { useSelector } from 'react-redux'
 import { RootState } from '../store'
-import { api } from '../services/api'
-
-interface MenuItem {
-  name: string
-  category: string
-}
+import { api, type MenuItem as DbMenuItem } from '../services/api'
 
 export const Dining: React.FC = () => {
   const auth = useSelector((state: RootState) => state.auth)
   const token = auth.token
   const member = auth.member
+
+  const [menuItems, setMenuItems] = useState<DbMenuItem[]>([])
+  const [menuLoading, setMenuLoading] = useState(true)
+
+  useEffect(() => {
+    api.getMenu().then(items => setMenuItems(items)).finally(() => setMenuLoading(false))
+  }, [])
+
+  const breakfastItems = menuItems.filter(i => i.menu === 'breakfast')
+  const lunchStarters = menuItems.filter(i => i.menu === 'lunch' && i.category === 'Starters')
+  const lunchMains = menuItems.filter(i => i.menu === 'lunch' && i.category === 'Mains')
+  const lunchPuddings = menuItems.filter(i => i.menu === 'lunch' && i.category === 'Puddings')
+  const beverageItems = menuItems.filter(i => i.menu === 'beverages')
+  const beverageSections = [...new Set(beverageItems.map(i => i.section))].filter(Boolean) as string[]
 
   const [formData, setFormData] = useState({
     date: '',
@@ -160,45 +169,6 @@ export const Dining: React.FC = () => {
       setIsSubmitting(false)
     }
   }
-
-  const menuItems: MenuItem[] = [
-    { name: 'Homemade Soup of the Day', category: 'Starters' },
-    { name: 'CUC Prawn Cocktail', category: 'Starters' },
-    { name: 'Devilled Kidneys, With Toasted Sourdough', category: 'Starters' },
-    { name: 'Goats Cheese, Tomato and Spinach Tart, Dressed Salad', category: 'Starters' },
-    { name: 'Smoked Salmon Plate, Capers, Shallots, Lemon Oil, Brown Bread and Butter', category: 'Starters' },
-    { name: 'Oven Roasted Breast of Free-Range Chicken, Colcannon Potatoes, Braised Carrots, Bourguignon Sauce', category: 'Mains' },
-    { name: 'Pan Fried Fillet of Sea Bream, Herb Butter, New Potatoes, Carrot Puree, Braised Fennel, Watercress and Pernod Cream Sauce', category: 'Mains' },
-    { name: '"CUC" Confit Belly of Pork, Bacon and Apple Mash, Buttered Sweetheart Cabbage, Seasonal Vegetables, Crackling, Apple Sauce and Cider Jus', category: 'Mains' },
-    { name: 'Roast Rump and Braised Lamb Shoulder Rissole, Tomato and Basil Fondue, Herb Broad Beans and Peas, Red Currant Jus', category: 'Mains' },
-    { name: 'Whole Dover Sole "on or off the bone", Spinach, Parsley Steamed New Potatoes, Tomato and Caper Butter Sauce', category: 'Mains' },
-    { name: 'Homemade Pasta, Wilted Spinach, Porcini Cream, Freshly Grated Parmesan Truffle Oil', category: 'Mains' },
-    { name: '"CUC" Sticky Toffee Pudding, Vanilla Custard', category: 'Puddings' },
-    { name: 'Chocolate Fondant, Vanilla Ice Cream and Chocolate Sauce', category: 'Puddings' },
-    { name: 'Selection of Cheeses, Celery, Grapes and Crackers', category: 'Puddings' },
-    { name: 'Selection of Ice Cream and Sorbets', category: 'Puddings' },
-  ]
-
-  const starters = menuItems.filter(item => item.category === 'Starters')
-  const mains = menuItems.filter(item => item.category === 'Mains')
-  const puddings = menuItems.filter(item => item.category === 'Puddings')
-
-  const beverages = [
-    {
-      section: 'Dessert Wine',
-      items: [
-        { name: 'Sauterne – Château Les Mingets 2019', formats: 'Bottle · Glass' },
-        { name: 'Alison Botrytis Riesling 2020', formats: 'Half Bottle' },
-      ],
-    },
-    {
-      section: 'Port',
-      items: [
-        { name: 'Quinta Da Roenda – Croft 2004', formats: 'Glass' },
-        { name: 'Fonseca Reserve Bin 27', formats: 'Glass' },
-      ],
-    },
-  ]
 
   return (
     <div className="">
@@ -655,6 +625,10 @@ export const Dining: React.FC = () => {
               {isSubmitting ? 'Submitting...' : 'Request Reservation'}
             </button>
           </form>
+        ) : menuLoading ? (
+          <div className="flex justify-center py-12">
+            <div className="w-6 h-6 border-2 border-cambridge/30 border-t-cambridge rounded-full animate-spin" />
+          </div>
         ) : activeMenuTab === 'breakfast' ? (
           <div className="max-w-2xl mx-auto">
             <div className="club-card overflow-hidden">
@@ -665,19 +639,14 @@ export const Dining: React.FC = () => {
               <div className="px-6 py-4">
                 <p className="text-sm text-ink-mid italic mb-5">All breakfasts include Tea, Coffee, Juice and Toast</p>
                 <div className="divide-y divide-cambridge/10">
-                  {[
-                    { name: 'Full English Breakfast', description: 'Egg, Bacon, Sausages, Tomatoes, Mushrooms, Black Pudding and Hash Browns (Beans optional)', price: '£24.50' },
-                    { name: 'Continental Breakfast', description: '', price: '£14.50' },
-                    { name: 'Vegetarian Breakfast', description: 'Pre-order required', price: '£18.50' },
-                    { name: 'Smoked Salmon & Scrambled Eggs', description: '', price: '£18.50' },
-                    { name: 'Bacon or Sausage Sandwich', description: '', price: '£8.50' },
-                  ].map((item, i) => (
-                    <div key={i} className="flex items-baseline justify-between py-3 gap-4">
-                      <div>
+                  {breakfastItems.map((item) => (
+                    <div key={item.id} className="py-3">
+                      <div className="flex items-baseline justify-between gap-4">
                         <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
-                        {item.description && <p className="text-xs text-ink-mid mt-0.5">{item.description}</p>}
+                        {item.price && <span className="font-serif text-oxford-blue flex-shrink-0">{item.price}</span>}
                       </div>
-                      <span className="font-serif text-oxford-blue flex-shrink-0">{item.price}</span>
+                      {item.description && <p className="text-xs text-ink-mid mt-0.5">{item.description}</p>}
+                      {item.image_url && <img src={item.image_url} alt={item.name} className="mt-2 rounded w-full max-w-xs object-cover" />}
                     </div>
                   ))}
                 </div>
@@ -687,9 +656,9 @@ export const Dining: React.FC = () => {
         ) : (
           <div className="space-y-10">
             {[
-              { label: 'First Course', title: 'Starters', items: starters },
-              { label: 'Second Course', title: 'Main Courses', items: mains },
-              { label: 'Third Course', title: 'Desserts & Cheese', items: puddings },
+              { label: 'First Course', title: 'Starters', items: lunchStarters },
+              { label: 'Second Course', title: 'Main Courses', items: lunchMains },
+              { label: 'Third Course', title: 'Desserts & Cheese', items: lunchPuddings },
             ].map(({ label, title, items }) => (
               <div key={title} className="club-card overflow-hidden">
                 <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
@@ -697,36 +666,42 @@ export const Dining: React.FC = () => {
                   <h2 className="font-serif text-ivory text-xl font-normal">{title}</h2>
                 </div>
                 <ul className="divide-y divide-cambridge/10 px-6 py-2">
-                  {items.map((item, index) => (
-                    <li key={index} className="py-3">
-                      <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
+                  {items.map((item) => (
+                    <li key={item.id} className="py-3">
+                      <div className="flex items-baseline justify-between gap-4">
+                        <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
+                        {item.price && <span className="font-serif text-oxford-blue flex-shrink-0">{item.price}</span>}
+                      </div>
+                      {item.description && <p className="text-xs text-ink-mid mt-0.5">{item.description}</p>}
+                      {item.image_url && <img src={item.image_url} alt={item.name} className="mt-2 rounded w-full max-w-xs object-cover" />}
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
 
-            {/* Beverages */}
-            <div className="club-card overflow-hidden">
-              <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
-                <h2 className="font-serif text-ivory text-xl font-normal">Beverages</h2>
+            {beverageSections.length > 0 && (
+              <div className="club-card overflow-hidden">
+                <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
+                  <h2 className="font-serif text-ivory text-xl font-normal">Beverages</h2>
+                </div>
+                <div className="px-6 py-4 space-y-6">
+                  {beverageSections.map((section) => (
+                    <div key={section}>
+                      <p className="font-serif text-oxford-blue text-base font-semibold mb-3">{section}</p>
+                      <ul className="divide-y divide-cambridge/10">
+                        {beverageItems.filter(i => i.section === section).map((item) => (
+                          <li key={item.id} className="py-3 flex justify-between items-baseline gap-4">
+                            <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
+                            {item.formats && <span className="text-sm text-ink-mid whitespace-nowrap">{item.formats}</span>}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="px-6 py-4 space-y-6">
-                {beverages.map(({ section, items }) => (
-                  <div key={section}>
-                    <p className="font-serif text-oxford-blue text-base font-semibold mb-3">{section}</p>
-                    <ul className="divide-y divide-cambridge/10">
-                      {items.map((item, i) => (
-                        <li key={i} className="py-3 flex justify-between items-baseline gap-4">
-                          <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
-                          <span className="text-sm text-ink-mid whitespace-nowrap">{item.formats}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
+            )}
           </div>
         )}
       </div>

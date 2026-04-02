@@ -55,6 +55,19 @@ export interface ReciprocalClub {
   logo_path?: string | null
 }
 
+export interface MenuItem {
+  id: string
+  menu: string
+  category: string | null
+  section: string | null
+  name: string
+  description: string | null
+  price: string | null
+  formats: string | null
+  image_url: string | null
+  sort_order: number
+}
+
 export const api = {
   async login(email: string, password: string): Promise<AuthResponse> {
     const response = await fetch(`${API_BASE}/login`, {
@@ -146,6 +159,13 @@ export const api = {
       const error = await response.json()
       throw new Error(error.error || 'Failed to update booking')
     }
+  },
+
+  async getMenu(): Promise<MenuItem[]> {
+    const response = await fetch(`${API_BASE}/menu`)
+    if (!response.ok) throw new Error('Failed to fetch menu')
+    const data = await response.json()
+    return data.items || []
   },
 
   async getNews(): Promise<ClubNews[]> {

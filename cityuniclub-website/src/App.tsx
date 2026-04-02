@@ -225,19 +225,22 @@ const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean; showApp
         </div>
       </div>
       <div
-        className="overflow-hidden bg-cambridge/95 transition-all duration-500 ease-out"
-        style={{ maxHeight: showAppBanner ? '60px' : '0px' }}
+        className="overflow-hidden bg-oxford-blue transition-all duration-500 ease-out"
+        style={{ maxHeight: showAppBanner ? '80px' : '0px' }}
       >
-        <div className="relative px-6 flex items-center justify-center" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
-          <a href="https://apps.apple.com/gb/app/cityuniclub-app/id6760672157" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-oxford-blue">
-            <span role="img" aria-label="phone" style={{ fontSize: '1.125rem', lineHeight: 1 }}>📱</span>
-            <span className="font-cormorant text-sm md:text-base font-semibold tracking-wide" style={{ lineHeight: 1 }}>
-              New! The CUC iPhone app is here — <span className="underline underline-offset-2">Download now</span>
+        <div className="relative px-6 flex items-center justify-center" style={{ paddingTop: '14px', paddingBottom: '14px' }}>
+          <a href="https://apps.apple.com/gb/app/cityuniclub-app/id6760672157" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 bg-white/10 hover:bg-white/20 transition rounded-full px-5 py-2">
+            <span role="img" aria-label="phone" style={{ fontSize: '1.35rem', lineHeight: 1 }}>📱</span>
+            <span className="font-cormorant text-base md:text-lg font-bold tracking-wide text-white" style={{ lineHeight: 1.2 }}>
+              New! The CUC iPhone app is here
+            </span>
+            <span className="bg-cambridge text-oxford-blue text-xs md:text-sm font-bold px-3 py-1 rounded-full whitespace-nowrap">
+              Download now
             </span>
           </a>
           <button
             onClick={onDismissBanner}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-oxford-blue/60 hover:text-oxford-blue transition p-1"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition p-1"
             aria-label="Dismiss"
           >
             ✕

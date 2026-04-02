@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { FROM_EMAIL, CLUB_NAME, CLUB_ADDRESS, CLUB_EMAIL, CLUB_PHONE } from '../_shared/constants.ts'
+import { FROM_EMAIL, CLUB_NAME, CLUB_ADDRESS, CLUB_EMAIL, CLUB_PHONE, escapeHtml } from '../_shared/constants.ts'
+import { getCorsHeaders } from '../_shared/cors.ts'
 
 function formatDiningDate(dateStr: string): string {
   const [y, m, d] = dateStr.split('-').map(Number)
@@ -25,13 +26,9 @@ async function sendEmail(resendKey: string, payload: object) {
   }
 }
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, apikey, x-session-token',
-  'Access-Control-Allow-Methods': 'POST, PATCH, OPTIONS',
-}
-
 serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req)
+
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -156,11 +153,11 @@ serve(async (req: Request) => {
             subject: `Dining reservation updated — ${formattedDate}`,
             html: `
               <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;">
-                <p>Dear ${actorName},</p>
+                <p>Dear ${escapeHtml(actorName)},</p>
                 <p>Your dining reservation has been updated.</p>
-                <p><strong>Date:</strong> ${formattedDate}<br>
-                <strong>Time:</strong> ${formattedTime}<br>
-                <strong>Meal:</strong> ${existing.meal_type}<br>
+                <p><strong>Date:</strong> ${escapeHtml(formattedDate)}<br>
+                <strong>Time:</strong> ${escapeHtml(formattedTime)}<br>
+                <strong>Meal:</strong> ${escapeHtml(existing.meal_type)}<br>
                 <strong>Guests:</strong> ${guest_count}<br>
                 <strong>Status:</strong> Pending confirmation</p>
                 <p>If you have any questions, please contact us:</p>
@@ -227,11 +224,11 @@ serve(async (req: Request) => {
           subject: `Dining reservation cancelled — ${formattedDate}`,
           html: `
             <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;">
-              <p>Dear ${actorName},</p>
+              <p>Dear ${escapeHtml(actorName)},</p>
               <p>Your dining reservation has been cancelled.</p>
-              <p><strong>Date:</strong> ${formattedDate}<br>
-              <strong>Time:</strong> ${formattedTime}<br>
-              <strong>Meal:</strong> ${existing.meal_type}</p>
+              <p><strong>Date:</strong> ${escapeHtml(formattedDate)}<br>
+              <strong>Time:</strong> ${escapeHtml(formattedTime)}<br>
+              <strong>Meal:</strong> ${escapeHtml(existing.meal_type)}</p>
               <p>If this was not expected, please contact us:</p>
               <ul>
                 <li><strong>Phone:</strong> ${CLUB_PHONE}</li>
@@ -334,27 +331,27 @@ serve(async (req: Request) => {
               from: FROM_EMAIL,
               to: ['secretary@cityuniversityclub.co.uk'],
               reply_to: guest_email,
-              subject: `Guest Dining Reservation — ${guest_name}`,
+              subject: `Guest Dining Reservation — ${escapeHtml(guest_name)}`,
               html: `
                 <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;">
                   <h2 style="color:#002147;">New Guest Dining Reservation</h2>
                   <div style="background:#f5f5f5;padding:15px;border-left:4px solid #002147;margin:20px 0;">
                     <h3 style="margin-top:0;color:#002147;">Guest Details</h3>
-                    <p><strong>Name:</strong> ${guest_name}<br>
-                    <strong>Email:</strong> <a href="mailto:${guest_email}">${guest_email}</a></p>
+                    <p><strong>Name:</strong> ${escapeHtml(guest_name)}<br>
+                    <strong>Email:</strong> <a href="mailto:${escapeHtml(guest_email)}">${escapeHtml(guest_email)}</a></p>
                   </div>
                   <div style="background:#f5f5f5;padding:15px;border-left:4px solid #A3C1AD;margin:20px 0;">
                     <h3 style="margin-top:0;color:#002147;">Reservation Details</h3>
-                    <p><strong>Date:</strong> ${reservation_date}<br>
-                    <strong>Time:</strong> ${reservation_time}<br>
-                    <strong>Meal Type:</strong> ${meal_type}<br>
+                    <p><strong>Date:</strong> ${escapeHtml(reservation_date)}<br>
+                    <strong>Time:</strong> ${escapeHtml(reservation_time)}<br>
+                    <strong>Meal Type:</strong> ${escapeHtml(meal_type)}<br>
                     <strong>Guests:</strong> ${guest_count}<br>
-                    ${table_preference ? `<strong>Table Preference:</strong> ${table_preference}<br>` : ''}
+                    ${table_preference ? `<strong>Table Preference:</strong> ${escapeHtml(table_preference)}<br>` : ''}
                     </p>
                   </div>
                   ${special_requests ? `<div style="background:#fff3cd;padding:15px;border-left:4px solid #ffc107;margin:20px 0;">
                     <h3 style="margin-top:0;color:#856404;">Special Requests</h3>
-                    <p>${special_requests}</p>
+                    <p>${escapeHtml(special_requests)}</p>
                   </div>` : ''}
                   <hr style="border:none;border-top:1px solid #ddd;margin:30px 0;">
                   <p style="color:#666;font-size:12px;"><strong>${CLUB_NAME}</strong><br>${CLUB_ADDRESS}</p>
@@ -372,7 +369,7 @@ serve(async (req: Request) => {
               subject: `Your dining reservation request — ${CLUB_NAME}`,
               html: `
                 <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;">
-                  <p>Dear ${guest_name},</p>
+                  <p>Dear ${escapeHtml(guest_name)},</p>
                   <p>Thank you for your dining reservation request at City University Club. We have received your request and will be in touch to confirm your booking shortly.</p>
                   <p>We are currently transitioning to a new booking system, so please bear with us. In the meantime, to confirm your reservation or if you have any questions, please don't hesitate to get in touch directly:</p>
                   <ul>

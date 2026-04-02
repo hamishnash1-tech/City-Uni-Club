@@ -1,6 +1,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { FROM_EMAIL, CLUB_NAME, CLUB_ADDRESS, CLUB_EMAIL, CLUB_PHONE } from '../_shared/constants.ts'
+import { FROM_EMAIL, CLUB_NAME, CLUB_ADDRESS, CLUB_EMAIL, CLUB_PHONE, escapeHtml } from '../_shared/constants.ts'
+import { getCorsHeaders } from '../_shared/cors.ts'
 
 function formatEventDate(dateStr: string | null): string {
   if (!dateStr) return 'Date TBA'
@@ -22,13 +23,8 @@ async function sendEmail(resendKey: string, payload: object) {
   }
 }
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'Content-Type, x-session-token, apikey, authorization, x-client-info',
-  'Access-Control-Allow-Methods': 'GET, POST, PATCH, OPTIONS',
-}
-
 serve(async (req: Request) => {
+  const corsHeaders = getCorsHeaders(req)
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders, status: 200 })
   }
@@ -159,11 +155,11 @@ serve(async (req: Request) => {
           await sendEmail(resendKey, {
             from: FROM_EMAIL,
             to: [actorEmail],
-            subject: `Booking updated — ${eventTitle}`,
+            subject: `Booking updated — ${escapeHtml(eventTitle)}`,
             html: `
               <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;">
-                <p>Dear ${actorName},</p>
-                <p>Your booking for <strong>${eventTitle}</strong> on ${eventDate} has been updated.</p>
+                <p>Dear ${escapeHtml(actorName)},</p>
+                <p>Your booking for <strong>${escapeHtml(eventTitle)}</strong> on ${escapeHtml(eventDate)} has been updated.</p>
                 <p>Updated guests: ${guest_count}<br>Status: Pending confirmation</p>
                 <p>If you have any questions, please contact us:</p>
                 <ul>
@@ -226,11 +222,11 @@ serve(async (req: Request) => {
         await sendEmail(resendKey, {
           from: FROM_EMAIL,
           to: [actorEmail],
-          subject: `Booking cancelled — ${eventTitle}`,
+          subject: `Booking cancelled — ${escapeHtml(eventTitle)}`,
           html: `
             <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;">
-              <p>Dear ${actorName},</p>
-              <p>Your booking for <strong>${eventTitle}</strong> on ${eventDate} has been cancelled.</p>
+              <p>Dear ${escapeHtml(actorName)},</p>
+              <p>Your booking for <strong>${escapeHtml(eventTitle)}</strong> on ${escapeHtml(eventDate)} has been cancelled.</p>
               <p>If this was not expected, please contact us:</p>
               <ul>
                 <li><strong>Phone:</strong> ${CLUB_PHONE}</li>
@@ -344,13 +340,13 @@ serve(async (req: Request) => {
         await sendEmail(resendKey, {
           from: FROM_EMAIL,
           to: [guest_email],
-          subject: `Booking request received — ${event.title}`,
+          subject: `Booking request received — ${escapeHtml(event.title)}`,
           html: `
             <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;">
-              <p>Dear ${guest_name},</p>
+              <p>Dear ${escapeHtml(guest_name)},</p>
               <p>Thank you for your booking request for the following event at ${CLUB_NAME}:</p>
               <div style="background:#f5f5f5;padding:15px;border-left:4px solid #002147;margin:20px 0;">
-                <p style="margin:0;"><strong>${event.title}</strong><br>
+                <p style="margin:0;"><strong>${escapeHtml(event.title)}</strong><br>
                 ${formattedDate}<br>
                 Guests: ${guest_count}<br>
                 Total: ${priceText}</p>

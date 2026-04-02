@@ -1,16 +1,11 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { FROM_EMAIL } from '../_shared/constants.ts'
+import { FROM_EMAIL, CLUB_NAME, CLUB_ADDRESS, CLUB_EMAIL, CLUB_PHONE, escapeHtml } from '../_shared/constants.ts'
+import { getCorsHeaders } from '../_shared/cors.ts'
 
 serve(async (req: Request) => {
-  // CORS headers - allow all origins
-  const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type, x-session-token, apikey',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  }
+  const corsHeaders = getCorsHeaders(req)
 
-  // Handle preflight
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders, status: 204 })
   }
@@ -121,7 +116,7 @@ serve(async (req: Request) => {
           body: JSON.stringify({
             from: FROM_EMAIL,
             to: ['secretary@cityuniversityclub.co.uk'],
-            subject: `Dining Reservation - ${member.full_name}`,
+            subject: `Dining Reservation - ${escapeHtml(member.full_name)}`,
             html: `
               <html>
                 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
@@ -129,22 +124,22 @@ serve(async (req: Request) => {
                   <p>A new dining reservation has been submitted.</p>
                   <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid #002147; margin: 20px 0;">
                     <h3 style="margin-top: 0; color: #002147;">Member Details</h3>
-                    <p><strong>Name:</strong> ${member.full_name}<br>
-                    <strong>Email:</strong> ${member.email}<br>
-                    <strong>Membership Number:</strong> ${member.membership_number}</p>
+                    <p><strong>Name:</strong> ${escapeHtml(member.full_name)}<br>
+                    <strong>Email:</strong> ${escapeHtml(member.email)}<br>
+                    <strong>Membership Number:</strong> ${escapeHtml(member.membership_number)}</p>
                   </div>
                   <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid #A3C1AD; margin: 20px 0;">
                     <h3 style="margin-top: 0; color: #002147;">Reservation Details</h3>
-                    <p><strong>Date:</strong> ${reservation_date}<br>
-                    <strong>Time:</strong> ${reservation_time}<br>
-                    <strong>Meal Type:</strong> ${meal_type}<br>
+                    <p><strong>Date:</strong> ${escapeHtml(reservation_date)}<br>
+                    <strong>Time:</strong> ${escapeHtml(reservation_time)}<br>
+                    <strong>Meal Type:</strong> ${escapeHtml(meal_type)}<br>
                     <strong>Guests:</strong> ${guest_count}<br>
-                    <strong>Table Preference:</strong> ${table_preference || 'Not specified'}<br>
+                    <strong>Table Preference:</strong> ${escapeHtml(table_preference || 'Not specified')}<br>
                     <strong>Total Price:</strong> £${total_price.toFixed(2)}</p>
                   </div>
                   ${special_requests ? `<div style="background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
                     <h3 style="margin-top: 0; color: #856404;">Special Requests</h3>
-                    <p>${special_requests}</p>
+                    <p>${escapeHtml(special_requests)}</p>
                   </div>` : ''}
                   <p>Please review this reservation in the admin dashboard.</p>
                   <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
