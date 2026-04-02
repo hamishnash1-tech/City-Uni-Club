@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "additionalDirectories": [
+      "/Users/anandsrivastava/environment/cityuniclub/cityuniclub-backend/supabase/functions/change-password",
+      "/Users/anandsrivastava/environment/cityuniclub/cityuniclub-backend/supabase/functions/admin-loi",
+      "/Users/anandsrivastava/environment/cityuniclub/cityuniclub-backend/supabase/functions/admin-members",
+      "/Users/anandsrivastava/environment/cityuniclub/cityuniclub-backend/supabase/functions/admin-news",
+      "/Users/anandsrivastava/environment/cityuniclub/cityuniclub-backend/supabase/functions/join-enquiry",
+      "/Users/anandsrivastava/environment/cityuniclub/cityuniclub-backend/supabase/functions/admin-status",
+      "/Users/anandsrivastava/environment/cityuniclub/cityuniclub-backend/supabase/functions/loi-requests",
+      "/Users/anandsrivastava/environment/cityuniclub/cityuniclub-backend/supabase/functions/send-loi-email",
+      "/Users/anandsrivastava/environment/cityuniclub/cityuniclub-backend/supabase/functions/status"
+    ]
+  }
+}
