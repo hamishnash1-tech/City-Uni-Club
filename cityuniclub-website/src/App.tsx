@@ -159,67 +159,89 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
 }
 
 // Top Banner
-const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean }> = ({ onMenuToggle, menuOpen }) => {
+const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean; showAppBanner: boolean; onDismissBanner: () => void }> = ({ onMenuToggle, menuOpen, showAppBanner, onDismissBanner }) => {
   const auth = useSelector((state: RootState) => state.auth)
   const dispatch = useDispatch()
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-oxford-blue/95 backdrop-blur-sm border-b border-white/10 px-4 py-2">
-      <div className="flex items-center gap-4">
-        {/* Mobile hamburger */}
-        <button
-          onClick={onMenuToggle}
-          className="md:hidden text-ivory/70 hover:text-ivory transition p-1 flex-shrink-0"
-          aria-label="Menu"
-        >
-          <div style={{ position: 'relative', width: '20px', height: '20px' }}>
-            {[
-              { closed: 'translateY(-5.5px)', opened: 'rotate(45deg)' },
-              { closed: 'translateY(0)',       opened: null },
-              { closed: 'translateY(5.5px)',  opened: 'rotate(-45deg)' },
-            ].map((bar, i) => (
-              <span key={i} style={{
-                position: 'absolute',
-                left: '1px',
-                top: 'calc(50% - 0.75px)',
-                width: '18px',
-                height: '1.5px',
-                borderRadius: '1px',
-                background: 'currentColor',
-                transformOrigin: 'center',
-                ...(bar.opened
-                  ? { transform: menuOpen ? bar.opened : bar.closed, transition: 'transform 0.3s ease-out' }
-                  : { opacity: menuOpen ? 0 : 1, transition: 'opacity 0.15s ease-out' }),
-              }} />
-            ))}
-          </div>
-        </button>
+    <div className="fixed top-0 left-0 right-0 z-50">
+      <div className="bg-oxford-blue/95 backdrop-blur-sm border-b border-white/10 px-4 py-2">
+        <div className="flex items-center gap-4">
+          {/* Mobile hamburger */}
+          <button
+            onClick={onMenuToggle}
+            className="md:hidden text-ivory/70 hover:text-ivory transition p-1 flex-shrink-0"
+            aria-label="Menu"
+          >
+            <div style={{ position: 'relative', width: '20px', height: '20px' }}>
+              {[
+                { closed: 'translateY(-5.5px)', opened: 'rotate(45deg)' },
+                { closed: 'translateY(0)',       opened: null },
+                { closed: 'translateY(5.5px)',  opened: 'rotate(-45deg)' },
+              ].map((bar, i) => (
+                <span key={i} style={{
+                  position: 'absolute',
+                  left: '1px',
+                  top: 'calc(50% - 0.75px)',
+                  width: '18px',
+                  height: '1.5px',
+                  borderRadius: '1px',
+                  background: 'currentColor',
+                  transformOrigin: 'center',
+                  ...(bar.opened
+                    ? { transform: menuOpen ? bar.opened : bar.closed, transition: 'transform 0.3s ease-out' }
+                    : { opacity: menuOpen ? 0 : 1, transition: 'opacity 0.15s ease-out' }),
+                }} />
+              ))}
+            </div>
+          </button>
 
-        {/* Logo + name */}
-        <Link to="/home" className="flex items-center gap-2 flex-shrink-0">
-          <div className="w-7 h-7 bg-cambridge/45 rounded-full flex items-center justify-center overflow-hidden">
-            <img src="/assets/cuc-logo-square.png" alt="CUC" className="w-6 h-6 object-contain" />
-          </div>
-          <span className="block md:hidden lg:block font-cormorant text-sm tracking-widest uppercase text-cambridge-light/70">City University Club</span>
-        </Link>
+          {/* Logo + name */}
+          <Link to="/home" className="flex items-center gap-2 flex-shrink-0">
+            <div className="w-7 h-7 bg-cambridge/45 rounded-full flex items-center justify-center overflow-hidden">
+              <img src="/assets/cuc-logo-square.png" alt="CUC" className="w-6 h-6 object-contain" />
+            </div>
+            <span className="block md:hidden lg:block font-cormorant text-sm tracking-widest uppercase text-cambridge-light/70">City University Club</span>
+          </Link>
 
-        {/* Desktop nav — centre */}
-        <div className="flex-1 flex justify-center">
-          <DesktopNav />
+          {/* Desktop nav — centre */}
+          <div className="flex-1 flex justify-center">
+            <DesktopNav />
+          </div>
+
+          {/* Desktop right — user or login/join */}
+          <div className="hidden md:flex items-center gap-3 flex-shrink-0">
+            {auth.isAuthenticated && auth.member ? (
+              <Link to="/profile" className="flex items-center gap-1.5 text-ivory/80 hover:text-ivory transition">
+                <IconUser className="w-4 h-4" />
+                <span className="text-sm font-light tracking-wide text-ivory/80">{auth.member.full_name}</span>
+              </Link>
+            ) : (
+              <Link to="/login" className="label-caps text-cambridge-light/60 hover:text-cambridge-light transition">
+                Sign In
+              </Link>
+            )}
+          </div>
         </div>
-
-        {/* Desktop right — user or login/join */}
-        <div className="hidden md:flex items-center gap-3 flex-shrink-0">
-          {auth.isAuthenticated && auth.member ? (
-            <Link to="/profile" className="flex items-center gap-1.5 text-ivory/80 hover:text-ivory transition">
-              <IconUser className="w-4 h-4" />
-              <span className="text-sm font-light tracking-wide text-ivory/80">{auth.member.full_name}</span>
-            </Link>
-          ) : (
-            <Link to="/login" className="label-caps text-cambridge-light/60 hover:text-cambridge-light transition">
-              Sign In
-            </Link>
-          )}
+      </div>
+      <div
+        className="overflow-hidden bg-cambridge/95 transition-all duration-500 ease-out"
+        style={{ maxHeight: showAppBanner ? '60px' : '0px' }}
+      >
+        <div className="relative px-6 flex items-center justify-center" style={{ paddingTop: '12px', paddingBottom: '12px' }}>
+          <a href="https://apps.apple.com/gb/app/cityuniclub-app/id6760672157" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-oxford-blue">
+            <span role="img" aria-label="phone" style={{ fontSize: '1.125rem', lineHeight: 1 }}>📱</span>
+            <span className="font-cormorant text-sm md:text-base font-semibold tracking-wide" style={{ lineHeight: 1 }}>
+              New! The CUC iPhone app is here — <span className="underline underline-offset-2">Download now</span>
+            </span>
+          </a>
+          <button
+            onClick={onDismissBanner}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-oxford-blue/60 hover:text-oxford-blue transition p-1"
+            aria-label="Dismiss"
+          >
+            ✕
+          </button>
         </div>
       </div>
     </div>
@@ -243,11 +265,21 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 // App Component — persistent shell wraps all routes so TabBar never remounts
 const App: React.FC = () => {
   const [menuOpen, setMenuOpen] = useState(false)
+  const auth = useSelector((state: RootState) => state.auth)
+  const [showBanner, setShowBanner] = useState(() => {
+    return auth.isAuthenticated && sessionStorage.getItem('show_app_banner') === 'true'
+  })
+
+  useEffect(() => {
+    if (auth.isAuthenticated && sessionStorage.getItem('show_app_banner') === 'true') {
+      setShowBanner(true)
+    }
+  }, [auth.isAuthenticated])
 
   return (
     <>
       <ScrollToTop />
-      <TopBanner onMenuToggle={() => setMenuOpen(o => !o)} menuOpen={menuOpen} />
+      <TopBanner onMenuToggle={() => setMenuOpen(o => !o)} menuOpen={menuOpen} showAppBanner={showBanner} onDismissBanner={() => { setShowBanner(false); sessionStorage.removeItem('show_app_banner') }} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       <div
         className="pt-10 md:pt-12 min-h-screen flex flex-col"

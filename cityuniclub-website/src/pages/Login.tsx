@@ -35,6 +35,7 @@ export const Login: React.FC = () => {
         member: response.member
       }))
 
+      sessionStorage.setItem('show_app_banner', 'true')
       console.log('Navigating to home...')
       navigate('/home')
     } catch (err: any) {

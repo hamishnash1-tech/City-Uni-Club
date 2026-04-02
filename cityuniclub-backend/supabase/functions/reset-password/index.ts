@@ -72,6 +72,11 @@ serve(async (req) => {
                 <p style="margin: 0;">${CLUB_NAME}</p>
                 <p style="margin: 0;">${CLUB_EMAIL}</p>
                 <p style="margin: 0;">Tel: ${CLUB_PHONE}</p>
+                <p style="margin-top: 20px;">
+                  <a href="https://apps.apple.com/gb/app/cityuniclub-app/id6760672157" style="color: #002147; text-decoration: none;">
+                    Download our iPhone app
+                  </a>
+                </p>
               </body>
             </html>
           `,
