@@ -531,6 +531,9 @@ export const Dining: React.FC = () => {
                   <div className="label-caps text-ink-light">12:00 – 14:30</div>
                 </button>
               </div>
+              <p className="text-xs text-ink-light mt-2">
+                To arrange a booking outside of normal hours, please <a href="/info#get-in-touch" className="underline hover:text-oxford-blue">contact the Club Secretary</a>.
+              </p>
             </div>
 
             {/* Date & Guests */}
@@ -614,7 +617,7 @@ export const Dining: React.FC = () => {
             )}
 
             <div className="rounded border border-amber-300 bg-amber-50 px-4 py-3 text-xs text-amber-800 leading-relaxed">
-              Members or guests with food allergies must contact the Club Secretary directly before making a booking.
+              Members or guests with food allergies must <a href="/info#get-in-touch" className="underline font-medium hover:text-amber-900">contact the Club Secretary</a> directly before making a booking.
             </div>
 
             <button

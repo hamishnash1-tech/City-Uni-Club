@@ -64,7 +64,7 @@ export const Info: React.FC = () => (
       </section>
 
       {/* Contact */}
-      <section>
+      <section id="get-in-touch">
         <p className="label-caps text-cambridge-muted mb-3">Get in Touch</p>
         <div className="club-card p-5 text-sm text-ink space-y-4">
 
