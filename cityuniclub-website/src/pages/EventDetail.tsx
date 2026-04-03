@@ -473,7 +473,7 @@ export const EventDetail: React.FC = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <p className="text-xs text-amber-800 leading-relaxed">
-                      Members or guests with food allergies must contact the Club Secretary directly before making a booking.
+                      Members or guests with food allergies must <a href="/info#get-in-touch" className="underline font-medium hover:text-amber-900">contact the Club Secretary</a> directly before making a booking.
                     </p>
                   </div>
                 )}

@@ -253,8 +253,17 @@ const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean; showApp
 
 // Scroll to top on route change
 const ScrollToTop: React.FC = () => {
-  const { pathname } = useLocation()
-  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  const { pathname, hash } = useLocation()
+  useEffect(() => {
+    if (hash) {
+      setTimeout(() => {
+        const el = document.getElementById(hash.slice(1))
+        if (el) el.scrollIntoView({ behavior: 'smooth' })
+      }, 100)
+    } else {
+      window.scrollTo(0, 0)
+    }
+  }, [pathname, hash])
   return null
 }
 

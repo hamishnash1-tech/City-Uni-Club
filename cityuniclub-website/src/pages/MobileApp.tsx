@@ -39,7 +39,7 @@ export const MobileApp: React.FC = () => (
       {/* Download buttons */}
       <div className="flex flex-wrap justify-center gap-3 mt-5">
         <a
-          href="https://apps.apple.com/gb/app/city-university-club/id6745389339"
+          href="https://apps.apple.com/gb/app/cityuniclub-app/id6760672157"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 bg-ivory text-oxford-blue px-5 py-2.5 rounded text-sm font-semibold hover:bg-ivory/90 transition"
