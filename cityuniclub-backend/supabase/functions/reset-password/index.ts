@@ -69,14 +69,14 @@ serve(async (req) => {
                 </p>
                 <p>This link expires in <strong>15 minutes</strong>. If you did not request a password reset, you can safely ignore this email.</p>
                 <br>
-                <p style="margin: 0;">${CLUB_NAME}</p>
-                <p style="margin: 0;">${CLUB_EMAIL}</p>
-                <p style="margin: 0;">Tel: ${CLUB_PHONE}</p>
                 <p style="margin-top: 20px;">
                   <a href="https://apps.apple.com/gb/app/cityuniclub-app/id6760672157" style="color: #002147; text-decoration: none;">
                     Download our iPhone app
                   </a>
                 </p>
+                <p style="margin: 0;">${CLUB_NAME}</p>
+                <p style="margin: 0;">${CLUB_EMAIL}</p>
+                <p style="margin: 0;">Tel: ${CLUB_PHONE}</p>
               </body>
             </html>
           `,
