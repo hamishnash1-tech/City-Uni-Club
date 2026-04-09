@@ -359,4 +359,29 @@ export const api = {
 
     return response.json()
   },
+
+  async getLoi(token: string, id: string): Promise<{ request: any; emails: any[] } | null> {
+    const response = await fetch(`${LOI_API_URL}?id=${id}`, {
+      headers: {
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'apikey': SUPABASE_ANON_KEY,
+        'x-session-token': token,
+      },
+    })
+    if (!response.ok) return null
+    return response.json()
+  },
+
+  async getMyLois(token: string, page = 1, limit = 10): Promise<{ requests: any[]; total: number }> {
+    const response = await fetch(`${LOI_API_URL}?page=${page}&limit=${limit}`, {
+      headers: {
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        'apikey': SUPABASE_ANON_KEY,
+        'x-session-token': token,
+      },
+    })
+    if (!response.ok) return { requests: [], total: 0 }
+    const data = await response.json()
+    return { requests: data.requests ?? [], total: data.total ?? 0 }
+  },
 }
