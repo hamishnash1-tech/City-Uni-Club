@@ -72,6 +72,7 @@ function AppRoutes() {
         <Route path="clubs" element={<ReciprocalClubsPage />} />
         <Route path="news" element={<NewsPage />} />
         <Route path="loi" element={<LoiPage />} />
+
       </Route>
     </Routes>
     </>

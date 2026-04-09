@@ -21,8 +21,7 @@ export const Dining: React.FC = () => {
   const lunchStarters = menuItems.filter(i => i.menu === 'lunch' && i.category === 'Starters')
   const lunchMains = menuItems.filter(i => i.menu === 'lunch' && i.category === 'Mains')
   const lunchPuddings = menuItems.filter(i => i.menu === 'lunch' && i.category === 'Puddings')
-  const beverageItems = menuItems.filter(i => i.menu === 'beverages')
-  const beverageSections = [...new Set(beverageItems.map(i => i.section))].filter(Boolean) as string[]
+  const canapesItems = menuItems.filter(i => i.menu === 'canapes')
 
   const [formData, setFormData] = useState({
     date: '',
@@ -38,7 +37,7 @@ export const Dining: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState<'book' | 'reservations' | 'menu'>('book')
-  const [activeMenuTab, setActiveMenuTab] = useState<'breakfast' | 'lunch'>('breakfast')
+  const [activeMenuTab, setActiveMenuTab] = useState<'breakfast' | 'lunch' | 'canapes'>('breakfast')
 
   const [reservations, setReservations] = useState<any[]>([])
   const [reservationsLoading, setReservationsLoading] = useState(false)
@@ -130,9 +129,11 @@ export const Dining: React.FC = () => {
     }
   }
 
-  const breakfastTimes = ['09:00', '09:30', '10:00', '10:30', '11:00']
-  const lunchTimes = ['12:00', '12:30', '13:00', '13:30', '14:00', '14:30']
-  const times = formData.meal_type === 'Breakfast' ? breakfastTimes : lunchTimes
+  const breakfastTimes = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30']
+  const lunchTimes = ['11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00']
+  const allTimes = formData.meal_type === 'Breakfast' ? breakfastTimes : lunchTimes
+  const breakfastRange = `${breakfastTimes[0]} – ${breakfastTimes[breakfastTimes.length - 1]}`
+  const lunchRange = `${lunchTimes[0]} – ${lunchTimes[lunchTimes.length - 1]}`
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -234,28 +235,37 @@ export const Dining: React.FC = () => {
         {activeTab === 'menu' && (
           <div className="flex justify-center mb-6">
             <div className="relative flex border border-cambridge/20 rounded-sm p-1">
-              <div
-                className="absolute top-1 bottom-1 bg-cambridge/25 rounded-sm transition-all duration-300 ease-out"
-                style={{
-                  left: '4px',
-                  width: 'calc(50% - 4px)',
-                  transform: activeMenuTab === 'breakfast' ? 'translateX(0)' : 'translateX(100%)',
-                }}
-              />
-              {([
-                { id: 'breakfast', label: 'Breakfast' },
-                { id: 'lunch', label: 'Lunch' },
-              ] as const).map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveMenuTab(tab.id)}
-                  className={`relative py-1.5 px-6 text-sm transition-colors duration-200 rounded-sm ${
-                    activeMenuTab === tab.id ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
-                  }`}
-                >
-                  <span className="label-caps">{tab.label}</span>
-                </button>
-              ))}
+              {(() => {
+                const menuTabs = [
+                  { id: 'breakfast', label: 'Breakfast' },
+                  { id: 'lunch', label: 'Lunch' },
+                  { id: 'canapes', label: 'Canapés' },
+                ] as const
+                const activeIndex = menuTabs.findIndex(t => t.id === activeMenuTab)
+                return (
+                  <>
+                    <div
+                      className="absolute top-1 bottom-1 bg-cambridge/25 rounded-sm transition-all duration-300 ease-out"
+                      style={{
+                        left: '4px',
+                        width: `calc(${100 / menuTabs.length}% - ${8 / menuTabs.length}px)`,
+                        transform: `translateX(${activeIndex * 100}%)`,
+                      }}
+                    />
+                    {menuTabs.map(tab => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveMenuTab(tab.id)}
+                        className={`relative py-1.5 px-4 text-sm transition-colors duration-200 rounded-sm ${
+                          activeMenuTab === tab.id ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
+                        }`}
+                      >
+                        <span className="label-caps">{tab.label}</span>
+                      </button>
+                    ))}
+                  </>
+                )
+              })()}
             </div>
           </div>
         )}
@@ -446,11 +456,11 @@ export const Dining: React.FC = () => {
               <div className="space-y-2 text-sm text-ink-mid">
                 <div className="flex justify-between">
                   <span>Breakfast</span>
-                  <span>8:00 – 11:00</span>
+                  <span>{breakfastRange}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Lunch</span>
-                  <span>12:00 – 14:30</span>
+                  <span>{lunchRange}</span>
                 </div>
                 <div className="pt-1">
                   <span className="label-caps text-ink-light">Tuesday – Friday</span>
@@ -495,7 +505,7 @@ export const Dining: React.FC = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div className="text-xs text-ink leading-relaxed space-y-1">
-                    <p>You are reserving as a guest. Your reservation won't be confirmed until reviewed by the Club.</p>
+                    <p>You are reserving as a guest. Please await confirmation of your booking.</p>
                     <p>If you're a member, <Link to="/login" className="text-cambridge-blue underline">sign in</Link> to reserve with your membership.</p>
                   </div>
                 </div>
@@ -516,7 +526,7 @@ export const Dining: React.FC = () => {
                   }`}
                 >
                   <div className="font-serif text-oxford-blue font-normal mb-0.5">Breakfast</div>
-                  <div className="label-caps text-ink-light">8:00 – 11:00</div>
+                  <div className="label-caps text-ink-light">{breakfastRange}</div>
                 </button>
                 <button
                   type="button"
@@ -528,7 +538,7 @@ export const Dining: React.FC = () => {
                   }`}
                 >
                   <div className="font-serif text-oxford-blue font-normal mb-0.5">Lunch</div>
-                  <div className="label-caps text-ink-light">12:00 – 14:30</div>
+                  <div className="label-caps text-ink-light">{lunchRange}</div>
                 </button>
               </div>
               <p className="text-xs text-ink-light mt-2">
@@ -579,22 +589,16 @@ export const Dining: React.FC = () => {
             {formData.date && (
               <div className="club-card p-5">
                 <label className="label-caps text-ink-light block mb-3">Select Time</label>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                  {times.map((time) => (
-                    <button
-                      key={time}
-                      type="button"
-                      onClick={() => setFormData({ ...formData, time })}
-                      className={`py-2 rounded text-xs font-medium transition ${
-                        formData.time === time
-                          ? 'bg-oxford-blue text-ivory'
-                          : 'bg-ivory-cream text-ink hover:bg-cambridge-subtle'
-                      }`}
-                    >
-                      {time}
-                    </button>
+                <select
+                  value={formData.time}
+                  onChange={e => setFormData({ ...formData, time: e.target.value })}
+                  className="club-input"
+                >
+                  <option value="">Choose a time…</option>
+                  {allTimes.map(t => (
+                    <option key={t} value={t}>{t}</option>
                   ))}
-                </div>
+                </select>
               </div>
             )}
 
@@ -656,7 +660,7 @@ export const Dining: React.FC = () => {
               </div>
             </div>
           </div>
-        ) : (
+        ) : activeMenuTab === 'lunch' ? (
           <div className="space-y-10">
             {[
               { label: 'First Course', title: 'Starters', items: lunchStarters },
@@ -682,29 +686,23 @@ export const Dining: React.FC = () => {
                 </ul>
               </div>
             ))}
-
-            {beverageSections.length > 0 && (
-              <div className="club-card overflow-hidden">
-                <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
-                  <h2 className="font-serif text-ivory text-xl font-normal">Beverages</h2>
-                </div>
-                <div className="px-6 py-4 space-y-6">
-                  {beverageSections.map((section) => (
-                    <div key={section}>
-                      <p className="font-serif text-oxford-blue text-base font-semibold mb-3">{section}</p>
-                      <ul className="divide-y divide-cambridge/10">
-                        {beverageItems.filter(i => i.section === section).map((item) => (
-                          <li key={item.id} className="py-3 flex justify-between items-baseline gap-4">
-                            <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
-                            {item.formats && <span className="text-sm text-ink-mid whitespace-nowrap">{item.formats}</span>}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
+          </div>
+        ) : (
+          <div className="max-w-2xl mx-auto">
+            <div className="club-card overflow-hidden">
+              <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
+                <p className="label-caps text-cambridge-light/60 mb-1">Reception</p>
+                <h2 className="font-serif text-ivory text-xl font-normal">Canapés</h2>
               </div>
-            )}
+              <ul className="divide-y divide-cambridge/10 px-6 py-2">
+                {canapesItems.map((item) => (
+                  <li key={item.id} className="py-3">
+                    <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
+                    {item.description && <p className="text-xs text-ink-mid mt-0.5">{item.description}</p>}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
       </div>

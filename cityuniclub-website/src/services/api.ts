@@ -43,6 +43,7 @@ export interface ClubNews {
   category: string
   published_date: string
   is_featured: boolean
+  is_banner: boolean
 }
 
 export interface ReciprocalClub {
@@ -173,6 +174,13 @@ export const api = {
     if (!response.ok) throw new Error('Failed to fetch news')
     const data = await response.json()
     return data.news || []
+  },
+
+  async getBanner(): Promise<ClubNews | null> {
+    const response = await fetch(`${API_BASE}/news`)
+    if (!response.ok) return null
+    const data = await response.json()
+    return data.banner ?? null
   },
 
   async getClubRegionCounts(token: string): Promise<Record<string, number>> {

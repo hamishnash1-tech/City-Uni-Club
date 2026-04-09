@@ -41,6 +41,9 @@ serve(async (req: Request) => {
 
     if (req.method === 'POST') {
       const body = await req.json()
+      if (body.is_banner) {
+        await db.from('club_news').update({ is_banner: false }).eq('is_banner', true)
+      }
       const { data, error } = await db.from('club_news').insert([body]).select().single()
       if (error) throw error
       return new Response(JSON.stringify({ article: data }), { status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
@@ -49,6 +52,9 @@ serve(async (req: Request) => {
     if (req.method === 'PUT') {
       if (!id) return new Response(JSON.stringify({ error: 'Missing id' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
       const body = await req.json()
+      if (body.is_banner) {
+        await db.from('club_news').update({ is_banner: false }).eq('is_banner', true).neq('id', id)
+      }
       const { data, error } = await db.from('club_news').update(body).eq('id', id).select().single()
       if (error) throw error
       return new Response(JSON.stringify({ article: data }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })

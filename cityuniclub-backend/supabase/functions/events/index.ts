@@ -79,8 +79,7 @@ serve(async (req: Request) => {
       .from('events')
       .select('*')
       .eq('is_active', true)
-      .or(`event_date.gte.${today},is_tba.eq.true`)
-      .order('is_tba', { ascending: true })
+      .or(`event_date.gte.${today},event_date.is.null`)
       .order('event_date', { ascending: true, nullsFirst: false })
 
     if (error) throw error

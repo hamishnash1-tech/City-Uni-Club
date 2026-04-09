@@ -49,6 +49,7 @@ interface NewsArticle {
   published_date: string
   is_featured: boolean
   is_active: boolean
+  is_banner: boolean
   created_at: string
   updated_at: string
 }
@@ -90,6 +91,7 @@ export default function NewsPage() {
     content: '',
     is_featured: false,
     is_active: true,
+    is_banner: false,
   })
 
   const authHeaders = useMemo(() => ({
@@ -145,6 +147,7 @@ export default function NewsPage() {
         content: article.content,
         is_featured: article.is_featured,
         is_active: article.is_active,
+        is_banner: article.is_banner,
       })
     } else {
       setEditingArticle(null)
@@ -155,6 +158,7 @@ export default function NewsPage() {
         content: '',
         is_featured: false,
         is_active: true,
+        is_banner: false,
       })
     }
     setOpenDialog(true)
@@ -323,6 +327,7 @@ export default function NewsPage() {
                         color={categoryColors[article.category]}
                       />
                       {article.is_featured && <Chip icon={<StarIcon />} label="Featured" size="small" color="warning" variant="outlined" />}
+                      {article.is_banner && <Chip label="Banner" size="small" color="error" variant="outlined" />}
                       {!article.is_active && <Chip label="Hidden" size="small" color="default" />}
                     </Box>
                     <Box>
@@ -398,7 +403,7 @@ export default function NewsPage() {
               required
             />
 
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               <FormControlLabel
                 control={<Switch checked={formData.is_featured} onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })} />}
                 label="Featured"
@@ -406,6 +411,10 @@ export default function NewsPage() {
               <FormControlLabel
                 control={<Switch checked={formData.is_active} onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })} />}
                 label="Active (visible on website)"
+              />
+              <FormControlLabel
+                control={<Switch checked={formData.is_banner} onChange={(e) => setFormData({ ...formData, is_banner: e.target.checked })} color="error" />}
+                label="Banner (replaces opening hours on Dining page)"
               />
             </Box>
 
