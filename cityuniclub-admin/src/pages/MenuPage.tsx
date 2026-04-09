@@ -159,7 +159,7 @@ export default function MenuPage() {
       const body = {
         menu: form.menu,
         category: form.menu === 'lunch' ? form.category || null : null,
-        section: form.menu === 'beverages' ? form.section || null : null,
+        section: null,
         name: form.name.trim(),
         description: form.description.trim() || null,
         price: form.price.trim() || null,
