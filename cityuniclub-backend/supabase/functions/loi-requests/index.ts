@@ -122,19 +122,12 @@ serve(async (req: Request) => {
       )
     }
 
-    if (club.contact_email) {
-      await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/send-loi-email`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
-        },
-        body: JSON.stringify({ id: request.id }),
-      })
-    }
+    const message = club.contact_email
+      ? 'LOI request submitted successfully'
+      : 'LOI request submitted successfully. Note: reciprocal club email not provided — the Club will need to send the letter manually.'
 
     return new Response(
-      JSON.stringify({ request, message: 'LOI request submitted successfully' }),
+      JSON.stringify({ request, message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 201 }
     )
   } catch (error: any) {

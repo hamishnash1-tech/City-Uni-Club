@@ -64,7 +64,6 @@ export const LOIRequest: React.FC = () => {
         purpose: loiRequest.purpose || 'Business',
         special_requests: undefined,
       })
-      console.log('LOI request submitted successfully!')
       setSuccess(true)
       setTimeout(() => navigate('/reciprocal-clubs'), 2000)
     } catch (err: any) {
@@ -86,7 +85,7 @@ export const LOIRequest: React.FC = () => {
           </div>
           <h2 className="font-serif text-oxford-blue font-normal text-2xl mb-3">Request Submitted</h2>
           <p className="text-ink-mid text-sm leading-relaxed">
-            Your Letter of Introduction request has been submitted. You will receive confirmation within 3–5 business days.
+            Your Letter of Introduction request has been submitted and is awaiting approval. The Club Secretary will send the LoI on your behalf once approved.
           </p>
         </div>
       </div>
