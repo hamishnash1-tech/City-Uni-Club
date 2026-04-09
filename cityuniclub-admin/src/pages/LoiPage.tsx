@@ -50,6 +50,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import PendingIcon from '@mui/icons-material/Pending'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import EmailIcon from '@mui/icons-material/Email'
+import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 
 interface EmailEntry {
   id: string
@@ -573,15 +574,21 @@ export default function LoiPage() {
                       </Button>
                     )}
                     {(request.status === 'approved' || request.status === 'sent') && (
-                      <IconButton
-                        size="small"
-                        color="info"
-                        onClick={() => handleSendEmail(request)}
-                        disabled={sending}
-                        title="Send LOI email"
-                      >
-                        <SendIcon fontSize="small" />
-                      </IconButton>
+                      request.club_email ? (
+                        <IconButton
+                          size="small"
+                          color="info"
+                          onClick={() => handleSendEmail(request)}
+                          disabled={sending}
+                          title="Send LOI email"
+                        >
+                          <SendIcon fontSize="small" />
+                        </IconButton>
+                      ) : (
+                        <IconButton size="small" color="warning" title="No club email — must be sent manually" disabled>
+                          <WarningAmberIcon fontSize="small" />
+                        </IconButton>
+                      )
                     )}
                     <IconButton size="small" color="error" onClick={() => handleDelete(request.id)}>
                       <DeleteIcon fontSize="small" />
