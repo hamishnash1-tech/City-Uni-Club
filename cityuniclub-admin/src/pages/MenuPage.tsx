@@ -34,7 +34,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import { useAuth } from '../context/AuthContext'
 import { FUNCTIONS_URL } from '../services/supabase'
 
-type MenuType = 'breakfast' | 'lunch' | 'beverages' | 'canapes'
+type MenuType = 'breakfast' | 'lunch' | 'canapes'
 
 interface MenuItemData {
   id: string
@@ -51,7 +51,6 @@ interface MenuItemData {
 }
 
 const LUNCH_CATEGORIES = ['Starters', 'Mains', 'Puddings']
-const BEVERAGE_SECTIONS = ['Dessert Wine', 'Port', 'Spirits', 'Cocktails', 'Soft Drinks']
 
 const emptyForm = {
   menu: 'lunch' as MenuType,
@@ -244,7 +243,6 @@ export default function MenuPage() {
       <Tabs value={tab} onChange={(_, v) => setTab(v)} sx={{ mb: 3 }}>
         <Tab label="Breakfast" value="breakfast" />
         <Tab label="Lunch" value="lunch" />
-        <Tab label="Beverages" value="beverages" />
         <Tab label="Canapés" value="canapes" />
       </Tabs>
 
@@ -334,7 +332,6 @@ export default function MenuPage() {
               >
                 <MuiMenuItem value="breakfast">Breakfast</MuiMenuItem>
                 <MuiMenuItem value="lunch">Lunch</MuiMenuItem>
-                <MuiMenuItem value="beverages">Beverages</MuiMenuItem>
                 <MuiMenuItem value="canapes">Canapés</MuiMenuItem>
               </Select>
             </FormControl>
@@ -348,22 +345,9 @@ export default function MenuPage() {
               </FormControl>
             )}
 
-            {form.menu === 'beverages' && (
-              <TextField
-                label="Section"
-                value={form.section}
-                onChange={e => setForm(f => ({ ...f, section: e.target.value }))}
-                placeholder="e.g. Dessert Wine, Port"
-                helperText={`Suggestions: ${BEVERAGE_SECTIONS.join(', ')}`}
-              />
-            )}
-
             <TextField label="Name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required />
             <TextField label="Description" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} multiline rows={2} />
             <TextField label="Price" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="e.g. £24.50" />
-            {form.menu === 'beverages' && (
-              <TextField label="Formats" value={form.formats} onChange={e => setForm(f => ({ ...f, formats: e.target.value }))} placeholder="e.g. Bottle · Glass" />
-            )}
             <TextField label="Sort Order" type="number" value={form.sort_order} onChange={e => setForm(f => ({ ...f, sort_order: Number(e.target.value) }))} />
             <FormControlLabel
               control={<Switch checked={form.is_active} onChange={e => setForm(f => ({ ...f, is_active: e.target.checked }))} />}
