@@ -25,7 +25,7 @@ serve(async (req: Request) => {
     )
 
     const { data: { user }, error } = await db.auth.getUser(token)
-    if (error || !user || user.user_metadata?.role !== 'admin') {
+    if (error || !user || user.app_metadata?.role !== 'admin') {
       return new Response(JSON.stringify({ error: 'Forbidden' }), {
         status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })

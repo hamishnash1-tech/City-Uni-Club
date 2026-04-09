@@ -2,9 +2,13 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { getCorsHeaders } from '../_shared/cors.ts'
 
-serve(async (req) => {
+export interface Deps {
+  supabase?: any
+  supabaseAdmin?: any
+}
+
+export async function handler(req: Request, deps: Deps = {}): Promise<Response> {
   const corsHeaders = getCorsHeaders(req)
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -12,27 +16,24 @@ serve(async (req) => {
   try {
     const { email, password } = await req.json()
 
-    // Validate input
     if (!email || !password) {
       throw new Error('Email and password are required')
     }
 
-    // Create Supabase client with anon key (safe for auth operations)
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
-    
-    if (!supabaseAnonKey) {
+
+    if (!supabaseAnonKey && !deps.supabase) {
       throw new Error('SUPABASE_ANON_KEY not configured')
     }
 
-    const supabase = createClient(supabaseUrl, supabaseAnonKey)
-    const supabaseAdmin = createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '')
+    const supabase = deps.supabase ?? createClient(supabaseUrl, supabaseAnonKey)
+    const supabaseAdmin = deps.supabaseAdmin ?? createClient(supabaseUrl, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '')
 
     const forwardedFor = req.headers.get('x-forwarded-for')
     const ipAddress = forwardedFor ? forwardedFor.split(',')[0].trim() : null
     const userAgent = req.headers.get('user-agent')
 
-    // Sign in with Supabase Auth
     const { data: sessionData, error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password
@@ -46,8 +47,7 @@ serve(async (req) => {
       throw new Error('Invalid email or password')
     }
 
-    // Check if user has admin role
-    const userRole = sessionData.user.user_metadata?.role || 'user'
+    const userRole = sessionData.user.app_metadata?.role || 'user'
 
     if (userRole !== 'admin') {
       await supabase.auth.signOut()
@@ -94,4 +94,6 @@ serve(async (req) => {
       },
     )
   }
-})
+}
+
+serve((req) => handler(req))

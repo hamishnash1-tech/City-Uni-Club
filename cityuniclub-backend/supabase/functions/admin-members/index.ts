@@ -25,7 +25,7 @@ serve(async (req) => {
     const token = authHeader.replace('Bearer ', '')
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
 
-    if (authError || !user || user.user_metadata?.role !== 'admin') {
+    if (authError || !user || user.app_metadata?.role !== 'admin') {
       return new Response(JSON.stringify({ error: 'Admin access required' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403
       })

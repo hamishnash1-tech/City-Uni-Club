@@ -20,7 +20,7 @@ serve(async (req: Request) => {
 
     const token = authHeader.replace('Bearer ', '')
     const { data: { user }, error: authError } = await db.auth.getUser(token)
-    if (authError || !user || user.user_metadata?.role !== 'admin') return json({ error: 'Forbidden' }, 403)
+    if (authError || !user || user.app_metadata?.role !== 'admin') return json({ error: 'Forbidden' }, 403)
 
     const url = new URL(req.url)
     const id = url.searchParams.get('id')

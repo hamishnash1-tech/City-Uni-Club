@@ -55,6 +55,7 @@ interface EmailEntry {
   id: string
   sent_to: string
   cc: string | null
+  bcc: string | null
   sent_at: string
   resend_email_id: string | null
 }
@@ -305,11 +306,6 @@ export default function LoiPage() {
       return
     }
     setRequests(requests.map(r => r.id === id ? { ...r, status: 'approved' } : r))
-
-    const request = requests.find(r => r.id === id)
-    if (request) {
-      await handleSendEmail({ ...request, status: 'approved' })
-    }
   }
 
   const handleSendEmail = async (request: LoiRequest) => {
@@ -672,11 +668,16 @@ export default function LoiPage() {
                         })}
                       </Typography>
                       <Typography variant="body2">
-                        Sent to <strong>{entry.sent_to}</strong>
+                        To: <strong>{entry.sent_to}</strong>
                       </Typography>
                       {entry.cc && (
-                        <Typography variant="caption" color="textSecondary">
+                        <Typography variant="caption" display="block" color="textSecondary">
                           CC: {entry.cc}
+                        </Typography>
+                      )}
+                      {entry.bcc && (
+                        <Typography variant="caption" display="block" color="textSecondary">
+                          BCC: {entry.bcc}
                         </Typography>
                       )}
                     </Box>

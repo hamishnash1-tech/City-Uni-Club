@@ -135,19 +135,13 @@ serve(async (req) => {
     const isServiceRole = token === Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     if (!isServiceRole) {
       const { data: { user }, error: authError } = await supabase.auth.getUser(token)
-      if (authError || !user || user.user_metadata?.role !== 'admin') {
+      if (authError || !user || user.app_metadata?.role !== 'admin') {
         return new Response(JSON.stringify({ error: 'Admin access required' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 403
         })
       }
     }
-
-    // Email sending disabled
-    return new Response(JSON.stringify({ success: true, disabled: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200
-    })
 
     const { id } = await req.json()
     if (!id) throw new Error('Missing LOI request id')
@@ -165,6 +159,7 @@ serve(async (req) => {
     if (fetchError || !request) throw new Error('LOI request not found')
 
     const memberName = request.members?.full_name
+    const memberEmail = request.members?.email
     const clubName = request.reciprocal_clubs?.name
     const clubEmail = request.reciprocal_clubs?.contact_email
 
@@ -212,6 +207,7 @@ serve(async (req) => {
         from: FROM_EMAIL,
         to: [clubEmail],
         cc: [CLUB_EMAIL],
+        bcc: memberEmail ? [memberEmail] : undefined,
         subject: `Letter of Introduction — ${escapeHtml(memberName)}`,
         html: emailBody,
         attachments: [
@@ -230,6 +226,7 @@ serve(async (req) => {
       p_loi_request_id: id,
       p_sent_to: clubEmail,
       p_cc: CLUB_EMAIL,
+      p_bcc: memberEmail ?? null,
       p_resend_email_id: responseData.id ?? null,
     })
 

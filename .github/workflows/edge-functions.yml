@@ -1,0 +1,22 @@
+name: Edge Functions Tests
+
+on:
+  push:
+    branches: [main]
+    paths: [cityuniclub-backend/supabase/functions/**]
+  pull_request:
+    branches: [main]
+    paths: [cityuniclub-backend/supabase/functions/**]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cityuniclub-backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: npm test

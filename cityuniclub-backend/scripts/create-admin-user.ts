@@ -38,8 +38,10 @@ async function createAdminUser() {
       email: adminEmail,
       password: adminPassword,
       email_confirm: true,
-      user_metadata: {
+      app_metadata: {
         role: 'admin',
+      },
+      user_metadata: {
         full_name: 'Club Secretary',
       }
     })
@@ -57,10 +59,9 @@ async function createAdminUser() {
           const { error: updateError } = await supabase.auth.admin.updateUserById(
             existingUser.id,
             {
-              user_metadata: {
+              app_metadata: {
                 role: 'admin',
-                full_name: 'Club Secretary',
-              }
+              },
             }
           )
           

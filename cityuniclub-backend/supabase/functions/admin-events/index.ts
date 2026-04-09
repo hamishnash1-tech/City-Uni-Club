@@ -45,7 +45,7 @@ serve(async (req: Request) => {
     const token = authHeader.replace('Bearer ', '')
     const { data: { user }, error: authError } = await db.auth.getUser(token)
 
-    if (authError || !user || user.user_metadata?.role !== 'admin') {
+    if (authError || !user || user.app_metadata?.role !== 'admin') {
       return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 

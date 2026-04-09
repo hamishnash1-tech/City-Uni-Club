@@ -11,6 +11,7 @@
     "db:generate": "supabase gen types typescript --local > src/types/database.ts",
     "db:migrate": "supabase migration up",
     "db:seed": "tsx src/seed/index.ts",
+    "test": "deno task --config supabase/functions/deno.json test",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "vercel-build": "echo 'Vercel build complete'",
@@ -45,7 +46,7 @@
     "eslint": "^8.55.0",
     "prettier": "^3.1.0",
     "supabase": "^1.131.0",
-    "tsx": "^4.6.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.3.2",
     "vercel": "^50.25.1"
   }

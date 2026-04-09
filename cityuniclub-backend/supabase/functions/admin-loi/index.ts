@@ -26,7 +26,7 @@ serve(async (req) => {
     const token = authHeader.replace('Bearer ', '')
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
 
-    if (authError || !user || user.user_metadata?.role !== 'admin') {
+    if (authError || !user || user.app_metadata?.role !== 'admin') {
       return new Response(JSON.stringify({ error: 'Admin access required' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 403
@@ -53,7 +53,7 @@ serve(async (req) => {
 
         const { data: emails, error: emailsError } = await supabase
           .from('loi_emails_sent')
-          .select('id, sent_to, cc, sent_at, resend_email_id')
+          .select('id, sent_to, cc, bcc, sent_at, resend_email_id')
           .eq('loi_request_id', id)
           .order('sent_at', { ascending: true })
 
