@@ -85,13 +85,11 @@ export const BookingModal: React.FC<BookingModalProps> = ({ event, onClose, onSu
           <div className="bg-gray-50 p-4 rounded-lg">
             <h3 className="font-serif text-oxford-blue font-semibold mb-1">{event.title}</h3>
             <p className="text-sm text-secondary-text">
-              {new Date(event.event_date).toLocaleDateString('en-GB', { 
-                weekday: 'long', 
-                day: 'numeric', 
-                month: 'long' 
-              })}
+              {event.event_date
+                ? new Date(event.event_date).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+                : 'Date TBA'}
             </p>
-            {event.price_per_person > 0 && (
+            {event.price_per_person != null && event.price_per_person > 0 && (
               <p className="text-sm text-cambridge-blue font-semibold mt-2">
                 £{event.price_per_person} per person
               </p>
@@ -222,7 +220,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({ event, onClose, onSu
           </div>
 
           {/* Price Summary */}
-          {event.price_per_person > 0 && (
+          {event.price_per_person != null && event.price_per_person > 0 && (
             <div className="bg-cambridge-blue/20 p-4 rounded-lg">
               <div className="flex justify-between items-center">
                 <span className="text-oxford-blue font-medium">Total Price</span>

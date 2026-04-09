@@ -17,6 +17,7 @@ const TermsAndConditions = React.lazy(() => import('./pages/TermsAndConditions')
 const PrivacyPolicy    = React.lazy(() => import('./pages/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })))
 const MobileApp        = React.lazy(() => import('./pages/MobileApp').then(m => ({ default: m.MobileApp })))
 import { IconHome, IconDining, IconEvents, IconNews, IconClubs, IconUser } from './icons'
+import { OpeningHoursBanner } from './components/OpeningHoursBanner'
 
 const tabs = [
   { id: 'home',   label: 'Home',   path: '/home',             icon: <IconHome className="w-4 h-4" /> },
@@ -159,7 +160,8 @@ const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean }> = ({ 
   const dispatch = useDispatch()
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-oxford-blue/95 backdrop-blur-sm border-b border-white/10 px-4 py-2">
+    <div className="fixed top-0 left-0 right-0 z-50 bg-oxford-blue/95 backdrop-blur-sm border-b border-white/10">
+      <div className="px-4 py-2">
       <div className="flex items-center gap-4">
         {/* Mobile hamburger */}
         <button
@@ -217,6 +219,8 @@ const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean }> = ({ 
           )}
         </div>
       </div>
+      </div>
+      <OpeningHoursBanner />
     </div>
   )
 }
@@ -244,7 +248,7 @@ const App: React.FC = () => {
       <ScrollToTop />
       <TopBanner onMenuToggle={() => setMenuOpen(o => !o)} menuOpen={menuOpen} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <div className="pt-10 md:pt-12 min-h-screen flex flex-col">
+      <div className="pt-20 md:pt-20 min-h-screen flex flex-col">
         <div className="flex-1">
         <React.Suspense fallback={<div className="flex justify-center py-20"><div className="w-6 h-6 border-2 border-cambridge/30 border-t-cambridge rounded-full animate-spin" /></div>}>
           <Routes>

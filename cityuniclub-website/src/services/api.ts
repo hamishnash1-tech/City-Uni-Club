@@ -28,9 +28,8 @@ export interface Event {
   title: string
   description: string | null
   event_type: string
-  event_date: string
-  price_per_person: number
-  is_tba: boolean
+  event_date: string | null
+  price_per_person: number | null
 }
 
 export interface ClubNews {

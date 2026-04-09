@@ -32,7 +32,7 @@ export const Home: React.FC = () => {
         {/* Decorative gold rule */}
         <div className="w-48 my-3 gold-rule"></div>
 
-        <p className="label-caps text-cambridge-light mb-10 tracking-widest">42 Crutched Friars · London EC3N 2AP</p>
+        <p className="label-caps text-cambridge-light tracking-widest mb-10">42 Crutched Friars · London EC3N 2AP</p>
 
         {/* Info Cards */}
         <div className="grid md:grid-cols-3 gap-4 max-w-3xl w-full">

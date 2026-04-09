@@ -11,6 +11,7 @@ const DiningPage         = lazy(() => import('./pages/DiningPage'))
 const ReciprocalClubsPage = lazy(() => import('./pages/ReciprocalClubsPage'))
 const NewsPage           = lazy(() => import('./pages/NewsPage'))
 const LoiPage            = lazy(() => import('./pages/LoiPage'))
+const OpeningHoursPage   = lazy(() => import('./pages/OpeningHoursPage'))
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -44,6 +45,7 @@ function AppRoutes() {
         <Route path="clubs" element={<ReciprocalClubsPage />} />
         <Route path="news" element={<NewsPage />} />
         <Route path="loi" element={<LoiPage />} />
+        <Route path="opening-hours" element={<OpeningHoursPage />} />
       </Route>
     </Routes>
     </Suspense>

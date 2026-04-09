@@ -14,7 +14,11 @@ function formatEventDate(dateStr: string): string {
   // Parse as local time to avoid UTC midnight timezone shift
   const [year, month, day] = dateStr.split('-').map(Number)
   const d = new Date(year, month - 1, day)
-  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })
+  if (isNaN(d.getTime())) {
+    console.error(`[Events] Invalid date string: "${dateStr}"`)
+    return dateStr
+  }
+  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/London' })
 }
 
 function formatPrice(price: number): string {
@@ -80,9 +84,9 @@ export const Events: React.FC = () => {
         {!loading && !error && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => {
-              const displayDate = event.is_tba ? 'Date TBA' : formatEventDate(event.event_date)
-              const price = event.price_per_person > 0 ? formatPrice(event.price_per_person) : '£TBA'
-              const isTba = event.is_tba || event.price_per_person === 0
+              const displayDate = event.event_date ? formatEventDate(event.event_date) : 'Date TBA'
+              const price = event.price_per_person ? formatPrice(event.price_per_person) : '£TBA'
+              const isTba = !event.event_date || !event.price_per_person
 
               return (
                 <div key={event.id} className="club-card border border-cambridge/50 rounded-md overflow-hidden">
@@ -156,9 +160,9 @@ export const Events: React.FC = () => {
               <div className="border-l-2 border-cambridge/50 bg-ivory-warm p-4">
                 <h3 className="font-serif text-oxford-blue font-normal mb-1">{selectedEvent.title}</h3>
                 <p className="text-sm text-ink-mid">
-                  {selectedEvent.is_tba ? 'Date TBA' : formatEventDate(selectedEvent.event_date)}
+                  {selectedEvent.event_date ? formatEventDate(selectedEvent.event_date) : 'Date TBA'}
                 </p>
-                {selectedEvent.price_per_person > 0 && (
+                {selectedEvent.price_per_person != null && selectedEvent.price_per_person > 0 && (
                   <p className="font-serif text-oxford-blue mt-2">{formatPrice(selectedEvent.price_per_person)} per person</p>
                 )}
               </div>

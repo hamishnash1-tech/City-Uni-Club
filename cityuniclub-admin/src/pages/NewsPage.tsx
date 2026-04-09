@@ -51,10 +51,10 @@ interface NewsArticle {
 const initialNews: NewsArticle[] = [
   {
     id: 'n1',
-    title: 'Free Gin Friday - every Friday at lunch',
+    title: 'Gin Friday - every Friday at lunch',
     date: '2025-03-07',
     category: 'Special Offer',
-    content: 'Enjoy complimentary gin and tonic every Friday during lunch service. Choose from our selection of premium gins including Bombay Sapphire, Tanqueray, and our house gin. Available from 12:00 to 14:30 in the dining room.',
+    content: 'Enjoy the club gin every Friday during lunch service. Choose from our selection of premium gins including Bombay Sapphire, Tanqueray, and our house gin. Available from 12:00 to 14:30 in the dining room.',
     author: 'Club Secretary',
     created_at: '2025-03-01'
   },
