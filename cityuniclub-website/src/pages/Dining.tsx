@@ -701,28 +701,6 @@ export const Dining: React.FC = () => {
               </div>
             ))}
 
-            {beverageSections.length > 0 && (
-              <div className="club-card overflow-hidden">
-                <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
-                  <h2 className="font-serif text-ivory text-xl font-normal">Beverages</h2>
-                </div>
-                <div className="px-6 py-4 space-y-6">
-                  {beverageSections.map((section) => (
-                    <div key={section}>
-                      <p className="font-serif text-oxford-blue text-base font-semibold mb-3">{section}</p>
-                      <ul className="divide-y divide-cambridge/10">
-                        {beverageItems.filter(i => i.section === section).map((item) => (
-                          <li key={item.id} className="py-3 flex justify-between items-baseline gap-4">
-                            <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
-                            {item.formats && <span className="text-sm text-ink-mid whitespace-nowrap">{item.formats}</span>}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>
