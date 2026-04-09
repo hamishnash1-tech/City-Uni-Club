@@ -53,7 +53,6 @@ export default function AdminLayout() {
     { text: 'Reciprocal Clubs', icon: <BusinessIcon />, path: '/clubs' },
     { text: 'LOI Requests', icon: <MailIcon />, path: '/loi' },
     { text: 'News', icon: <NewReleasesIcon />, path: '/news' },
-    { text: 'Opening Hours', icon: <AccessTimeIcon />, path: '/opening-hours' }
   ]
 
   const drawer = (
