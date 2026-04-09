@@ -9,7 +9,7 @@ serve(async (req: Request) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  if (req.method !== 'POST') {
+  if (req.method !== 'POST' && req.method !== 'GET') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 405
@@ -41,6 +41,57 @@ serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'Invalid or expired session' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 401
+      })
+    }
+
+    if (req.method === 'GET') {
+      const url = new URL(req.url)
+      const id = url.searchParams.get('id')
+
+      if (id) {
+        const { data: request, error: reqError } = await supabase
+          .from('loi_requests')
+          .select('id, arrival_date, departure_date, purpose, status, created_at, updated_at, reciprocal_clubs (name, location, country)')
+          .eq('id', id)
+          .eq('member_id', session.member_id)
+          .single()
+
+        if (reqError || !request) {
+          return new Response(JSON.stringify({ error: 'Not found' }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 404
+          })
+        }
+
+        const { data: emails } = await supabase
+          .from('loi_emails_sent')
+          .select('sent_at')
+          .eq('loi_request_id', id)
+          .order('sent_at', { ascending: true })
+
+        return new Response(JSON.stringify({ request, emails: emails ?? [] }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200
+        })
+      }
+
+      const page = Math.max(1, parseInt(url.searchParams.get('page') ?? '1') || 1)
+      const limit = Math.min(50, Math.max(1, parseInt(url.searchParams.get('limit') ?? '10') || 10))
+      const from = (page - 1) * limit
+      const to = from + limit - 1
+
+      const { data, error, count } = await supabase
+        .from('loi_requests')
+        .select('id, arrival_date, departure_date, status, created_at, reciprocal_clubs (name, location, country)', { count: 'exact' })
+        .eq('member_id', session.member_id)
+        .order('created_at', { ascending: false })
+        .range(from, to)
+
+      if (error) throw error
+
+      return new Response(JSON.stringify({ requests: data, total: count ?? 0 }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200
       })
     }
 
