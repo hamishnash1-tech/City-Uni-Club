@@ -25,7 +25,6 @@ import NewReleasesIcon from '@mui/icons-material/NewReleases'
 import MailIcon from '@mui/icons-material/Mail'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import LogoutIcon from '@mui/icons-material/Logout'
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
 
 const drawerWidth = 240
 
