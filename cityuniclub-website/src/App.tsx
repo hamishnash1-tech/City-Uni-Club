@@ -160,12 +160,13 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
 }
 
 // Top Banner
-const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean; showAppBanner: boolean; onDismissBanner: () => void; newsBanner: ClubNews | null }> = ({ onMenuToggle, menuOpen, showAppBanner, onDismissBanner, newsBanner }) => {
+const TopBanner = React.forwardRef<HTMLDivElement, { onMenuToggle: () => void; menuOpen: boolean; showAppBanner: boolean; onDismissBanner: () => void; newsBanner: ClubNews | null }>(
+  ({ onMenuToggle, menuOpen, showAppBanner, onDismissBanner, newsBanner }, ref) => {
   const auth = useSelector((state: RootState) => state.auth)
   const dispatch = useDispatch()
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50">
+    <div ref={ref} className="fixed top-0 left-0 right-0 z-50">
       <div className="bg-oxford-blue/95 backdrop-blur-sm border-b border-white/10 px-4 py-2">
         <div className="flex items-center gap-4">
           {/* Mobile hamburger */}
@@ -251,12 +252,15 @@ const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean; showApp
       {newsBanner && (
         <div className="bg-oxford-blue border-b border-cambridge/40 px-4 py-3 text-center">
           <p className="font-cormorant text-base md:text-lg font-semibold text-ivory leading-snug">{newsBanner.title}</p>
-          <p className="font-cormorant text-sm md:text-base text-ivory/70 leading-snug mt-0.5">{newsBanner.content}</p>
+          <p className="font-cormorant text-sm md:text-base text-ivory/70 leading-snug mt-0.5">
+            {newsBanner.content}{' '}
+            <Link to={`/news/${newsBanner.id}`} className="text-cambridge underline underline-offset-2 hover:text-cambridge-light transition font-semibold whitespace-nowrap">Read more →</Link>
+          </p>
         </div>
       )}
     </div>
   )
-}
+})
 
 // Scroll to top on route change
 const ScrollToTop: React.FC = () => {
@@ -289,6 +293,8 @@ const App: React.FC = () => {
     return auth.isAuthenticated && sessionStorage.getItem('show_app_banner') === 'true'
   })
   const [newsBanner, setNewsBanner] = useState<ClubNews | null>(null)
+  const headerRef = useRef<HTMLDivElement>(null)
+  const [headerHeight, setHeaderHeight] = useState(40)
 
   useEffect(() => {
     if (auth.isAuthenticated && sessionStorage.getItem('show_app_banner') === 'true') {
@@ -300,14 +306,24 @@ const App: React.FC = () => {
     api.getBanner().then(b => setNewsBanner(b))
   }, [])
 
+  useEffect(() => {
+    const el = headerRef.current
+    if (!el) return
+    const observer = new ResizeObserver(() => setHeaderHeight(el.offsetHeight))
+    observer.observe(el)
+    setHeaderHeight(el.offsetHeight)
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <>
       <ScrollToTop />
-      <TopBanner onMenuToggle={() => setMenuOpen(o => !o)} menuOpen={menuOpen} showAppBanner={showBanner} onDismissBanner={() => { setShowBanner(false); sessionStorage.removeItem('show_app_banner') }} newsBanner={newsBanner} />
+      <TopBanner ref={headerRef} onMenuToggle={() => setMenuOpen(o => !o)} menuOpen={menuOpen} showAppBanner={showBanner} onDismissBanner={() => { setShowBanner(false); sessionStorage.removeItem('show_app_banner') }} newsBanner={newsBanner} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       <div
-        className="pt-10 md:pt-12 min-h-screen flex flex-col"
+        className="min-h-screen flex flex-col"
         style={{
+          paddingTop: headerHeight,
           backgroundImage: 'url(/assets/cuc-building.avif)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',

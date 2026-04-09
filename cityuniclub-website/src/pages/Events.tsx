@@ -56,9 +56,9 @@ export const Events: React.FC = () => {
         {!loading && !error && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => {
-              const displayDate = event.is_tba ? 'Date TBA' : formatEventDate(event.event_date)
-              const price = event.price_per_person > 0 ? formatPrice(event.price_per_person) : '£TBA'
-              const isTba = event.is_tba || event.price_per_person === 0
+              const displayDate = event.event_date ? formatEventDate(event.event_date) : 'Date TBA'
+              const price = event.price_per_person ? formatPrice(event.price_per_person) : '£TBA'
+              const isTba = !event.event_date || !event.price_per_person
 
               const booking = event.my_booking
               const bookingStatus = booking?.status
