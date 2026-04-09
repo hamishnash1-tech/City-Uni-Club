@@ -34,7 +34,7 @@ import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
 import { useAuth } from '../context/AuthContext'
 import { FUNCTIONS_URL } from '../services/supabase'
 
-type MenuType = 'breakfast' | 'lunch' | 'beverages'
+type MenuType = 'breakfast' | 'lunch' | 'beverages' | 'canapes'
 
 interface MenuItemData {
   id: string
@@ -245,6 +245,7 @@ export default function MenuPage() {
         <Tab label="Breakfast" value="breakfast" />
         <Tab label="Lunch" value="lunch" />
         <Tab label="Beverages" value="beverages" />
+        <Tab label="Canapés" value="canapes" />
       </Tabs>
 
       {loading ? (
@@ -334,6 +335,7 @@ export default function MenuPage() {
                 <MuiMenuItem value="breakfast">Breakfast</MuiMenuItem>
                 <MuiMenuItem value="lunch">Lunch</MuiMenuItem>
                 <MuiMenuItem value="beverages">Beverages</MuiMenuItem>
+                <MuiMenuItem value="canapes">Canapés</MuiMenuItem>
               </Select>
             </FormControl>
 
