@@ -23,6 +23,7 @@ export const Dining: React.FC = () => {
   const lunchPuddings = menuItems.filter(i => i.menu === 'lunch' && i.category === 'Puddings')
   const beverageItems = menuItems.filter(i => i.menu === 'beverages')
   const beverageSections = [...new Set(beverageItems.map(i => i.section))].filter(Boolean) as string[]
+  const canapesItems = menuItems.filter(i => i.menu === 'canapes')
 
   const [formData, setFormData] = useState({
     date: '',
@@ -38,7 +39,7 @@ export const Dining: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState<'book' | 'reservations' | 'menu'>('book')
-  const [activeMenuTab, setActiveMenuTab] = useState<'breakfast' | 'lunch'>('breakfast')
+  const [activeMenuTab, setActiveMenuTab] = useState<'breakfast' | 'lunch' | 'canapes'>('breakfast')
 
   const [reservations, setReservations] = useState<any[]>([])
   const [reservationsLoading, setReservationsLoading] = useState(false)
@@ -238,13 +239,14 @@ export const Dining: React.FC = () => {
                 className="absolute top-1 bottom-1 bg-cambridge/25 rounded-sm transition-all duration-300 ease-out"
                 style={{
                   left: '4px',
-                  width: 'calc(50% - 4px)',
-                  transform: activeMenuTab === 'breakfast' ? 'translateX(0)' : 'translateX(100%)',
+                  width: 'calc(33.33% - 4px)',
+                  transform: activeMenuTab === 'breakfast' ? 'translateX(0)' : activeMenuTab === 'lunch' ? 'translateX(100%)' : 'translateX(200%)',
                 }}
               />
               {([
                 { id: 'breakfast', label: 'Breakfast' },
                 { id: 'lunch', label: 'Lunch' },
+                { id: 'canapes', label: 'Canapés' },
               ] as const).map(tab => (
                 <button
                   key={tab.id}
@@ -437,6 +439,22 @@ export const Dining: React.FC = () => {
                 )
               })
             )}
+          </div>
+        ) : activeMenuTab === 'canapes' ? (
+          <div className="max-w-2xl mx-auto">
+            <div className="club-card overflow-hidden">
+              <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
+                <p className="label-caps text-cambridge-light/60 mb-1">Reception & Events</p>
+                <h2 className="font-serif text-ivory text-xl font-normal">Canapés</h2>
+              </div>
+              <ul className="divide-y divide-cambridge/10 px-6 py-2">
+                {canapesItems.map((item) => (
+                  <li key={item.id} className="py-3">
+                    <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         ) : activeTab === 'book' ? (
           <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl mx-auto">

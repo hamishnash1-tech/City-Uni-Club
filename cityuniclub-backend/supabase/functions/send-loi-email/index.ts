@@ -143,12 +143,6 @@ serve(async (req) => {
       }
     }
 
-    // Email sending disabled
-    return new Response(JSON.stringify({ success: true, disabled: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200
-    })
-
     const { id } = await req.json()
     if (!id) throw new Error('Missing LOI request id')
 

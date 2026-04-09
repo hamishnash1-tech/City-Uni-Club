@@ -59,6 +59,7 @@ struct DiningView: View {
                 HStack(spacing: 10) {
                     mealTypeButton("Breakfast")
                     mealTypeButton("Lunch")
+                    mealTypeButton("Canapés")
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
@@ -67,9 +68,11 @@ struct DiningView: View {
                     VStack(spacing: 20) {
                         // Menu Card
                         menuCard
-                        
-                        // Reservation Section
-                        reservationSection
+
+                        // Reservation Section (not shown for Canapés)
+                        if selectedMealType != "Canapés" {
+                            reservationSection
+                        }
                     }
                     .padding(.bottom, 100)
                 }
@@ -310,6 +313,22 @@ struct DiningView: View {
                     "Vegan/Vegetarian Full English",
                     "Smoked Salmon & Scrambled Eggs",
                     "Bacon or Sausage Sandwich"
+                ])
+            } else if selectedMealType == "Canapés" {
+                menuSection(title: "CANAPÉS", items: [
+                    "Rare Roast Beef mini-Yorkshire puddings horseradish cream",
+                    "Truffled mushroom and brie de Meaux",
+                    "Soy glazed belly of pork served on Chinese spoons",
+                    "Spinach and goats cheese frittata",
+                    "Honey glazed cocktail sausages",
+                    "Smoked Salmon Blinis",
+                    "Bloody Mary Prawn cocktail croustades",
+                    "Goats cheese and spinach tartlets",
+                    "Chicken yakatori skewers",
+                    "Mini cod's of fish and chips",
+                    "Rosary ash goats cheese tartlets",
+                    "Mini vegetable and meat spring rolls and samosas",
+                    "Chicken liver parfait on toasted rye bread"
                 ])
             } else {
                 // LUNCH MENU - No Prices
