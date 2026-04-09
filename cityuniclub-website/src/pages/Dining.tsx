@@ -21,8 +21,7 @@ export const Dining: React.FC = () => {
   const lunchStarters = menuItems.filter(i => i.menu === 'lunch' && i.category === 'Starters')
   const lunchMains = menuItems.filter(i => i.menu === 'lunch' && i.category === 'Mains')
   const lunchPuddings = menuItems.filter(i => i.menu === 'lunch' && i.category === 'Puddings')
-  const beverageItems = menuItems.filter(i => i.menu === 'beverages')
-  const beverageSections = [...new Set(beverageItems.map(i => i.section))].filter(Boolean) as string[]
+  const canapesItems = menuItems.filter(i => i.menu === 'canapes')
 
   const [formData, setFormData] = useState({
     date: '',
@@ -38,7 +37,7 @@ export const Dining: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState<'book' | 'reservations' | 'menu'>('book')
-  const [activeMenuTab, setActiveMenuTab] = useState<'breakfast' | 'lunch'>('breakfast')
+  const [activeMenuTab, setActiveMenuTab] = useState<'breakfast' | 'lunch' | 'canapes'>('breakfast')
 
   const [reservations, setReservations] = useState<any[]>([])
   const [reservationsLoading, setReservationsLoading] = useState(false)
@@ -234,28 +233,37 @@ export const Dining: React.FC = () => {
         {activeTab === 'menu' && (
           <div className="flex justify-center mb-6">
             <div className="relative flex border border-cambridge/20 rounded-sm p-1">
-              <div
-                className="absolute top-1 bottom-1 bg-cambridge/25 rounded-sm transition-all duration-300 ease-out"
-                style={{
-                  left: '4px',
-                  width: 'calc(50% - 4px)',
-                  transform: activeMenuTab === 'breakfast' ? 'translateX(0)' : 'translateX(100%)',
-                }}
-              />
-              {([
-                { id: 'breakfast', label: 'Breakfast' },
-                { id: 'lunch', label: 'Lunch' },
-              ] as const).map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveMenuTab(tab.id)}
-                  className={`relative py-1.5 px-6 text-sm transition-colors duration-200 rounded-sm ${
-                    activeMenuTab === tab.id ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
-                  }`}
-                >
-                  <span className="label-caps">{tab.label}</span>
-                </button>
-              ))}
+              {(() => {
+                const menuTabs = [
+                  { id: 'breakfast', label: 'Breakfast' },
+                  { id: 'lunch', label: 'Lunch' },
+                  { id: 'canapes', label: 'Canapés' },
+                ] as const
+                const activeIndex = menuTabs.findIndex(t => t.id === activeMenuTab)
+                return (
+                  <>
+                    <div
+                      className="absolute top-1 bottom-1 bg-cambridge/25 rounded-sm transition-all duration-300 ease-out"
+                      style={{
+                        left: '4px',
+                        width: `calc(${100 / menuTabs.length}% - ${8 / menuTabs.length}px)`,
+                        transform: `translateX(${activeIndex * 100}%)`,
+                      }}
+                    />
+                    {menuTabs.map(tab => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveMenuTab(tab.id)}
+                        className={`relative py-1.5 px-4 text-sm transition-colors duration-200 rounded-sm ${
+                          activeMenuTab === tab.id ? 'text-ivory' : 'text-ivory/50 hover:text-ivory'
+                        }`}
+                      >
+                        <span className="label-caps">{tab.label}</span>
+                      </button>
+                    ))}
+                  </>
+                )
+              })()}
             </div>
           </div>
         )}
@@ -656,7 +664,7 @@ export const Dining: React.FC = () => {
               </div>
             </div>
           </div>
-        ) : (
+        ) : activeMenuTab === 'lunch' ? (
           <div className="space-y-10">
             {[
               { label: 'First Course', title: 'Starters', items: lunchStarters },
@@ -682,29 +690,23 @@ export const Dining: React.FC = () => {
                 </ul>
               </div>
             ))}
-
-            {beverageSections.length > 0 && (
-              <div className="club-card overflow-hidden">
-                <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
-                  <h2 className="font-serif text-ivory text-xl font-normal">Beverages</h2>
-                </div>
-                <div className="px-6 py-4 space-y-6">
-                  {beverageSections.map((section) => (
-                    <div key={section}>
-                      <p className="font-serif text-oxford-blue text-base font-semibold mb-3">{section}</p>
-                      <ul className="divide-y divide-cambridge/10">
-                        {beverageItems.filter(i => i.section === section).map((item) => (
-                          <li key={item.id} className="py-3 flex justify-between items-baseline gap-4">
-                            <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
-                            {item.formats && <span className="text-sm text-ink-mid whitespace-nowrap">{item.formats}</span>}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
+          </div>
+        ) : (
+          <div className="max-w-2xl mx-auto">
+            <div className="club-card overflow-hidden">
+              <div className="bg-oxford-blue border-b border-cambridge/30 px-6 py-4">
+                <p className="label-caps text-cambridge-light/60 mb-1">Reception</p>
+                <h2 className="font-serif text-ivory text-xl font-normal">Canapés</h2>
               </div>
-            )}
+              <ul className="divide-y divide-cambridge/10 px-6 py-2">
+                {canapesItems.map((item) => (
+                  <li key={item.id} className="py-3">
+                    <p className="font-serif text-oxford-blue font-normal">{item.name}</p>
+                    {item.description && <p className="text-xs text-ink-mid mt-0.5">{item.description}</p>}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
       </div>

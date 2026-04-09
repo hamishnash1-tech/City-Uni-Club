@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { RootState } from './store'
 import { logout } from './slices/authSlice'
+import { api, type ClubNews } from './services/api'
 const Login            = React.lazy(() => import('./pages/Login').then(m => ({ default: m.Login })))
 const ForgotPassword   = React.lazy(() => import('./pages/ForgotPassword').then(m => ({ default: m.ForgotPassword })))
 const ResetPassword    = React.lazy(() => import('./pages/ResetPassword').then(m => ({ default: m.ResetPassword })))
@@ -159,7 +160,7 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
 }
 
 // Top Banner
-const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean; showAppBanner: boolean; onDismissBanner: () => void }> = ({ onMenuToggle, menuOpen, showAppBanner, onDismissBanner }) => {
+const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean; showAppBanner: boolean; onDismissBanner: () => void; newsBanner: ClubNews | null }> = ({ onMenuToggle, menuOpen, showAppBanner, onDismissBanner, newsBanner }) => {
   const auth = useSelector((state: RootState) => state.auth)
   const dispatch = useDispatch()
 
@@ -247,6 +248,12 @@ const TopBanner: React.FC<{ onMenuToggle: () => void; menuOpen: boolean; showApp
           </button>
         </div>
       </div>
+      {newsBanner && (
+        <div className="bg-oxford-blue border-b border-cambridge/40 px-4 py-3 text-center">
+          <p className="font-cormorant text-base md:text-lg font-semibold text-ivory leading-snug">{newsBanner.title}</p>
+          <p className="font-cormorant text-sm md:text-base text-ivory/70 leading-snug mt-0.5">{newsBanner.content}</p>
+        </div>
+      )}
     </div>
   )
 }
@@ -281,6 +288,7 @@ const App: React.FC = () => {
   const [showBanner, setShowBanner] = useState(() => {
     return auth.isAuthenticated && sessionStorage.getItem('show_app_banner') === 'true'
   })
+  const [newsBanner, setNewsBanner] = useState<ClubNews | null>(null)
 
   useEffect(() => {
     if (auth.isAuthenticated && sessionStorage.getItem('show_app_banner') === 'true') {
@@ -288,10 +296,14 @@ const App: React.FC = () => {
     }
   }, [auth.isAuthenticated])
 
+  useEffect(() => {
+    api.getBanner().then(b => setNewsBanner(b))
+  }, [])
+
   return (
     <>
       <ScrollToTop />
-      <TopBanner onMenuToggle={() => setMenuOpen(o => !o)} menuOpen={menuOpen} showAppBanner={showBanner} onDismissBanner={() => { setShowBanner(false); sessionStorage.removeItem('show_app_banner') }} />
+      <TopBanner onMenuToggle={() => setMenuOpen(o => !o)} menuOpen={menuOpen} showAppBanner={showBanner} onDismissBanner={() => { setShowBanner(false); sessionStorage.removeItem('show_app_banner') }} newsBanner={newsBanner} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
       <div
         className="pt-10 md:pt-12 min-h-screen flex flex-col"

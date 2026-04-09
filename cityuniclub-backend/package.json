@@ -13,6 +13,7 @@
     "db:seed": "tsx src/seed/index.ts",
     "lint": "eslint src --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
+    "test": "deno task --config supabase/functions/deno.json test",
     "vercel-build": "echo 'Vercel build complete'",
     "deploy": "./setup-and-deploy.sh",
     "deploy:prod": "vercel --prod",

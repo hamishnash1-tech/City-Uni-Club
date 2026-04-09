@@ -24,8 +24,10 @@ serve(async (req: Request) => {
       throw error
     }
 
+    const banner = news?.find((a: any) => a.is_banner) ?? null
+
     return new Response(
-      JSON.stringify({ news }),
+      JSON.stringify({ news, banner }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200
