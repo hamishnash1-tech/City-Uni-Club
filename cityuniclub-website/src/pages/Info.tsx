@@ -1,7 +1,31 @@
-import React from 'react'
+import React, { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
-export const Info: React.FC = () => (
+const GALLERY_PHOTOS = [
+  { src: '/assets/photos/maindining_HDR1.jpg', alt: 'Main Dining Room' },
+  { src: '/assets/photos/Lounge_HDR.jpg', alt: 'The Lounge' },
+  { src: '/assets/photos/5D_A4118.jpg', alt: 'Club Interior' },
+  { src: '/assets/photos/5D_A4026.jpg', alt: 'Club Interior' },
+  { src: '/assets/photos/5D_A4163-HDR.jpg', alt: 'Club Interior' },
+  { src: '/assets/photos/5D_A4101.jpg', alt: 'Club Interior' },
+  { src: '/assets/photos/5D_A4125.jpg', alt: 'Club Interior' },
+  { src: '/assets/photos/5D_A4084-HDR.jpg', alt: 'Club Interior' },
+  { src: '/assets/photos/5D_A4088.jpg', alt: 'Club Interior' },
+  { src: '/assets/photos/5D_A4066.jpg', alt: 'Club Interior' },
+  { src: '/assets/photos/5D_A4008.jpg', alt: 'Club Interior' },
+  { src: '/assets/photos/cuc.jpg', alt: 'City University Club' },
+]
+
+export const Info: React.FC = () => {
+  const [lightbox, setLightbox] = useState<number | null>(null)
+  const carouselRef = useRef<HTMLDivElement>(null)
+
+  const scroll = (dir: 'left' | 'right') => {
+    carouselRef.current?.scrollBy({ left: dir === 'left' ? -240 : 240, behavior: 'smooth' })
+  }
+
+  return (
+  <>
   <div className="pb-20">
 
     {/* Header */}
@@ -45,6 +69,31 @@ export const Info: React.FC = () => (
             The Club enjoys reciprocity with over 450 of the finest clubs throughout the world including
             many in London and other parts of the country.
           </p>
+        </div>
+      </section>
+
+      {/* Gallery */}
+      <section>
+        <p className="label-caps text-cambridge-muted mb-3">Gallery</p>
+        <div className="flex items-center gap-2">
+          <button onClick={() => scroll('left')} className="flex-none w-9 h-9 flex items-center justify-center rounded-sm bg-cambridge/15 border border-cambridge/40 text-ivory/70 text-xl hover:bg-cambridge/30 hover:text-ivory hover:border-cambridge transition" aria-label="Scroll left">‹</button>
+          <div ref={carouselRef} className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 flex-1" style={{ scrollbarWidth: 'none' }}>
+          {GALLERY_PHOTOS.map((photo, i) => (
+            <button
+              key={i}
+              onClick={() => setLightbox(i)}
+              className="flex-none w-56 aspect-[4/3] overflow-hidden rounded-sm snap-start focus:outline-none focus:ring-2 focus:ring-cambridge"
+            >
+              <img
+                src={photo.src}
+                alt={photo.alt}
+                loading="lazy"
+                className="w-full h-full object-cover transition duration-300 hover:scale-105"
+              />
+            </button>
+          ))}
+          </div>
+          <button onClick={() => scroll('right')} className="flex-none w-9 h-9 flex items-center justify-center rounded-sm bg-cambridge/15 border border-cambridge/40 text-ivory/70 text-xl hover:bg-cambridge/30 hover:text-ivory hover:border-cambridge transition" aria-label="Scroll right">›</button>
         </div>
       </section>
 
@@ -156,4 +205,45 @@ export const Info: React.FC = () => (
 
     </div>
   </div>
-)
+
+  {/* Lightbox */}
+  {lightbox !== null && (
+    <div
+      className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+      onClick={() => setLightbox(null)}
+    >
+      <button
+        className="absolute top-4 right-4 text-white/70 hover:text-white text-3xl leading-none"
+        onClick={() => setLightbox(null)}
+        aria-label="Close"
+      >
+        ×
+      </button>
+      <button
+        className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white text-3xl leading-none px-2"
+        onClick={e => { e.stopPropagation(); setLightbox((lightbox - 1 + GALLERY_PHOTOS.length) % GALLERY_PHOTOS.length) }}
+        aria-label="Previous"
+      >
+        ‹
+      </button>
+      <img
+        src={GALLERY_PHOTOS[lightbox].src}
+        alt={GALLERY_PHOTOS[lightbox].alt}
+        className="max-h-[85vh] max-w-full object-contain rounded-sm"
+        onClick={e => e.stopPropagation()}
+      />
+      <button
+        className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white text-3xl leading-none px-2"
+        onClick={e => { e.stopPropagation(); setLightbox((lightbox + 1) % GALLERY_PHOTOS.length) }}
+        aria-label="Next"
+      >
+        ›
+      </button>
+      <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 text-sm">
+        {GALLERY_PHOTOS[lightbox].alt} · {lightbox + 1} / {GALLERY_PHOTOS.length}
+      </p>
+    </div>
+  )}
+  </>
+  )
+}
