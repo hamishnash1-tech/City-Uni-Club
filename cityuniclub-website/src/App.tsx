@@ -106,7 +106,7 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
   useEffect(() => { onClose() }, [pathname])
 
   return (
-    <div className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}>
+    <div className={`fixed inset-0 z-[60] md:hidden transition-all duration-300 ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}>
       <div
         className={`absolute inset-0 bg-navy-deep/80 backdrop-blur-sm transition-opacity duration-300 ${open ? 'opacity-100' : 'opacity-0'}`}
         onClick={onClose}
@@ -160,8 +160,8 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
 }
 
 // Top Banner
-const TopBanner = React.forwardRef<HTMLDivElement, { onMenuToggle: () => void; menuOpen: boolean; showAppBanner: boolean; onDismissBanner: () => void; newsBanner: ClubNews | null }>(
-  ({ onMenuToggle, menuOpen, showAppBanner, onDismissBanner, newsBanner }, ref) => {
+const TopBanner = React.forwardRef<HTMLDivElement, { showAppBanner: boolean; onDismissBanner: () => void; newsBanner: ClubNews | null }>(
+  ({ showAppBanner, onDismissBanner, newsBanner }, ref) => {
   const auth = useSelector((state: RootState) => state.auth)
   const dispatch = useDispatch()
 
@@ -169,34 +169,8 @@ const TopBanner = React.forwardRef<HTMLDivElement, { onMenuToggle: () => void; m
     <div ref={ref} className="fixed top-0 left-0 right-0 z-50">
       <div className="bg-oxford-blue/95 backdrop-blur-sm border-b border-white/10 px-4 py-2">
         <div className="flex items-center gap-4">
-          {/* Mobile hamburger */}
-          <button
-            onClick={onMenuToggle}
-            className="md:hidden text-ivory/70 hover:text-ivory transition p-1 flex-shrink-0"
-            aria-label="Menu"
-          >
-            <div style={{ position: 'relative', width: '20px', height: '20px' }}>
-              {[
-                { closed: 'translateY(-5.5px)', opened: 'rotate(45deg)' },
-                { closed: 'translateY(0)',       opened: null },
-                { closed: 'translateY(5.5px)',  opened: 'rotate(-45deg)' },
-              ].map((bar, i) => (
-                <span key={i} style={{
-                  position: 'absolute',
-                  left: '1px',
-                  top: 'calc(50% - 0.75px)',
-                  width: '18px',
-                  height: '1.5px',
-                  borderRadius: '1px',
-                  background: 'currentColor',
-                  transformOrigin: 'center',
-                  ...(bar.opened
-                    ? { transform: menuOpen ? bar.opened : bar.closed, transition: 'transform 0.3s ease-out' }
-                    : { opacity: menuOpen ? 0 : 1, transition: 'opacity 0.15s ease-out' }),
-                }} />
-              ))}
-            </div>
-          </button>
+          {/* Mobile hamburger placeholder — keeps layout; real button rendered at z-[70] */}
+          <div className="md:hidden w-[28px] flex-shrink-0" />
 
           {/* Logo + name */}
           <Link to="/home" className="flex items-center gap-2 flex-shrink-0">
@@ -318,8 +292,36 @@ const App: React.FC = () => {
   return (
     <>
       <ScrollToTop />
-      <TopBanner ref={headerRef} onMenuToggle={() => setMenuOpen(o => !o)} menuOpen={menuOpen} showAppBanner={showBanner} onDismissBanner={() => { setShowBanner(false); sessionStorage.removeItem('show_app_banner') }} newsBanner={newsBanner} />
+      <TopBanner ref={headerRef} showAppBanner={showBanner} onDismissBanner={() => { setShowBanner(false); sessionStorage.removeItem('show_app_banner') }} newsBanner={newsBanner} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
+      {/* Hamburger — above both banner (z-50) and menu overlay (z-[60]) */}
+      <button
+        onClick={() => setMenuOpen(o => !o)}
+        className="md:hidden fixed top-[9px] left-4 z-[70] text-ivory/70 hover:text-ivory transition p-1"
+        aria-label="Menu"
+      >
+        <div style={{ position: 'relative', width: '20px', height: '20px' }}>
+          {[
+            { closed: 'translateY(-5.5px)', opened: 'rotate(45deg)' },
+            { closed: 'translateY(0)',       opened: null },
+            { closed: 'translateY(5.5px)',  opened: 'rotate(-45deg)' },
+          ].map((bar, i) => (
+            <span key={i} style={{
+              position: 'absolute',
+              left: '1px',
+              top: 'calc(50% - 0.75px)',
+              width: '18px',
+              height: '1.5px',
+              borderRadius: '1px',
+              background: 'currentColor',
+              transformOrigin: 'center',
+              ...(bar.opened
+                ? { transform: menuOpen ? bar.opened : bar.closed, transition: 'transform 0.3s ease-out' }
+                : { opacity: menuOpen ? 0 : 1, transition: 'opacity 0.15s ease-out' }),
+            }} />
+          ))}
+        </div>
+      </button>
       <div
         className="min-h-screen flex flex-col"
         style={{
