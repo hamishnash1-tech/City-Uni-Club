@@ -203,6 +203,64 @@ export const Info: React.FC = () => {
         </div>
       </section>
 
+      {/* Venue Hire */}
+      <section>
+        <p className="label-caps text-cambridge-muted mb-3">Venue Hire</p>
+        <div className="space-y-4">
+
+          <div className="club-card p-5 text-sm text-ink space-y-5">
+            <div className="space-y-3">
+              <p className="font-medium text-ink">Suitable for:</p>
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-ink-mid">
+                {['Conferences', 'Meetings & workshops', 'Networking', 'Presentations', 'Private dining', 'Team away days'].map(item => (
+                  <li key={item} className="flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-cambridge-muted flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="border-t border-cambridge/10 pt-5 space-y-3">
+              <p className="font-medium text-ink">Facilities:</p>
+              <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-ink-mid">
+                {['Air conditioning', 'Breakout spaces', 'Close to transport links', 'Disabled access', 'Natural light', 'TV/projector', 'Whiteboards/flipcharts'].map(item => (
+                  <li key={item} className="flex items-center gap-2">
+                    <span className="w-1 h-1 rounded-full bg-cambridge-muted flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="border-t border-cambridge/10 pt-5 space-y-3">
+              <p className="font-medium text-ink">Capacities:</p>
+              <div className="divide-y divide-cambridge/10">
+                {[
+                  { layout: 'Boardroom', capacity: 20 },
+                  { layout: 'Cabaret', capacity: 30 },
+                  { layout: 'Classroom', capacity: 30 },
+                  { layout: 'Standing', capacity: 150 },
+                  { layout: 'Theatre', capacity: 34 },
+                  { layout: 'U-shaped', capacity: 30 },
+                ].map(({ layout, capacity }) => (
+                  <div key={layout} className="flex justify-between py-2 first:pt-0 last:pb-0">
+                    <span className="text-ink-mid">{layout}</span>
+                    <span className="text-ink">{capacity}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="border-t border-cambridge/10 pt-5 text-center">
+              <Link to="/venue-hire" className="inline-block label-caps px-8 py-3 bg-oxford-blue text-ivory font-semibold rounded-sm hover:bg-oxford-blue/80 transition">
+                Make a Venue Hire Enquiry
+              </Link>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
     </div>
   </div>
 
