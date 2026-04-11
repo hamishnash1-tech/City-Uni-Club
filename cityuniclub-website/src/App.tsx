@@ -21,6 +21,7 @@ const TermsAndConditions = React.lazy(() => import('./pages/TermsAndConditions')
 const PrivacyPolicy    = React.lazy(() => import('./pages/PrivacyPolicy').then(m => ({ default: m.PrivacyPolicy })))
 const MobileApp        = React.lazy(() => import('./pages/MobileApp').then(m => ({ default: m.MobileApp })))
 const Info             = React.lazy(() => import('./pages/Info').then(m => ({ default: m.Info })))
+const VenueHire        = React.lazy(() => import('./pages/VenueHire').then(m => ({ default: m.VenueHire })))
 import { IconUser } from './icons'
 
 const tabs = [
@@ -356,6 +357,7 @@ const App: React.FC = () => {
             <Route path="/about" element={<Navigate to="/info" replace />} />
             <Route path="/contact" element={<Navigate to="/info" replace />} />
             <Route path="/join" element={<Join />} />
+            <Route path="/venue-hire" element={<VenueHire />} />
           </Routes>
         </React.Suspense>
         </div>
@@ -371,6 +373,8 @@ const App: React.FC = () => {
             <Link to="/mobile-app" className="hover:text-cambridge transition">Mobile App</Link>
             <span>·</span>
             <Link to="/info" className="hover:text-cambridge transition">Info</Link>
+            <span>·</span>
+            <Link to="/venue-hire" className="hover:text-cambridge transition">Venue Hire</Link>
           </div>
         </footer>
       </div>
