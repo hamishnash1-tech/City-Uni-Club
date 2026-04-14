@@ -1,9 +1,15 @@
 import { useState, useMemo, useEffect, useCallback, type ReactElement } from 'react'
 import membersData from '../data/members.json'
+import clubsData from '../data/reciprocal-clubs.json'
 import { useAuth } from '../context/AuthContext'
 import { FUNCTIONS_URL } from '../services/supabase'
 
 const ADMIN_LOI_URL = `${FUNCTIONS_URL}/admin-loi`
+const clubEmailByName: Record<string, string> = Object.fromEntries(
+  (clubsData as { name: string; email: string }[])
+    .filter(c => c.email)
+    .map(c => [c.name.toLowerCase(), c.email])
+)
 import {
   Box,
   Container,
@@ -108,6 +114,8 @@ export default function LoiPage() {
   const [detailRequest, setDetailRequest] = useState<LoiRequest | null>(null)
   const [emailHistory, setEmailHistory] = useState<EmailEntry[]>([])
   const [loadingDetail, setLoadingDetail] = useState(false)
+  const [manualEmailRequest, setManualEmailRequest] = useState<LoiRequest | null>(null)
+  const [manualEmail, setManualEmail] = useState('')
 
   const getAuthHeaders = useCallback(() => ({
     'Content-Type': 'application/json',
@@ -129,7 +137,7 @@ export default function LoiPage() {
         club_name: r.reciprocal_clubs?.name || 'Unknown',
         club_location: r.reciprocal_clubs?.location || '',
         club_region: r.reciprocal_clubs?.region || '',
-        club_email: r.reciprocal_clubs?.contact_email || '',
+        club_email: r.reciprocal_clubs?.contact_email || clubEmailByName[(r.reciprocal_clubs?.name || '').toLowerCase()] || '',
         arrival_date: r.arrival_date,
         departure_date: r.departure_date,
         purpose: r.purpose,
@@ -306,23 +314,22 @@ export default function LoiPage() {
       return
     }
     setRequests(requests.map(r => r.id === id ? { ...r, status: 'approved' } : r))
-
-    const request = requests.find(r => r.id === id)
-    if (request) {
-      await handleSendEmail({ ...request, status: 'approved' })
-    }
   }
 
-  const handleSendEmail = async (request: LoiRequest) => {
+  const handleSendEmail = async (request: LoiRequest, overrideEmail?: string) => {
     setError('')
     setSuccess('')
     setSending(true)
 
     try {
+      const body: Record<string, string> = { id: request.id }
+      const emailToUse = overrideEmail || request.club_email
+      if (emailToUse) body.email = emailToUse
+
       const response = await fetch(`${FUNCTIONS_URL}/send-loi-email`, {
         method: 'POST',
         headers: getAuthHeaders(),
-        body: JSON.stringify({ id: request.id })
+        body: JSON.stringify(body)
       })
 
       const responseData = await response.json()
@@ -585,7 +592,12 @@ export default function LoiPage() {
                           <SendIcon fontSize="small" />
                         </IconButton>
                       ) : (
-                        <IconButton size="small" color="warning" title="No club email — must be sent manually" disabled>
+                        <IconButton
+                          size="small"
+                          color="warning"
+                          title="No club email on file — click to enter and send"
+                          onClick={() => { setManualEmailRequest(request); setManualEmail('') }}
+                        >
                           <WarningAmberIcon fontSize="small" />
                         </IconButton>
                       )
@@ -696,6 +708,40 @@ export default function LoiPage() {
             </DialogActions>
           </>
         )}
+      </Dialog>
+
+      {/* Manual Email Dialog */}
+      <Dialog open={!!manualEmailRequest} onClose={() => setManualEmailRequest(null)} maxWidth="xs" fullWidth>
+        <DialogTitle>Send LOI — Enter Club Email</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
+            {manualEmailRequest?.club_name} has no email on file. Enter the club's email address to send the LOI.
+          </Typography>
+          <TextField
+            fullWidth
+            label="Club Email Address"
+            type="email"
+            value={manualEmail}
+            onChange={(e) => setManualEmail(e.target.value)}
+            placeholder="secretary@club.com"
+            autoFocus
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setManualEmailRequest(null)}>Cancel</Button>
+          <Button
+            variant="contained"
+            disabled={!manualEmail || sending}
+            onClick={async () => {
+              if (manualEmailRequest) {
+                await handleSendEmail(manualEmailRequest, manualEmail)
+                setManualEmailRequest(null)
+              }
+            }}
+          >
+            {sending ? 'Sending...' : 'Send'}
+          </Button>
+        </DialogActions>
       </Dialog>
 
       {/* New LOI Request Dialog */}

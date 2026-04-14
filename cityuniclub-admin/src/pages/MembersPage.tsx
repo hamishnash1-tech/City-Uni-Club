@@ -27,12 +27,13 @@ import {
   FormControlLabel,
   Checkbox,
   Switch,
-  Tooltip,
 } from '@mui/material'
 import SearchIcon from '@mui/icons-material/Search'
 import MailIcon from '@mui/icons-material/Mail'
 import PhoneIcon from '@mui/icons-material/Phone'
 import AddIcon from '@mui/icons-material/Add'
+import EditIcon from '@mui/icons-material/Edit'
+import IconButton from '@mui/material/IconButton'
 import { FUNCTIONS_URL } from '../services/supabase'
 import { useAuth } from '../context/AuthContext'
 
@@ -77,11 +78,15 @@ export default function MembersPage() {
   const [page, setPage] = useState(0)
   const [rowsPerPage, setRowsPerPage] = useState(25)
 
-  const [togglingId, setTogglingId] = useState<string | null>(null)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [form, setForm] = useState(emptyForm)
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
+
+  const [editMember, setEditMember] = useState<Member | null>(null)
+  const [editForm, setEditForm] = useState({ member_since: '', membership_type: '', email: '', phone_number: '', is_active: true })
+  const [editSubmitting, setEditSubmitting] = useState(false)
+  const [editError, setEditError] = useState<string | null>(null)
 
   const authHeaders = {
     'Content-Type': 'application/json',
@@ -117,20 +122,44 @@ export default function MembersPage() {
     setPage(0)
   }
 
-  const handleToggleActive = async (id: string, is_active: boolean) => {
-    setTogglingId(id)
+
+  const handleOpenEdit = (member: Member) => {
+    setEditMember(member)
+    setEditForm({
+      member_since: member.member_since ? member.member_since.split('T')[0] : '',
+      membership_type: member.membership_type || '',
+      email: member.email || '',
+      phone_number: member.phone_number || '',
+      is_active: member.is_active,
+    })
+    setEditError(null)
+  }
+
+  const handleEditSubmit = async () => {
+    if (!editMember) return
+    setEditSubmitting(true)
+    setEditError(null)
     try {
       const res = await fetch(`${FUNCTIONS_URL}/admin-members`, {
         method: 'PATCH',
         headers: authHeaders,
-        body: JSON.stringify({ id, is_active }),
+        body: JSON.stringify({
+          id: editMember.id,
+          member_since: editForm.member_since || null,
+          membership_type: editForm.membership_type || null,
+          email: editForm.email,
+          phone_number: editForm.phone_number || null,
+          is_active: editForm.is_active,
+        }),
       })
-      if (!res.ok) throw new Error('Failed to update member')
-      setMembers(prev => prev.map(m => m.id === id ? { ...m, is_active } : m))
+      const json = await res.json()
+      if (!res.ok) throw new Error(json.error || 'Failed to update member')
+      setMembers(prev => prev.map(m => m.id === editMember.id ? { ...m, ...json.member } : m))
+      setEditMember(null)
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : 'Unknown error')
+      setEditError(e instanceof Error ? e.message : 'Unknown error')
     } finally {
-      setTogglingId(null)
+      setEditSubmitting(false)
     }
   }
 
@@ -210,18 +239,19 @@ export default function MembersPage() {
               <TableCell>Phone</TableCell>
               <TableCell>Member Since</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={8} align="center" sx={{ py: 4 }}>
+                <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
                   <CircularProgress size={32} />
                 </TableCell>
               </TableRow>
             ) : paginatedMembers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} align="center">
+                <TableCell colSpan={9} align="center">
                   <Typography color="textSecondary" sx={{ py: 4 }}>
                     {searchTerm ? 'No members found matching your search' : 'No members found'}
                   </Typography>
@@ -270,15 +300,16 @@ export default function MembersPage() {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Tooltip title={member.is_active ? 'Disable login' : 'Enable login'}>
-                      <Switch
-                        checked={member.is_active}
-                        onChange={(e) => handleToggleActive(member.id, e.target.checked)}
-                        disabled={togglingId === member.id}
-                        size="small"
-                        color="success"
-                      />
-                    </Tooltip>
+                    <Chip
+                      label={member.is_active ? 'Active' : 'Inactive'}
+                      size="small"
+                      color={member.is_active ? 'success' : 'default'}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <IconButton size="small" onClick={() => handleOpenEdit(member)} title="Edit member">
+                      <EditIcon fontSize="small" />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))
@@ -299,6 +330,80 @@ export default function MembersPage() {
           `${from}-${to} of ${count !== -1 ? count : `more than ${to}`}`
         }
       />
+
+      {/* Edit Member Dialog */}
+      <Dialog open={!!editMember} onClose={() => setEditMember(null)} maxWidth="xs" fullWidth>
+        <DialogTitle>Edit Member — {editMember?.full_name}</DialogTitle>
+        <DialogContent>
+          {editError && <Alert severity="error" sx={{ mb: 2, mt: 1 }}>{editError}</Alert>}
+          <Grid container spacing={2} sx={{ mt: 0.5 }}>
+            <Grid size={12}>
+              <TextField
+                label="Email"
+                type="email"
+                value={editForm.email}
+                onChange={e => setEditForm(prev => ({ ...prev, email: e.target.value }))}
+                fullWidth
+                required
+              />
+            </Grid>
+            <Grid size={12}>
+              <TextField
+                label="Phone Number"
+                value={editForm.phone_number}
+                onChange={e => setEditForm(prev => ({ ...prev, phone_number: e.target.value }))}
+                fullWidth
+                placeholder="+44 7700 900000"
+              />
+            </Grid>
+            <Grid size={12}>
+              <TextField
+                select
+                label="Membership Type"
+                value={editForm.membership_type}
+                onChange={e => setEditForm(prev => ({ ...prev, membership_type: e.target.value }))}
+                fullWidth
+              >
+                {MEMBERSHIP_TYPES.map(t => (
+                  <MenuItem key={t} value={t}>{t}</MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid size={12}>
+              <TextField
+                label="Member Since"
+                type="date"
+                value={editForm.member_since}
+                onChange={e => setEditForm(prev => ({ ...prev, member_since: e.target.value }))}
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid size={12}>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={editForm.is_active}
+                    onChange={e => setEditForm(prev => ({ ...prev, is_active: e.target.checked }))}
+                    color="success"
+                  />
+                }
+                label={editForm.is_active ? 'Login enabled' : 'Login disabled'}
+              />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditMember(null)}>Cancel</Button>
+          <Button
+            variant="contained"
+            onClick={handleEditSubmit}
+            disabled={editSubmitting || !editForm.email}
+          >
+            {editSubmitting ? 'Saving...' : 'Save'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Add Member Dialog */}
       <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>

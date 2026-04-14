@@ -155,7 +155,7 @@ struct MoreView: View {
                         .foregroundColor(.oxfordBlue)
                         .frame(width: 20)
 
-                    Text("020 7488 1770")
+                    Text("0207 167 6682")
                         .font(.system(size: 14))
                         .foregroundColor(.darkText)
                 }
