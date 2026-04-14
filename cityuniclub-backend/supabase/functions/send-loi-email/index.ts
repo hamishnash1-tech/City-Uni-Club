@@ -143,13 +143,7 @@ serve(async (req) => {
       }
     }
 
-    // Email sending disabled
-    return new Response(JSON.stringify({ success: true, disabled: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200
-    })
-
-    const { id } = await req.json()
+    const { id, email: emailOverride } = await req.json()
     if (!id) throw new Error('Missing LOI request id')
 
     const { data: request, error: fetchError } = await supabase
@@ -166,9 +160,9 @@ serve(async (req) => {
 
     const memberName = request.members?.full_name
     const clubName = request.reciprocal_clubs?.name
-    const clubEmail = request.reciprocal_clubs?.contact_email
+    const clubEmail = request.reciprocal_clubs?.contact_email || emailOverride || null
 
-    if (!clubEmail) throw new Error('Club has no contact email configured')
+    if (!clubEmail) throw new Error('Club has no contact email — provide one to send manually')
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
     if (!resendApiKey) throw new Error('RESEND_API_KEY not configured')

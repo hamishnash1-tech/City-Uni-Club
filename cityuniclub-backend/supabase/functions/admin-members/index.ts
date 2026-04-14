@@ -80,15 +80,28 @@ serve(async (req) => {
     }
 
     if (req.method === 'PATCH') {
-      const { id, is_active } = await req.json()
-      if (!id || is_active === undefined) {
-        return new Response(JSON.stringify({ error: 'Missing id or is_active' }), {
+      const { id, is_active, member_since, membership_type, email, phone_number } = await req.json()
+      if (!id) {
+        return new Response(JSON.stringify({ error: 'Missing id' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400
         })
       }
-      const { error } = await supabase.from('members').update({ is_active }).eq('id', id)
+      const update: Record<string, unknown> = {}
+      if (is_active !== undefined) update.is_active = is_active
+      if (member_since !== undefined) update.member_since = member_since
+      if (membership_type !== undefined) update.membership_type = membership_type
+      if (email !== undefined) update.email = email
+      if (phone_number !== undefined) update.phone_number = phone_number
+      if (Object.keys(update).length === 0) {
+        return new Response(JSON.stringify({ error: 'No fields to update' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400
+        })
+      }
+      const { data, error } = await supabase.from('members').update(update).eq('id', id)
+        .select('id, full_name, email, phone_number, membership_number, membership_type, is_active, member_since, member_until, created_at')
+        .single()
       if (error) throw error
-      return new Response(JSON.stringify({ success: true }), {
+      return new Response(JSON.stringify({ member: data }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       })
     }

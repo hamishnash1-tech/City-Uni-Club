@@ -10,9 +10,8 @@ export const Home: React.FC = () => {
   return (
     <div
       className="relative bg-cover bg-center bg-no-repeat min-h-[calc(100vh-2.5rem)]"
-      style={{ backgroundImage: `url('/assets/cuc-building.avif')` }}
+      style={{ backgroundImage: `url('/assets/cuc-building.avif')`, backgroundAttachment: 'fixed' }}
     >
-      <div className="absolute inset-0 bg-navy-gradient" style={{ opacity: 0.62 }}></div>
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-2.5rem)] px-4 py-10">
@@ -25,17 +24,19 @@ export const Home: React.FC = () => {
         </div>
 
         {/* Club Name */}
-        <h1 className="font-cormorant text-5xl font-light text-ivory tracking-wide uppercase text-center mb-1">
-          City University Club
-        </h1>
+        <div className="bg-black/30 backdrop-blur-sm rounded-xl px-10 py-6 flex flex-col items-center mb-10">
+          <h1 className="font-cormorant text-5xl font-light text-ivory tracking-wide uppercase text-center mb-1">
+            City University Club
+          </h1>
 
-        {/* Decorative gold rule */}
-        <div className="w-48 my-3 gold-rule"></div>
+          {/* Decorative gold rule */}
+          <div className="w-48 my-3 gold-rule"></div>
 
-        <p className="label-caps text-cambridge-light mb-3 tracking-widest">42 Crutched Friars · London EC3N 2AP</p>
-        <div className="flex flex-col items-center gap-1 mb-10 text-sm text-ivory/60">
-          <a href="tel:+442071676682" className="hover:text-cambridge transition">0207 167 6682</a>
-          <a href="mailto:secretary@cityuniversityclub.co.uk" className="hover:text-cambridge transition">secretary@cityuniversityclub.co.uk</a>
+          <p className="label-caps text-cambridge-light mb-3 tracking-widest">42 Crutched Friars · London EC3N 2AP</p>
+          <div className="flex flex-col items-center gap-1 text-sm text-ivory/60">
+            <a href="tel:+442071676682" className="hover:text-cambridge transition">0207 167 6682</a>
+            <a href="mailto:secretary@cityuniversityclub.co.uk" className="hover:text-cambridge transition">secretary@cityuniversityclub.co.uk</a>
+          </div>
         </div>
 
         {/* Info Cards */}
@@ -69,7 +70,7 @@ export const Home: React.FC = () => {
         </div>
 
         {/* Member CTA */}
-        <div className="mt-10 flex flex-col items-center gap-3">
+        <div className="mt-10 flex flex-col items-center gap-3 bg-black/30 backdrop-blur-sm rounded-xl px-8 py-4">
           {isAuthenticated ? (
             <a href="/reciprocal-clubs" className="btn-outline">
               Member Area
