@@ -43,7 +43,7 @@ serve(async (req) => {
           .from('loi_requests')
           .select(`
             id, member_id, club_id, arrival_date, departure_date, purpose, status, created_at,
-            members (full_name, email),
+            members (first_name, middle_name, last_name, email),
             reciprocal_clubs (name, location, country, region, contact_email)
           `)
           .eq('id', id)
@@ -69,7 +69,7 @@ serve(async (req) => {
         .from('loi_requests')
         .select(`
           id, member_id, club_id, arrival_date, departure_date, purpose, status, created_at,
-          members (full_name, email),
+          members (first_name, middle_name, last_name, email),
           reciprocal_clubs (name, location, country, region, contact_email)
         `)
         .order('created_at', { ascending: false })
@@ -86,12 +86,28 @@ serve(async (req) => {
       const { id, status } = await req.json()
       if (!id || !status) throw new Error('Missing id or status')
 
+      const { data: current } = await supabase
+        .from('loi_requests')
+        .select('status')
+        .eq('id', id)
+        .single()
+
       const { error } = await supabase
         .from('loi_requests')
         .update({ status })
         .eq('id', id)
 
       if (error) throw error
+
+      await supabase.from('booking_audit_log').insert({
+        booking_type: 'loi',
+        booking_id: id,
+        action: `status_changed_to_${status}`,
+        previous_value: { status: current?.status ?? null },
+        new_value: { status },
+        performed_by_admin_id: user.id,
+        performed_by_admin_email: user.email,
+      })
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

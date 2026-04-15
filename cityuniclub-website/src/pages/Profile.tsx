@@ -166,7 +166,7 @@ export const Profile: React.FC = () => {
           <h2 className="font-serif text-oxford-blue font-normal text-lg">Account Details</h2>
           <div>
             <label className="label-caps text-ink-light block mb-1">Full Name</label>
-            <p className="text-ink font-medium">{member.full_name}</p>
+            <p className="text-ink font-medium">{[member.first_name, member.middle_name, member.last_name].filter(Boolean).join(' ')}</p>
           </div>
           <div>
             <label className="label-caps text-ink-light block mb-1">Email Address</label>

@@ -61,7 +61,7 @@ serve(async (req: Request) => {
         const eventId = eventResult.data.id
         const [bookingsResult, pdfsResult] = await Promise.all([
           db.from('event_bookings')
-            .select('*, members(full_name, email, membership_number)')
+            .select('*, members(first_name, middle_name, last_name, email, membership_number)')
             .eq('event_id', eventId)
             .order('created_at', { ascending: false }),
           db.from('event_assets')
@@ -135,14 +135,33 @@ serve(async (req: Request) => {
       const body = await req.json()
       const { data, error } = await db.from('events').insert([body]).select().single()
       if (error) throw error
+      await db.from('booking_audit_log').insert({
+        booking_type: 'event_admin',
+        booking_id: data.id,
+        action: 'event_created',
+        previous_value: null,
+        new_value: { title: data.title, event_date: data.event_date },
+        performed_by_admin_id: user.id,
+        performed_by_admin_email: user.email,
+      })
       return new Response(JSON.stringify({ event: data }), { status: 201, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
     if (req.method === 'PUT') {
       if (!id) return new Response(JSON.stringify({ error: 'Missing id' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
       const body = await req.json()
+      const { data: before } = await db.from('events').select('title, event_date').eq('id', id).single()
       const { data, error } = await db.from('events').update(body).eq('id', id).select().single()
       if (error) throw error
+      await db.from('booking_audit_log').insert({
+        booking_type: 'event_admin',
+        booking_id: id,
+        action: 'event_updated',
+        previous_value: before ? { title: before.title, event_date: before.event_date } : null,
+        new_value: { title: data.title, event_date: data.event_date },
+        performed_by_admin_id: user.id,
+        performed_by_admin_email: user.email,
+      })
       return new Response(JSON.stringify({ event: data }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 
@@ -153,7 +172,7 @@ serve(async (req: Request) => {
 
       const { data: current } = await db
         .from('event_bookings')
-        .select('status, guest_count, special_requests, guest_email, guest_name, member_id, event_id, events(title, event_date, price_per_person), members(email, full_name)')
+        .select('status, guest_count, special_requests, guest_email, guest_name, member_id, event_id, events(title, event_date, price_per_person), members(email, first_name, middle_name, last_name)')
         .eq('id', booking_id)
         .single()
 
@@ -192,7 +211,8 @@ serve(async (req: Request) => {
       const resendKey = Deno.env.get('RESEND_API_KEY')
       if (resendKey && current) {
         const recipientEmail = (current as any).guest_email ?? (current as any).members?.email ?? null
-        const recipientName = (current as any).guest_name ?? (current as any).members?.full_name ?? 'Guest'
+        const memberDisplayName = [(current as any).members?.first_name, (current as any).members?.middle_name, (current as any).members?.last_name].filter(Boolean).join(' ') || 'Guest'
+        const recipientName = (current as any).guest_name ?? memberDisplayName
         const eventTitle = (current as any).events?.title ?? 'Event'
         const eventDate = formatEventDate((current as any).events?.event_date ?? null)
         const newGuestCount = updates.guest_count ?? current.guest_count
@@ -256,8 +276,18 @@ serve(async (req: Request) => {
 
     if (req.method === 'DELETE') {
       if (!id) return new Response(JSON.stringify({ error: 'Missing id' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+      const { data: before } = await db.from('events').select('title, event_date').eq('id', id).single()
       const { error } = await db.from('events').delete().eq('id', id)
       if (error) throw error
+      await db.from('booking_audit_log').insert({
+        booking_type: 'event_admin',
+        booking_id: id,
+        action: 'event_deleted',
+        previous_value: before ? { title: before.title, event_date: before.event_date } : null,
+        new_value: null,
+        performed_by_admin_id: user.id,
+        performed_by_admin_email: user.email,
+      })
       return new Response(JSON.stringify({ success: true }), { headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
     }
 

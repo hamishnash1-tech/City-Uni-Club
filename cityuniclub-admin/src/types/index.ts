@@ -8,8 +8,8 @@ export interface Member {
   id: string
   email: string
   first_name: string
+  middle_name?: string
   last_name: string
-  full_name: string
   phone_number?: string
   member_until: string
   membership_type?: string

@@ -111,11 +111,11 @@ serve(async (req: Request) => {
 
       const { data: member } = await supabase
         .from('members')
-        .select('email, full_name')
+        .select('email, first_name, middle_name, last_name')
         .eq('id', memberId)
         .single()
       const actorEmail = member?.email ?? null
-      const actorName = member?.full_name ?? 'Member'
+      const actorName = member ? [member.first_name, member.middle_name, member.last_name].filter(Boolean).join(' ') || 'Member' : 'Member'
       const formattedDate = formatDiningDate(existing.reservation_date)
       const formattedTime = formatDiningTime(existing.reservation_time)
       const resendKey = Deno.env.get('RESEND_API_KEY')

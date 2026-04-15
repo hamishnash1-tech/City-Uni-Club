@@ -83,9 +83,9 @@ export default function ReciprocalClubsPage() {
       headers: { 'Authorization': `Bearer ${sessionToken}` }
     })
       .then(r => r.json())
-      .then(data => setRequests((data.requests || []).map((r: { id: string; members?: { full_name?: string; email?: string }; reciprocal_clubs?: { name?: string; region?: string }; arrival_date: string; departure_date?: string; purpose: string; created_at: string; status: string }) => ({
+      .then(data => setRequests((data.requests || []).map((r: { id: string; members?: { first_name?: string; middle_name?: string | null; last_name?: string; email?: string }; reciprocal_clubs?: { name?: string; region?: string }; arrival_date: string; departure_date?: string; purpose: string; created_at: string; status: string }) => ({
         id: r.id,
-        member_name: r.members?.full_name || 'Unknown',
+        member_name: r.members ? [r.members.first_name, r.members.middle_name, r.members.last_name].filter(Boolean).join(' ') || 'Unknown' : 'Unknown',
         member_email: r.members?.email || '',
         club_name: r.reciprocal_clubs?.name || '',
         club_region: r.reciprocal_clubs?.region || '',

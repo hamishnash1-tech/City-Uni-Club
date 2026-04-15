@@ -60,7 +60,7 @@ serve(async (req: Request) => {
     // Get member details
     const { data: member } = await supabaseClient
       .from('members')
-      .select('email, full_name, first_name, membership_number')
+      .select('email, first_name, middle_name, last_name, membership_number')
       .eq('id', member_id)
       .single()
 
@@ -111,7 +111,7 @@ serve(async (req: Request) => {
       .select(`
         *,
         reciprocal_clubs (id, name, location, country, contact_email),
-        members (full_name, email, membership_number)
+        members (first_name, middle_name, last_name, email, membership_number)
       `)
       .single()
 
@@ -121,6 +121,15 @@ serve(async (req: Request) => {
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
       )
     }
+
+    await supabaseClient.from('booking_audit_log').insert({
+      booking_type: 'loi',
+      booking_id: request.id,
+      action: 'loi_created',
+      previous_value: null,
+      new_value: { status: 'pending', club_id: club.id },
+      performed_by_admin_email: request.members?.email ?? null,
+    })
 
     const message = club.contact_email
       ? 'LOI request submitted successfully'

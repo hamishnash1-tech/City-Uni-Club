@@ -32,5 +32,11 @@ CREATE TABLE IF NOT EXISTS opening_hours_overrides (
 ALTER TABLE opening_hours_defaults ENABLE ROW LEVEL SECURITY;
 ALTER TABLE opening_hours_overrides ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "public read defaults"  ON opening_hours_defaults  FOR SELECT USING (true);
-CREATE POLICY "public read overrides" ON opening_hours_overrides FOR SELECT USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'opening_hours_defaults' AND policyname = 'public read defaults') THEN
+    CREATE POLICY "public read defaults" ON opening_hours_defaults FOR SELECT USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'opening_hours_overrides' AND policyname = 'public read overrides') THEN
+    CREATE POLICY "public read overrides" ON opening_hours_overrides FOR SELECT USING (true);
+  END IF;
+END $$;

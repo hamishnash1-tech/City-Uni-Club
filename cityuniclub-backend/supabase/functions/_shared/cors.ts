@@ -3,6 +3,7 @@ const ALLOWED_ORIGINS = [
   'https://admin.cityuniversityclub.co.uk',
   'http://localhost:5173',
   'http://localhost:5174',
+  'http://localhost:5175',
 ]
 
 export function getCorsHeaders(req: Request) {

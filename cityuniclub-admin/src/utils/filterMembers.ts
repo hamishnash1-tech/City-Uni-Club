@@ -1,5 +1,5 @@
 interface FilterableMember {
-  full_name?: string | null
+  last_name?: string | null
   email: string
   membership_number?: string | number | null
 }
@@ -8,7 +8,7 @@ export function filterMembers<T extends FilterableMember>(members: T[], searchTe
   if (!searchTerm) return members
   const term = searchTerm.toLowerCase()
   return members.filter(m =>
-    m.full_name?.toLowerCase().includes(term) ||
+    m.last_name?.toLowerCase().includes(term) ||
     m.email.toLowerCase().includes(term) ||
     String(m.membership_number ?? '').toLowerCase().includes(term)
   )

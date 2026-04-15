@@ -33,7 +33,7 @@ serve(async (req: Request) => {
 
     const { data: member, error: memberError } = await supabaseClient
       .from('members')
-      .select('id, email, full_name, first_name, membership_number, membership_type')
+      .select('id, email, first_name, middle_name, last_name, membership_number, membership_type')
       .eq('id', session.member_id)
       .eq('is_active', true)
       .single()
@@ -46,8 +46,9 @@ serve(async (req: Request) => {
         member: {
           id: member.id,
           email: member.email,
-          full_name: member.full_name,
           first_name: member.first_name,
+          middle_name: member.middle_name,
+          last_name: member.last_name,
           membership_number: member.membership_number,
           membership_type: member.membership_type,
         },

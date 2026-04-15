@@ -40,7 +40,7 @@ serve(async (req) => {
       .select(`
         id, meal_type, guest_count, reservation_time, status, table_preference, special_requests,
         guest_name, guest_email,
-        members (full_name, email)
+        members (first_name, middle_name, last_name, email)
       `)
       .eq('reservation_date', today)
       .order('reservation_time', { ascending: true })

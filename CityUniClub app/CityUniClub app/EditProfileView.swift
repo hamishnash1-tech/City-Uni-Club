@@ -11,20 +11,22 @@ struct EditProfileView: View {
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var authManager: AuthManager
     
-    @State private var fullName: String
     @State private var firstName: String
+    @State private var middleName: String
+    @State private var lastName: String
     @State private var email: String
     @State private var phoneNumber: String
     @State private var isLoading = false
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var showSuccess = false
-    
+
     private let apiService = APIService.shared
-    
+
     init(member: Member) {
-        _fullName = State(initialValue: member.fullName ?? "")
         _firstName = State(initialValue: member.firstName ?? "")
+        _middleName = State(initialValue: member.middleName ?? "")
+        _lastName = State(initialValue: member.lastName ?? "")
         _email = State(initialValue: member.email)
         _phoneNumber = State(initialValue: member.phoneNumber ?? "")
     }
@@ -81,11 +83,11 @@ struct EditProfileView: View {
     private var profileSection: some View {
         VStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 12) {
-                Text("Full Name")
+                Text("First Name")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.oxfordBlue)
-                
-                TextField("Full Name", text: $fullName)
+
+                TextField("First Name", text: $firstName)
                     .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding()
@@ -99,13 +101,33 @@ struct EditProfileView: View {
                     )
                     .accentColor(.oxfordBlue)
             }
-            
+
             VStack(alignment: .leading, spacing: 12) {
-                Text("First Name")
+                Text("Middle Name")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(.oxfordBlue)
-                
-                TextField("First Name", text: $firstName)
+
+                TextField("Middle Name (optional)", text: $middleName)
+                    .font(.system(size: 16))
+                    .foregroundColor(.black)
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.white)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color.cambridgeBlue.opacity(0.3), lineWidth: 1)
+                            )
+                    )
+                    .accentColor(.oxfordBlue)
+            }
+
+            VStack(alignment: .leading, spacing: 12) {
+                Text("Last Name")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.oxfordBlue)
+
+                TextField("Last Name", text: $lastName)
                     .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding()
@@ -213,8 +235,9 @@ struct EditProfileView: View {
         
         do {
             let (updatedMember, _) = try await apiService.updateMemberProfile(
-                fullName: fullName,
-                firstName: firstName,
+                firstName: firstName.isEmpty ? nil : firstName,
+                middleName: middleName.isEmpty ? nil : middleName,
+                lastName: lastName.isEmpty ? nil : lastName,
                 phoneNumber: phoneNumber.isEmpty ? nil : phoneNumber
             )
             
@@ -251,8 +274,9 @@ struct EditProfileView_Previews: PreviewProvider {
         EditProfileView(member: Member(
             id: "1",
             email: "test@example.com",
-            fullName: "Test User",
             firstName: "Test",
+            middleName: nil,
+            lastName: "User",
             phoneNumber: "+44 7700 900123",
 
             membershipType: "Full Membership",

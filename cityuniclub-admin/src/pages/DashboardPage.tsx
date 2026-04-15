@@ -46,7 +46,7 @@ interface DiningReservation {
   status: string
   guest_name?: string | null
   guest_email?: string | null
-  members?: { full_name: string; email: string } | null
+  members?: { first_name: string; middle_name: string | null; last_name: string; email: string } | null
 }
 
 interface TodayEvent {
@@ -86,9 +86,9 @@ export default function DashboardPage() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
 
-      const requests: LOIRequest[] = (data.requests || []).slice(0, 10).map((req: { id: string; members?: { full_name?: string; email?: string }; reciprocal_clubs?: { name?: string }; club_id: string; arrival_date: string; departure_date: string; purpose: string; status: string; created_at: string }) => ({
+      const requests: LOIRequest[] = (data.requests || []).slice(0, 10).map((req: { id: string; members?: { first_name?: string; middle_name?: string | null; last_name?: string; email?: string }; reciprocal_clubs?: { name?: string }; club_id: string; arrival_date: string; departure_date: string; purpose: string; status: string; created_at: string }) => ({
         id: req.id,
-        member_name: req.members?.full_name || 'Unknown',
+        member_name: req.members ? [req.members.first_name, req.members.middle_name, req.members.last_name].filter(Boolean).join(' ') || 'Unknown' : 'Unknown',
         member_email: req.members?.email || '',
         club_name: req.reciprocal_clubs?.name || req.club_id,
         arrival_date: req.arrival_date,
@@ -281,7 +281,7 @@ export default function DashboardPage() {
                         <TableRow key={r.id} hover>
                           <TableCell>{formatTime(r.reservation_time)}</TableCell>
                           <TableCell>
-                            <Typography variant="body2">{r.members?.full_name || r.guest_name || '—'}</Typography>
+                            <Typography variant="body2">{r.members ? [r.members.first_name, r.members.middle_name, r.members.last_name].filter(Boolean).join(' ') : r.guest_name || '—'}</Typography>
                             <Typography variant="caption" color="textSecondary">{r.members?.email || r.guest_email || ''}</Typography>
                           </TableCell>
                           <TableCell>

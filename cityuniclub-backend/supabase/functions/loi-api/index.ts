@@ -107,7 +107,7 @@ serve(async (req: Request) => {
 
     const { data: member } = await supabase
       .from('members')
-      .select('email, full_name, membership_number')
+      .select('email, first_name, middle_name, last_name, membership_number')
       .eq('id', session.member_id)
       .single()
 
@@ -142,7 +142,7 @@ serve(async (req: Request) => {
         special_requests: special_requests || null,
         status: 'pending'
       })
-      .select(`*, reciprocal_clubs (name, location, country, contact_email), members (full_name, email, membership_number)`)
+      .select(`*, reciprocal_clubs (name, location, country, contact_email), members (first_name, middle_name, last_name, email, membership_number)`)
       .single()
 
     if (insertError) throw insertError

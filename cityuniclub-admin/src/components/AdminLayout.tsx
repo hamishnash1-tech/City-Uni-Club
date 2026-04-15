@@ -25,6 +25,7 @@ import NewReleasesIcon from '@mui/icons-material/NewReleases'
 import MailIcon from '@mui/icons-material/Mail'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import LogoutIcon from '@mui/icons-material/Logout'
+import HistoryIcon from '@mui/icons-material/History'
 
 const drawerWidth = 240
 
@@ -52,6 +53,7 @@ export default function AdminLayout() {
     { text: 'Reciprocal Clubs', icon: <BusinessIcon />, path: '/clubs' },
     { text: 'LOI Requests', icon: <MailIcon />, path: '/loi' },
     { text: 'News', icon: <NewReleasesIcon />, path: '/news' },
+    { text: 'Activity', icon: <HistoryIcon />, path: '/activity' },
   ]
 
   const drawer = (
