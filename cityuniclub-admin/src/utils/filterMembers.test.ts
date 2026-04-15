@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest'
 import { filterMembers } from './filterMembers'
 
 const members = [
-  { full_name: 'Alice Smith', email: 'alice@example.com', membership_number: 1001 },
-  { full_name: 'Bob Jones', email: 'bob@example.com', membership_number: '2002' },
-  { full_name: null, email: 'charlie@example.com', membership_number: null },
+  { last_name: 'Alice Smith', email: 'alice@example.com', membership_number: 1001 },
+  { last_name: 'Bob Jones', email: 'bob@example.com', membership_number: '2002' },
+  { last_name: null, email: 'charlie@example.com', membership_number: null },
 ]
 
 describe('filterMembers', () => {

@@ -47,7 +47,9 @@ const MEMBERSHIP_TYPES = [
 
 interface Member {
   id: string
-  full_name: string | null
+  last_name: string | null
+  first_name: string | null
+  middle_name: string | null
   email: string
   phone_number: string | null
   membership_number: string | null
@@ -58,8 +60,9 @@ interface Member {
 }
 
 const emptyForm = {
-  full_name: '',
+  last_name: '',
   first_name: '',
+  middle_name: '',
   email: '',
   phone_number: '',
   membership_type: 'Full Membership',
@@ -84,7 +87,7 @@ export default function MembersPage() {
   const [formError, setFormError] = useState<string | null>(null)
 
   const [editMember, setEditMember] = useState<Member | null>(null)
-  const [editForm, setEditForm] = useState({ member_since: '', membership_type: '', email: '', phone_number: '', is_active: true })
+  const [editForm, setEditForm] = useState({ first_name: '', middle_name: '', last_name: '', member_since: '', membership_type: '', email: '', phone_number: '', is_active: true })
   const [editSubmitting, setEditSubmitting] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
 
@@ -126,6 +129,9 @@ export default function MembersPage() {
   const handleOpenEdit = (member: Member) => {
     setEditMember(member)
     setEditForm({
+      first_name: member.first_name || '',
+      middle_name: member.middle_name || '',
+      last_name: member.last_name || '',
       member_since: member.member_since ? member.member_since.split('T')[0] : '',
       membership_type: member.membership_type || '',
       email: member.email || '',
@@ -145,6 +151,9 @@ export default function MembersPage() {
         headers: authHeaders,
         body: JSON.stringify({
           id: editMember.id,
+          last_name: editForm.last_name || null,
+          first_name: editForm.first_name || null,
+          middle_name: editForm.middle_name || null,
           member_since: editForm.member_since || null,
           membership_type: editForm.membership_type || null,
           email: editForm.email,
@@ -184,7 +193,7 @@ export default function MembersPage() {
       })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to create member')
-      setMembers(prev => [...prev, json.member].sort((a, b) => (a.full_name ?? '').localeCompare(b.full_name ?? '')))
+      setMembers(prev => [...prev, json.member].sort((a, b) => (a.last_name ?? '').localeCompare(b.last_name ?? '')))
       setDialogOpen(false)
     } catch (e: unknown) {
       setFormError(e instanceof Error ? e.message : 'Unknown error')
@@ -263,7 +272,7 @@ export default function MembersPage() {
                   <TableCell>{page * rowsPerPage + index + 1}</TableCell>
                   <TableCell>
                     <Typography variant="body2" fontWeight={500}>
-                      {member.full_name || '—'}
+                      {[member.first_name, member.middle_name, member.last_name].filter(Boolean).join(' ') || '—'}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -333,10 +342,34 @@ export default function MembersPage() {
 
       {/* Edit Member Dialog */}
       <Dialog open={!!editMember} onClose={() => setEditMember(null)} maxWidth="xs" fullWidth>
-        <DialogTitle>Edit Member — {editMember?.full_name}</DialogTitle>
+        <DialogTitle>Edit Member — {editMember ? [editMember.first_name, editMember.middle_name, editMember.last_name].filter(Boolean).join(' ') : ''}</DialogTitle>
         <DialogContent>
           {editError && <Alert severity="error" sx={{ mb: 2, mt: 1 }}>{editError}</Alert>}
           <Grid container spacing={2} sx={{ mt: 0.5 }}>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <TextField
+                label="First Name"
+                value={editForm.first_name}
+                onChange={e => setEditForm(prev => ({ ...prev, first_name: e.target.value }))}
+                fullWidth
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <TextField
+                label="Middle Name"
+                value={editForm.middle_name}
+                onChange={e => setEditForm(prev => ({ ...prev, middle_name: e.target.value }))}
+                fullWidth
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 4 }}>
+              <TextField
+                label="Last Name"
+                value={editForm.last_name}
+                onChange={e => setEditForm(prev => ({ ...prev, last_name: e.target.value }))}
+                fullWidth
+              />
+            </Grid>
             <Grid size={12}>
               <TextField
                 label="Email"
@@ -413,12 +446,12 @@ export default function MembersPage() {
           <Grid container spacing={2} sx={{ mt: 0.5 }}>
             <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
-                label="Full Name"
-                value={form.full_name}
-                onChange={set('full_name')}
+                label="Last Name"
+                value={form.last_name}
+                onChange={set('last_name')}
                 fullWidth
                 required
-                placeholder="John Smith"
+                placeholder="Smith"
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -429,6 +462,15 @@ export default function MembersPage() {
                 fullWidth
                 required
                 placeholder="John"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Middle Name"
+                value={form.middle_name ?? ''}
+                onChange={set('middle_name')}
+                fullWidth
+                placeholder="Optional"
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -519,7 +561,7 @@ export default function MembersPage() {
           <Button
             variant="contained"
             onClick={handleSubmit}
-            disabled={submitting || !form.full_name || !form.first_name || !form.email || !form.member_since || !form.password}
+            disabled={submitting || !form.last_name || !form.first_name || !form.email || !form.member_since || !form.password}
           >
             {submitting ? 'Adding...' : 'Add Member'}
           </Button>

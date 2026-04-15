@@ -116,6 +116,8 @@ export default function LoiPage() {
   const [loadingDetail, setLoadingDetail] = useState(false)
   const [manualEmailRequest, setManualEmailRequest] = useState<LoiRequest | null>(null)
   const [manualEmail, setManualEmail] = useState('')
+  const [detailFirstName, setDetailFirstName] = useState('')
+  const [detailLastName, setDetailLastName] = useState('')
 
   const getAuthHeaders = useCallback(() => ({
     'Content-Type': 'application/json',
@@ -128,10 +130,10 @@ export default function LoiPage() {
       const res = await fetch(ADMIN_LOI_URL, { headers: getAuthHeaders() })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Failed to fetch')
-      setRequests((data.requests || []).map((r: { id: string; member_id: string; members?: { full_name?: string; email?: string }; club_id: string; reciprocal_clubs?: { name?: string; location?: string; region?: string; contact_email?: string }; arrival_date: string; departure_date?: string; purpose: string; status: LoiRequest['status']; created_at: string }) => ({
+      setRequests((data.requests || []).map((r: { id: string; member_id: string; members?: { first_name?: string; middle_name?: string | null; last_name?: string; email?: string }; club_id: string; reciprocal_clubs?: { name?: string; location?: string; region?: string; contact_email?: string }; arrival_date: string; departure_date?: string; purpose: string; status: LoiRequest['status']; created_at: string }) => ({
         id: r.id,
         member_id: r.member_id,
-        member_name: r.members?.full_name || 'Unknown',
+        member_name: r.members ? [r.members.first_name, r.members.middle_name, r.members.last_name].filter(Boolean).join(' ') || 'Unknown' : 'Unknown',
         member_email: r.members?.email || '',
         club_id: r.club_id,
         club_name: r.reciprocal_clubs?.name || 'Unknown',
@@ -156,6 +158,9 @@ export default function LoiPage() {
 
   const handleOpenDetail = async (request: LoiRequest) => {
     setDetailRequest(request)
+    const spaceIdx = request.member_name.indexOf(' ')
+    setDetailFirstName(spaceIdx > -1 ? request.member_name.slice(0, spaceIdx) : request.member_name)
+    setDetailLastName(spaceIdx > -1 ? request.member_name.slice(spaceIdx + 1) : '')
     setEmailHistory([])
     setLoadingDetail(true)
     try {
@@ -316,7 +321,7 @@ export default function LoiPage() {
     setRequests(requests.map(r => r.id === id ? { ...r, status: 'approved' } : r))
   }
 
-  const handleSendEmail = async (request: LoiRequest, overrideEmail?: string) => {
+  const handleSendEmail = async (request: LoiRequest, overrideEmail?: string, overrideName?: string) => {
     setError('')
     setSuccess('')
     setSending(true)
@@ -325,6 +330,7 @@ export default function LoiPage() {
       const body: Record<string, string> = { id: request.id }
       const emailToUse = overrideEmail || request.club_email
       if (emailToUse) body.email = emailToUse
+      if (overrideName && overrideName !== request.member_name) body.name = overrideName
 
       const response = await fetch(`${FUNCTIONS_URL}/send-loi-email`, {
         method: 'POST',
@@ -623,10 +629,27 @@ export default function LoiPage() {
             <DialogContent dividers>
               {/* Request details */}
               <Grid container spacing={2} sx={{ mb: 3 }}>
+                <Grid size={{ xs: 3 }}>
+                  <TextField
+                    label="First Name"
+                    size="small"
+                    fullWidth
+                    value={detailFirstName}
+                    onChange={(e) => setDetailFirstName(e.target.value)}
+                  />
+                </Grid>
+                <Grid size={{ xs: 3 }}>
+                  <TextField
+                    label="Last Name"
+                    size="small"
+                    fullWidth
+                    value={detailLastName}
+                    onChange={(e) => setDetailLastName(e.target.value)}
+                  />
+                </Grid>
                 <Grid size={{ xs: 6 }}>
-                  <Typography variant="caption" color="textSecondary">Member</Typography>
-                  <Typography variant="body2" fontWeight={500}>{detailRequest.member_name}</Typography>
-                  <Typography variant="caption" color="textSecondary">{detailRequest.member_email}</Typography>
+                  <Typography variant="caption" color="textSecondary">Email</Typography>
+                  <Typography variant="body2">{detailRequest.member_email}</Typography>
                 </Grid>
                 <Grid size={{ xs: 6 }}>
                   <Typography variant="caption" color="textSecondary">Club</Typography>
@@ -705,6 +728,35 @@ export default function LoiPage() {
             </DialogContent>
             <DialogActions>
               <Button onClick={() => setDetailRequest(null)}>Close</Button>
+              {(detailRequest.status === 'approved' || detailRequest.status === 'sent') && (
+                detailRequest.club_email ? (
+                  <Button
+                    variant="contained"
+                    startIcon={<SendIcon />}
+                    disabled={sending || !detailFirstName}
+                    onClick={async () => {
+                      const name = `${detailFirstName} ${detailLastName}`.trim()
+                      await handleSendEmail(detailRequest, undefined, name)
+                      setDetailRequest(null)
+                    }}
+                  >
+                    {sending ? 'Sending...' : 'Send LOI'}
+                  </Button>
+                ) : (
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    startIcon={<WarningAmberIcon />}
+                    onClick={() => {
+                      setManualEmailRequest(detailRequest)
+                      setManualEmail('')
+                      setDetailRequest(null)
+                    }}
+                  >
+                    Enter Email & Send
+                  </Button>
+                )
+              )}
             </DialogActions>
           </>
         )}
@@ -734,7 +786,8 @@ export default function LoiPage() {
             disabled={!manualEmail || sending}
             onClick={async () => {
               if (manualEmailRequest) {
-                await handleSendEmail(manualEmailRequest, manualEmail)
+                const name = `${detailFirstName} ${detailLastName}`.trim()
+                await handleSendEmail(manualEmailRequest, manualEmail, name || undefined)
                 setManualEmailRequest(null)
               }
             }}

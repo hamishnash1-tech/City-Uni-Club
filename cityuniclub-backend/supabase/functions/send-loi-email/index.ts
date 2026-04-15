@@ -29,7 +29,8 @@ async function generateLoiPdf(
   memberName: string,
   clubName: string,
   visitDates: string,
-  sentDate: string
+  sentDate: string,
+  membershipNumber?: string | null
 ): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create()
   const page = pdfDoc.addPage([595.28, 841.89]) // A4
@@ -86,7 +87,8 @@ async function generateLoiPdf(
   y -= lineH * 0.5
 
   // Body
-  drawPara(`This letter is to introduce ${memberName} who is a member of the City University Club.`)
+  const memberRef = membershipNumber ? `${memberName} (Membership No. ${membershipNumber})` : memberName
+  drawPara(`This letter is to introduce ${memberRef} who is a member of the City University Club.`)
 
   drawPara(`I am most grateful to you for offering ${memberName} the hospitality of your Club under the terms of our reciprocal agreement, they will be visiting your club ${visitDates}.`)
 
@@ -143,14 +145,14 @@ serve(async (req) => {
       }
     }
 
-    const { id, email: emailOverride } = await req.json()
+    const { id, email: emailOverride, name: nameOverride } = await req.json()
     if (!id) throw new Error('Missing LOI request id')
 
     const { data: request, error: fetchError } = await supabase
       .from('loi_requests')
       .select(`
         id, arrival_date, departure_date, purpose, status,
-        members (full_name, email),
+        members (first_name, middle_name, last_name, email, membership_number),
         reciprocal_clubs (name, location, contact_email)
       `)
       .eq('id', id)
@@ -158,7 +160,8 @@ serve(async (req) => {
 
     if (fetchError || !request) throw new Error('LOI request not found')
 
-    const memberName = request.members?.full_name
+    const memberName = nameOverride || [request.members?.first_name, request.members?.middle_name, request.members?.last_name].filter(Boolean).join(' ')
+    const membershipNumber = request.members?.membership_number
     const clubName = request.reciprocal_clubs?.name
     const clubEmail = request.reciprocal_clubs?.contact_email || emailOverride || null
 
@@ -176,7 +179,7 @@ serve(async (req) => {
       : `on ${request.arrival_date}`
 
     // Generate PDF
-    const pdfBytes = await generateLoiPdf(memberName, clubName, visitDates, sentDate)
+    const pdfBytes = await generateLoiPdf(memberName, clubName, visitDates, sentDate, membershipNumber)
     const pdfBase64 = btoa(String.fromCharCode(...pdfBytes))
 
     const emailBody = `
@@ -205,7 +208,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: FROM_EMAIL,
         to: [clubEmail],
-        cc: [CLUB_EMAIL],
+        cc: [CLUB_EMAIL, request.members?.email].filter(Boolean),
         subject: `Letter of Introduction — ${escapeHtml(memberName)}`,
         html: emailBody,
         attachments: [
@@ -223,7 +226,7 @@ serve(async (req) => {
     await supabase.rpc('record_loi_email_sent', {
       p_loi_request_id: id,
       p_sent_to: clubEmail,
-      p_cc: CLUB_EMAIL,
+      p_cc: [CLUB_EMAIL, request.members?.email].filter(Boolean).join(', '),
       p_resend_email_id: responseData.id ?? null,
     })
 

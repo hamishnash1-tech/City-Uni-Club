@@ -87,7 +87,7 @@ interface Booking {
   status: string
   total_price: number | null
   created_at: string
-  members: { full_name: string; email: string; membership_number: string } | null
+  members: { first_name: string; middle_name: string | null; last_name: string; email: string; membership_number: string } | null
   audit_log: AuditEntry[]
 }
 
@@ -744,7 +744,7 @@ export default function EventDetailPage() {
                             </Tooltip>
                           )}
                         </TableCell>
-                        <TableCell>{isMember ? (b.members?.full_name ?? '—') : (b.guest_name ?? '—')}</TableCell>
+                        <TableCell>{isMember ? (b.members ? [b.members.first_name, b.members.middle_name, b.members.last_name].filter(Boolean).join(' ') : '—') : (b.guest_name ?? '—')}</TableCell>
                         <TableCell>{isMember ? (b.members?.email ?? '—') : (b.guest_email ?? '—')}</TableCell>
                         {isMember && <TableCell>{b.members?.membership_number ?? '—'}</TableCell>}
                         {!isMember && <TableCell>{b.guest_phone ?? '—'}</TableCell>}
@@ -876,7 +876,7 @@ export default function EventDetailPage() {
                               </Tooltip>
                             )}
                           </TableCell>
-                          <TableCell>{isMember ? (b.members?.full_name ?? '—') : (b.guest_name ?? '—')}</TableCell>
+                          <TableCell>{isMember ? (b.members ? [b.members.first_name, b.members.middle_name, b.members.last_name].filter(Boolean).join(' ') : '—') : (b.guest_name ?? '—')}</TableCell>
                           <TableCell>{isMember ? (b.members?.email ?? '—') : (b.guest_email ?? '—')}</TableCell>
                           {isMember && <TableCell>{b.members?.membership_number ?? '—'}</TableCell>}
                           {!isMember && <TableCell>{b.guest_phone ?? '—'}</TableCell>}
@@ -940,7 +940,7 @@ export default function EventDetailPage() {
         <DialogContent>
           {pendingAction && (() => {
             const b = pendingAction.booking
-            const name = b.members?.full_name || b.guest_name || '—'
+            const name = b.members ? [b.members.first_name, b.members.middle_name, b.members.last_name].filter(Boolean).join(' ') : b.guest_name || '—'
             const email = b.members?.email || b.guest_email || '—'
             const actionLabel = pendingAction.type === 'guest_count'
               ? `Update guest count to ${pendingAction.newGuestCount}`

@@ -20,11 +20,14 @@ private const val LOI_API_URL = "$API_BASE/loi-api"
 data class Member(
     val id: String = "",
     val email: String = "",
-    @SerializedName("full_name") val fullName: String = "",
     @SerializedName("first_name") val firstName: String = "",
+    @SerializedName("middle_name") val middleName: String? = null,
+    @SerializedName("last_name") val lastName: String = "",
     @SerializedName("membership_number") val membershipNumber: String = "",
     @SerializedName("membership_type") val membershipType: String = ""
-)
+) {
+    val fullName: String get() = listOfNotNull(firstName.ifBlank { null }, middleName?.ifBlank { null }, lastName.ifBlank { null }).joinToString(" ")
+}
 
 data class Session(
     val token: String = "",

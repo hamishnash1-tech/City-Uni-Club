@@ -34,8 +34,8 @@ serve(async (req) => {
     if (req.method === 'GET') {
       const { data, error } = await supabase
         .from('members')
-        .select('id, full_name, email, phone_number, membership_number, membership_type, is_active, member_since, member_until, created_at')
-        .order('full_name', { ascending: true })
+        .select('id, last_name, first_name, middle_name, email, phone_number, membership_number, membership_type, is_active, member_since, member_until, created_at')
+        .order('last_name', { ascending: true })
 
       if (error) throw error
 
@@ -46,10 +46,10 @@ serve(async (req) => {
 
     if (req.method === 'POST') {
       const body = await req.json()
-      const { full_name, first_name, email, phone_number, membership_type, member_since, member_until, is_active, password } = body
+      const { last_name, first_name, middle_name, email, phone_number, membership_type, member_since, member_until, is_active, password } = body
 
-      if (!full_name || !first_name || !email || !membership_type || !member_since || !password) {
-        return new Response(JSON.stringify({ error: 'Missing required fields: full_name, first_name, email, membership_type, member_since, password' }), {
+      if (!last_name || !first_name || !email || !membership_type || !member_since || !password) {
+        return new Response(JSON.stringify({ error: 'Missing required fields: last_name, first_name, email, membership_type, member_since, password' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400
         })
       }
@@ -59,8 +59,9 @@ serve(async (req) => {
       const { data, error } = await supabase
         .from('members')
         .insert({
-          full_name,
+          last_name,
           first_name,
+          middle_name: middle_name || null,
           email,
           phone_number: phone_number || null,
           membership_type,
@@ -69,7 +70,7 @@ serve(async (req) => {
           is_active: is_active ?? true,
           password_hash,
         })
-        .select('id, full_name, email, phone_number, membership_number, membership_type, is_active, member_since, member_until, created_at')
+        .select('id, last_name, first_name, middle_name, email, phone_number, membership_number, membership_type, is_active, member_since, member_until, created_at')
         .single()
 
       if (error) throw error
@@ -80,7 +81,7 @@ serve(async (req) => {
     }
 
     if (req.method === 'PATCH') {
-      const { id, is_active, member_since, membership_type, email, phone_number } = await req.json()
+      const { id, is_active, member_since, membership_type, email, phone_number, last_name, first_name, middle_name } = await req.json()
       if (!id) {
         return new Response(JSON.stringify({ error: 'Missing id' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400
@@ -92,13 +93,16 @@ serve(async (req) => {
       if (membership_type !== undefined) update.membership_type = membership_type
       if (email !== undefined) update.email = email
       if (phone_number !== undefined) update.phone_number = phone_number
+      if (last_name !== undefined) update.last_name = last_name
+      if (first_name !== undefined) update.first_name = first_name
+      if (middle_name !== undefined) update.middle_name = middle_name
       if (Object.keys(update).length === 0) {
         return new Response(JSON.stringify({ error: 'No fields to update' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400
         })
       }
       const { data, error } = await supabase.from('members').update(update).eq('id', id)
-        .select('id, full_name, email, phone_number, membership_number, membership_type, is_active, member_since, member_until, created_at')
+        .select('id, last_name, first_name, middle_name, email, phone_number, membership_number, membership_type, is_active, member_since, member_until, created_at')
         .single()
       if (error) throw error
       return new Response(JSON.stringify({ member: data }), {

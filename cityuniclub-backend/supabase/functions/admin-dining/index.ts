@@ -1,6 +1,19 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { FROM_EMAIL, CLUB_NAME, CLUB_ADDRESS, CLUB_EMAIL, CLUB_PHONE, escapeHtml } from '../_shared/constants.ts'
 import { getCorsHeaders } from '../_shared/cors.ts'
+
+async function sendEmail(resendKey: string, payload: object) {
+  try {
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${resendKey}` },
+      body: JSON.stringify(payload),
+    })
+  } catch (e) {
+    console.error('Email send failed:', e)
+  }
+}
 
 serve(async (req) => {
   const corsHeaders = getCorsHeaders(req)
@@ -44,7 +57,7 @@ serve(async (req) => {
           id, member_id, reservation_date, reservation_time, meal_type,
           guest_count, table_preference, special_requests, status, created_at,
           guest_name, guest_email,
-          members (full_name, email, membership_number)
+          members (first_name, middle_name, last_name, email, membership_number)
         `)
         .order('reservation_date', { ascending: true })
         .order('reservation_time', { ascending: true })
@@ -86,10 +99,10 @@ serve(async (req) => {
       const { id, status, guest_count, special_requests } = await req.json()
       if (!id) throw new Error('Missing id')
 
-      // Fetch current reservation for audit
+      // Fetch current reservation for audit and emails
       const { data: current } = await supabase
         .from('dining_reservations')
-        .select('status, guest_count, special_requests')
+        .select('status, guest_count, special_requests, guest_name, guest_email, reservation_date, reservation_time, member_id, members(first_name, middle_name, last_name, email)')
         .eq('id', id)
         .single()
 
@@ -131,7 +144,6 @@ serve(async (req) => {
 
       if (error) throw error
 
-      // Write audit log
       await supabase.from('booking_audit_log').insert({
         booking_type: 'dining',
         booking_id: id,
@@ -141,6 +153,57 @@ serve(async (req) => {
         performed_by_admin_id: user.id,
         performed_by_admin_email: user.email,
       })
+
+      // Send status-change email to booker
+      const resendKey = Deno.env.get('RESEND_API_KEY')
+      if (resendKey && status !== undefined && current) {
+        const members = (current as any).members
+        const recipientEmail = (current as any).guest_email ?? members?.email ?? null
+        const recipientName = (current as any).guest_name
+          ?? (members ? [members.first_name, members.middle_name, members.last_name].filter(Boolean).join(' ') : null)
+          ?? 'Guest'
+        const reservationDate = (current as any).reservation_date ?? ''
+        const reservationTime = (current as any).reservation_time ?? ''
+
+        if (recipientEmail) {
+          let subject = ''
+          let bodyContent = ''
+
+          if (status === 'confirmed') {
+            subject = `Dining reservation confirmed — ${escapeHtml(reservationDate)}`
+            bodyContent = `<p>Great news! Your dining reservation on <strong>${escapeHtml(reservationDate)}</strong> at ${escapeHtml(reservationTime)} has been confirmed.</p>
+              <p>Guests: ${updates.guest_count ?? current.guest_count}</p>`
+          } else if (status === 'cancelled') {
+            subject = `Dining reservation cancelled — ${escapeHtml(reservationDate)}`
+            bodyContent = `<p>Your dining reservation on <strong>${escapeHtml(reservationDate)}</strong> at ${escapeHtml(reservationTime)} has been cancelled.</p>
+              <p>If you believe this is an error or have any questions, please contact us.</p>`
+          } else if (status === 'rejected') {
+            subject = `Dining reservation not confirmed — ${escapeHtml(reservationDate)}`
+            bodyContent = `<p>Unfortunately, we are unable to confirm your dining reservation on <strong>${escapeHtml(reservationDate)}</strong> at ${escapeHtml(reservationTime)}.</p>
+              <p>Please contact us if you have any questions.</p>`
+          }
+
+          if (subject) {
+            await sendEmail(resendKey, {
+              from: FROM_EMAIL,
+              to: [recipientEmail],
+              subject,
+              html: `
+                <html><body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;max-width:600px;">
+                  <p>Dear ${escapeHtml(recipientName)},</p>
+                  ${bodyContent}
+                  <p>If you have any questions, please contact us:</p>
+                  <ul>
+                    <li><strong>Phone:</strong> ${CLUB_PHONE}</li>
+                    <li><strong>Email:</strong> ${CLUB_EMAIL}</li>
+                  </ul>
+                  <p>Warm regards,<br>${CLUB_NAME}<br>${CLUB_ADDRESS}</p>
+                </body></html>
+              `,
+            })
+          }
+        }
+      }
 
       return new Response(JSON.stringify({ success: true }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

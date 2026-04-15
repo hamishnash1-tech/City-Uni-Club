@@ -393,7 +393,7 @@ export const EventDetail: React.FC = () => {
               {isLoggedIn ? (
                 <div className="bg-ivory-warm border border-cambridge/20 rounded-sm px-4 py-3">
                   <p className="label-caps text-ink-light mb-1">Booking as</p>
-                  <p className="font-serif text-oxford-blue">{auth.member!.full_name}</p>
+                  <p className="font-serif text-oxford-blue">{[auth.member!.first_name, auth.member!.middle_name, auth.member!.last_name].filter(Boolean).join(' ')}</p>
                   <p className="text-xs text-ink-light mt-0.5">{auth.member!.email}</p>
                 </div>
               ) : (

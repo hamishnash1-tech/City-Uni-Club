@@ -3,8 +3,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 export interface Member {
   id: string
   email: string
-  full_name: string
   first_name: string
+  middle_name: string | null
+  last_name: string
   membership_number: string
   membership_type: string
 }

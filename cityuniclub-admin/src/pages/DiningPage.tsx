@@ -67,7 +67,9 @@ interface DiningReservation {
   guest_name?: string | null
   guest_email?: string | null
   members?: {
-    full_name: string
+    first_name: string
+    middle_name: string | null
+    last_name: string
     email: string
     membership_number: string
   } | null
@@ -550,7 +552,7 @@ export default function DiningPage() {
                                   </TableCell>
                                   <TableCell>
                                     <Typography variant="body2" fontWeight={500}>
-                                      {reservation.members?.full_name || '—'}
+                                      {reservation.members ? [reservation.members.first_name, reservation.members.middle_name, reservation.members.last_name].filter(Boolean).join(' ') : '—'}
                                     </Typography>
                                   </TableCell>
                                   <TableCell>
@@ -853,7 +855,7 @@ export default function DiningPage() {
                                   </TableCell>
                                   <TableCell>
                                     <Typography variant="body2">
-                                      {reservation.members?.full_name || reservation.guest_name || '—'}
+                                      {reservation.members ? [reservation.members.first_name, reservation.members.middle_name, reservation.members.last_name].filter(Boolean).join(' ') : reservation.guest_name || '—'}
                                     </Typography>
                                   </TableCell>
                                   <TableCell>
@@ -927,7 +929,7 @@ export default function DiningPage() {
         <DialogContent>
           {pendingAction && (() => {
             const r = pendingAction.reservation
-            const name = r.members?.full_name || r.guest_name || '—'
+            const name = r.members ? [r.members.first_name, r.members.middle_name, r.members.last_name].filter(Boolean).join(' ') : r.guest_name || '—'
             const email = r.members?.email || r.guest_email || '—'
             const date = new Date(`${r.reservation_date}T00:00:00`).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
             const time = formatTime(r.reservation_time)

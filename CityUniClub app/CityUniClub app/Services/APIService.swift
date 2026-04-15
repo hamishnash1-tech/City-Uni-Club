@@ -521,15 +521,17 @@ class APIService {
     }
 
     func updateMemberProfile(
-        fullName: String? = nil,
         firstName: String? = nil,
+        middleName: String? = nil,
+        lastName: String? = nil,
         phoneNumber: String? = nil,
         dietaryRequirements: String? = nil,
         notificationEnabled: Bool? = nil
     ) async throws -> (member: Member, profile: MemberProfile?) {
         struct ProfileUpdateRequest: Encodable {
-            let full_name: String?
             let first_name: String?
+            let middle_name: String?
+            let last_name: String?
             let phone_number: String?
             let dietary_requirements: String?
             let notification_enabled: Bool?
@@ -543,8 +545,9 @@ class APIService {
             endpoint: "/members/profile",
             method: "PUT",
             body: ProfileUpdateRequest(
-                full_name: fullName,
                 first_name: firstName,
+                middle_name: middleName,
+                last_name: lastName,
                 phone_number: phoneNumber,
                 dietary_requirements: dietaryRequirements,
                 notification_enabled: notificationEnabled

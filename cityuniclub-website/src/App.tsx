@@ -141,7 +141,7 @@ const MobileMenu: React.FC<{ open: boolean; onClose: () => void }> = ({ open, on
           <div className="border-t border-cambridge/20 pt-4 pb-2 px-3 rounded-sm bg-cambridge/10 space-y-3">
             <Link to="/profile" className="flex items-center gap-2 text-ivory/60 hover:text-ivory transition">
               <IconUser className="w-4 h-4" />
-              <span className="text-sm font-light">{auth.member.full_name}</span>
+              <span className="text-sm font-light">{[auth.member.first_name, auth.member.middle_name, auth.member.last_name].filter(Boolean).join(' ')}</span>
             </Link>
             <button
               onClick={() => { dispatch(logout()); onClose() }}
@@ -191,7 +191,7 @@ const TopBanner = React.forwardRef<HTMLDivElement, { showAppBanner: boolean; onD
             {auth.isAuthenticated && auth.member ? (
               <Link to="/profile" className="flex items-center gap-1.5 text-ivory/80 hover:text-ivory transition">
                 <IconUser className="w-4 h-4" />
-                <span className="text-sm font-light tracking-wide text-ivory/80">{auth.member.full_name}</span>
+                <span className="text-sm font-light tracking-wide text-ivory/80">{[auth.member.first_name, auth.member.middle_name, auth.member.last_name].filter(Boolean).join(' ')}</span>
               </Link>
             ) : (
               <Link to="/login" className="label-caps text-cambridge-light/60 hover:text-cambridge-light transition">

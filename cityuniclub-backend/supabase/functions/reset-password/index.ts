@@ -27,7 +27,7 @@ serve(async (req) => {
 
       const { data: member } = await supabase
         .from('members')
-        .select('id, full_name, first_name')
+        .select('id, first_name')
         .eq('email', email.toLowerCase().trim())
         .eq('is_active', true)
         .single()

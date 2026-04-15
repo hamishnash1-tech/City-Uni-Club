@@ -124,8 +124,9 @@ class ApiServiceTest {
               "member": {
                 "id": "abc123",
                 "email": "test@example.com",
-                "full_name": "John Doe",
                 "first_name": "John",
+                "middle_name": null,
+                "last_name": "Doe",
                 "membership_number": "M001",
                 "membership_type": "Full Member"
               },
@@ -142,8 +143,9 @@ class ApiServiceTest {
 
         assertEquals("abc123", auth.member.id)
         assertEquals("test@example.com", auth.member.email)
-        assertEquals("John Doe", auth.member.fullName)
         assertEquals("John", auth.member.firstName)
+        assertEquals("Doe", auth.member.lastName)
+        assertEquals("John Doe", auth.member.fullName)
         assertEquals("M001", auth.member.membershipNumber)
         assertEquals("Full Member", auth.member.membershipType)
         assertEquals("access_token_value", auth.session.token)

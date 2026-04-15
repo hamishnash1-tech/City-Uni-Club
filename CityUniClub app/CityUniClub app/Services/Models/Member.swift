@@ -10,19 +10,25 @@ import Foundation
 struct Member: Codable, Identifiable {
     let id: String
     let email: String
-    let fullName: String?
     let firstName: String?
+    let middleName: String?
+    let lastName: String?
     let phoneNumber: String?
     let membershipType: String?
     let memberSince: String?
     let memberUntil: String?
     let isActive: Bool?
-    
+
+    var fullName: String {
+        [firstName, middleName, lastName].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " ")
+    }
+
     enum CodingKeys: String, CodingKey {
         case id
         case email
-        case fullName = "full_name"
         case firstName = "first_name"
+        case middleName = "middle_name"
+        case lastName = "last_name"
         case phoneNumber = "phone_number"
         case membershipType = "membership_type"
         case memberSince = "member_since"

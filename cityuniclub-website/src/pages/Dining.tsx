@@ -472,7 +472,7 @@ export const Dining: React.FC = () => {
             {member ? (
               <div className="club-card p-5">
                 <h3 className="label-caps text-ink-light mb-3">Booking for</h3>
-                <p className="font-serif text-oxford-blue">{member.full_name}</p>
+                <p className="font-serif text-oxford-blue">{[member.first_name, member.middle_name, member.last_name].filter(Boolean).join(' ')}</p>
                 <p className="text-xs text-ink-light mt-1">{member.email}</p>
               </div>
             ) : (
