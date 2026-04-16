@@ -65,11 +65,6 @@ export default function OpeningHoursPage() {
   const [editingOverride, setEditingOverride] = useState<Override | null>(null)
   const [form, setForm] = useState({ date: '', open_time: '12:00', close_time: '22:00', is_closed: false, note: '' })
 
-  useEffect(() => {
-    loadDefaults()
-    loadOverrides()
-  }, [])
-
   const loadDefaults = async () => {
     const { data } = await supabase.from('opening_hours_defaults').select('*').order('day_of_week')
     if (data && data.length > 0) setDefaults(data)
@@ -83,6 +78,13 @@ export default function OpeningHoursPage() {
       .order('date')
     if (data) setOverrides(data)
   }
+
+  useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
+    void loadDefaults()
+    void loadOverrides()
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [])
 
   const saveDefault = async (day: DefaultHours) => {
     const update = day.is_closed
