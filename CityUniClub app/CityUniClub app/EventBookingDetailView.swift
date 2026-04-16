@@ -138,9 +138,9 @@ struct EventBookingDetailView: View {
                                     .foregroundColor(.white)
                                     .scrollContentBackground(.hidden)
                                     .frame(minHeight: 80)
-                                    .onChange(of: pendingNotes) { newValue in
-                                        if newValue.count > Self.maxNotesLength {
-                                            pendingNotes = String(newValue.prefix(Self.maxNotesLength))
+                                    .onChange(of: pendingNotes) {
+                                        if pendingNotes.count > Self.maxNotesLength {
+                                            pendingNotes = String(pendingNotes.prefix(Self.maxNotesLength))
                                         }
                                     }
                             }

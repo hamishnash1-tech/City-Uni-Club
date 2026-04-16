@@ -16,4 +16,8 @@ class UserPreferences(context: Context) {
     fun setDisplayName(name: String) {
         prefs.edit().putString(KEY_DISPLAY_NAME, name).apply()
     }
+
+    fun clear() {
+        prefs.edit().clear().apply()
+    }
 }

@@ -154,9 +154,9 @@ struct DiningReservationDetailView: View {
                                         .foregroundColor(.white)
                                         .scrollContentBackground(.hidden)
                                         .frame(minHeight: 80)
-                                        .onChange(of: pendingNotes) { newValue in
-                                            if newValue.count > DiningBookingItem.maxNotesLength {
-                                                pendingNotes = String(newValue.prefix(DiningBookingItem.maxNotesLength))
+                                        .onChange(of: pendingNotes) {
+                                            if pendingNotes.count > DiningBookingItem.maxNotesLength {
+                                                pendingNotes = String(pendingNotes.prefix(DiningBookingItem.maxNotesLength))
                                             }
                                         }
                                 }
