@@ -44,21 +44,15 @@ class ApiServiceTest {
     }
 
     @Test
-    fun `Member firstName fallback uses fullName split`() {
-        val member = Member(fullName = "James Smith", firstName = "")
-        val derived = member.firstName.ifBlank {
-            member.fullName.split(" ").firstOrNull() ?: "Member"
-        }
-        assertEquals("James", derived)
+    fun `Member fullName computed from firstName and lastName`() {
+        val member = Member(firstName = "James", lastName = "Smith")
+        assertEquals("James Smith", member.fullName)
     }
 
     @Test
-    fun `Member firstName used when present`() {
-        val member = Member(fullName = "James Smith", firstName = "James")
-        val derived = member.firstName.ifBlank {
-            member.fullName.split(" ").firstOrNull() ?: "Member"
-        }
-        assertEquals("James", derived)
+    fun `Member fullName includes middleName when present`() {
+        val member = Member(firstName = "James", middleName = "Edward", lastName = "Smith")
+        assertEquals("James Edward Smith", member.fullName)
     }
 
     @Test
@@ -89,7 +83,7 @@ class ApiServiceTest {
 
     @Test
     fun `AuthResponse holds member and session`() {
-        val member = Member(id = "1", email = "a@b.com", fullName = "Alice", firstName = "Alice")
+        val member = Member(id = "1", email = "a@b.com", firstName = "Alice")
         val session = Session(token = "tok", refreshToken = "ref")
         val auth = AuthResponse(member = member, session = session)
         assertEquals("1", auth.member.id)

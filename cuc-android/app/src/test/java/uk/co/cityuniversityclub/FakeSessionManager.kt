@@ -4,8 +4,7 @@ import uk.co.cityuniversityclub.network.Member
 
 class FakeSessionManager : ISessionManager {
 
-    private var savedAccessToken: String? = null
-    private var savedRefreshToken: String? = null
+    private var savedToken: String? = null
     private var savedMember: Member? = null
 
     var shouldRestoreSession: Boolean = false
@@ -13,8 +12,8 @@ class FakeSessionManager : ISessionManager {
     var restoredMember: Member = Member(
         id = "restored_id",
         email = "restored@example.com",
-        fullName = "Restored User",
         firstName = "Restored",
+        lastName = "User",
         membershipNumber = "R001",
         membershipType = "Full Member"
     )
@@ -25,17 +24,17 @@ class FakeSessionManager : ISessionManager {
     var clearSessionCallCount = 0
     var tryRestoreCallCount = 0
 
-    override fun saveSession(accessToken: String, refreshToken: String, member: Member) {
+    override fun saveSession(token: String, member: Member) {
         saveSessionCallCount++
-        savedAccessToken = accessToken
-        savedRefreshToken = refreshToken
+        savedToken = token
         savedMember = member
     }
 
+    override fun getToken(): String? = savedToken
+
     override fun clearSession() {
         clearSessionCallCount++
-        savedAccessToken = null
-        savedRefreshToken = null
+        savedToken = null
         savedMember = null
     }
 
@@ -46,5 +45,5 @@ class FakeSessionManager : ISessionManager {
     }
 
     fun getSavedMember(): Member? = savedMember
-    fun getSavedToken(): String? = savedAccessToken
+    fun getSavedToken(): String? = savedToken
 }

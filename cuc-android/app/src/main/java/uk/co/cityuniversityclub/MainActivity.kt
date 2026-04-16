@@ -30,7 +30,6 @@ class MainActivity : ComponentActivity() {
                     val isAuthenticated by viewModel.isAuthenticated.collectAsState()
                     val member by viewModel.member.collectAsState()
                     val isRestoring by viewModel.isRestoring.collectAsState()
-                    val displayName by viewModel.displayName.collectAsState()
                     var splashDone by remember { mutableStateOf(false) }
 
                     if (!splashDone || isRestoring) {
@@ -39,8 +38,6 @@ class MainActivity : ComponentActivity() {
                         AppNavigation(
                             member = member!!,
                             token = viewModel.token ?: "",
-                            displayName = displayName,
-                            onSetDisplayName = { viewModel.setDisplayName(it) },
                             onLogout = { viewModel.logout() }
                         )
                     } else {
