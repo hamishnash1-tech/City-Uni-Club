@@ -22,7 +22,7 @@ import uk.co.cityuniversityclub.ui.theme.OxfordBlue
 
 @Composable
 fun HomeScreen(member: Member, displayName: String) {
-    val memberFirstName = displayName.ifBlank { member.firstName.ifBlank { member.fullName.split(" ").firstOrNull() ?: "Member" } }.split(" ").firstOrNull() ?: "Member"
+    val memberFirstName = displayName.ifBlank { member.firstName.ifBlank { "Member" } }.split(" ").firstOrNull() ?: "Member"
     val memberFullName = displayName.ifBlank { member.fullName.ifBlank { "Member" } }
     val memberUntil = "March ${java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) + 1}"
 

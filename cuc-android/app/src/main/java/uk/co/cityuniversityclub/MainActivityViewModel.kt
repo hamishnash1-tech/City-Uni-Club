@@ -93,7 +93,9 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             token = null
             _member.value = null
             _isAuthenticated.value = false
+            _displayName.value = ""
             sessionManager.clearSession()
+            userPreferences.clear()
         }
     }
 }

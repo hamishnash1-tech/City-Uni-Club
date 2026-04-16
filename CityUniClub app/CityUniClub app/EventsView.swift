@@ -188,7 +188,6 @@ struct EventsView: View {
                 let loadedEvents = try await apiService.getEvents()
                 
                 // Filter out past events
-                let today = Date()
                 let dateFormatter = DateFormatter()
                 dateFormatter.dateFormat = "yyyy-MM-dd"
                 
