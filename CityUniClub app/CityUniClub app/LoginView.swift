@@ -6,7 +6,6 @@ struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
     @State private var showPassword = false
-    @State private var showForgotPassword = false
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var isAttempting = false
@@ -158,20 +157,13 @@ struct LoginView: View {
                     .opacity(isAttempting || email.isEmpty || password.isEmpty ? 0.6 : 1)
 
                     // Forgot Password
-                    Button {
-                        showForgotPassword = true
-                    } label: {
+                    Link(destination: URL(string: "https://www.cityuniversityclub.co.uk/forgot-password")!) {
                         Text("Forgot Password?")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.cambridgeBlue)
                             .underline()
                     }
                     .padding(.top, 8)
-                    .alert("Forgot Password", isPresented: $showForgotPassword) {
-                        Button("OK", role: .cancel) {}
-                    } message: {
-                        Text("Please email the Club Secretary at secretary@cityuniversityclub.co.uk to reset your password.")
-                    }
 
                     // Help Text
                     Text("Contact the secretary for login assistance")
