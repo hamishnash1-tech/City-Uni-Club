@@ -42,7 +42,7 @@ private val navItems = listOf(
 )
 
 @Composable
-fun AppNavigation(member: Member, token: String, displayName: String, onSetDisplayName: (String) -> Unit, onLogout: () -> Unit) {
+fun AppNavigation(member: Member, token: String, onLogout: () -> Unit) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -89,7 +89,7 @@ fun AppNavigation(member: Member, token: String, displayName: String, onSetDispl
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") {
-                HomeScreen(member = member, displayName = displayName)
+                HomeScreen(member = member)
             }
             composable("events") {
                 EventsScreen(member = member, token = token)
@@ -101,8 +101,6 @@ fun AppNavigation(member: Member, token: String, displayName: String, onSetDispl
                 MoreScreen(
                     member = member,
                     token = token,
-                    displayName = displayName,
-                    onSetDisplayName = onSetDisplayName,
                     onLogout = onLogout
                 )
             }

@@ -147,8 +147,8 @@ class AuthStateMachineTest {
 
     @Test
     fun `FakeSessionManager saveSession stores values`() {
-        val member = Member(id = "x", email = "x@x.com", fullName = "X User")
-        fake.saveSession("acc", "ref", member)
+        val member = Member(id = "x", email = "x@x.com", firstName = "X", lastName = "User")
+        fake.saveSession("acc", member)
         assertEquals(1, fake.saveSessionCallCount)
         assertEquals("acc", fake.getSavedToken())
         assertEquals("x@x.com", fake.getSavedMember()?.email)
@@ -175,8 +175,8 @@ class AuthStateMachineTest {
             member = Member(
                 id = id,
                 email = email,
-                fullName = name,
                 firstName = name.split(" ").first(),
+                lastName = name.split(" ").drop(1).joinToString(" "),
                 membershipNumber = "M001",
                 membershipType = type
             ),
@@ -213,7 +213,7 @@ class AuthStateMachine(private val sessionManager: ISessionManager) {
         token = auth.session.token
         member.value = auth.member
         isAuthenticated.value = true
-        sessionManager.saveSession(auth.session.token, auth.session.refreshToken, auth.member)
+        sessionManager.saveSession(auth.session.token, auth.member)
     }
 
     fun handleLoginFailure(@Suppress("UNUSED_PARAMETER") error: String) {

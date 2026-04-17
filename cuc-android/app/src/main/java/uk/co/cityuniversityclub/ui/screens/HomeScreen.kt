@@ -21,9 +21,9 @@ import uk.co.cityuniversityclub.ui.theme.CambridgeBlue
 import uk.co.cityuniversityclub.ui.theme.OxfordBlue
 
 @Composable
-fun HomeScreen(member: Member, displayName: String) {
-    val memberFirstName = displayName.ifBlank { member.firstName.ifBlank { "Member" } }.split(" ").firstOrNull() ?: "Member"
-    val memberFullName = displayName.ifBlank { member.fullName.ifBlank { "Member" } }
+fun HomeScreen(member: Member) {
+    val memberFirstName = member.firstName.ifBlank { "Member" }
+    val memberFullName = member.fullName.ifBlank { "Member" }
     val memberUntil = "March ${java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) + 1}"
 
     Box(modifier = Modifier.fillMaxSize()) {

@@ -37,8 +37,6 @@ private sealed class MoreSubScreen {
 fun MoreScreen(
     member: Member,
     token: String,
-    displayName: String,
-    onSetDisplayName: (String) -> Unit,
     onLogout: () -> Unit
 ) {
     var subScreen by remember { mutableStateOf<MoreSubScreen>(MoreSubScreen.Menu) }
@@ -63,8 +61,6 @@ fun MoreScreen(
                 MoreSubHeader(title = "Profile", onBack = { subScreen = MoreSubScreen.Menu })
                 ProfileScreen(
                     member = member,
-                    displayName = displayName,
-                    onSetDisplayName = onSetDisplayName,
                     onLogout = onLogout
                 )
             }

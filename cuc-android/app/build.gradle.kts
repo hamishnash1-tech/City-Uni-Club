@@ -11,7 +11,7 @@ android {
         applicationId = "uk.co.cityuniversityclub"
         minSdk = 24
         targetSdk = 35
-        versionCode = 4
+        versionCode = 5
         versionName = "1.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

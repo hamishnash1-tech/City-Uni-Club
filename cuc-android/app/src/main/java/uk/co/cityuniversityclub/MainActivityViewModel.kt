@@ -28,8 +28,6 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    private val userPreferences = UserPreferences(application)
-
     private val _isAuthenticated = MutableStateFlow(false)
     val isAuthenticated: StateFlow<Boolean> = _isAuthenticated.asStateFlow()
 
@@ -38,9 +36,6 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
     private val _isRestoring = MutableStateFlow(true)
     val isRestoring: StateFlow<Boolean> = _isRestoring.asStateFlow()
-
-    private val _displayName = MutableStateFlow(userPreferences.getDisplayName())
-    val displayName: StateFlow<String> = _displayName.asStateFlow()
 
     var token: String? = null
         private set
@@ -79,11 +74,6 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         }
     }
 
-    fun setDisplayName(name: String) {
-        userPreferences.setDisplayName(name)
-        _displayName.value = name
-    }
-
     fun logout() {
         viewModelScope.launch {
             val t = token
@@ -93,9 +83,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             token = null
             _member.value = null
             _isAuthenticated.value = false
-            _displayName.value = ""
             sessionManager.clearSession()
-            userPreferences.clear()
         }
     }
 }
