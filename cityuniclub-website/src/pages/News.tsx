@@ -33,7 +33,7 @@ export const News: React.FC = () => {
   return (
     <div className="">
       {/* Header */}
-      <div className="bg-cambridge/15 pt-7 pb-5 px-4 border-b border-cambridge/20">
+      <div className="bg-oxford-blue/80 pt-7 pb-5 px-4 border-b border-cambridge/20">
         <div className="flex items-center justify-center gap-2 text-ivory">
           <IconNews />
           <h1 className="font-serif text-2xl font-normal text-ivory">Club News</h1>

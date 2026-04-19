@@ -29,7 +29,7 @@ export const Info: React.FC = () => {
   <div className="pb-20">
 
     {/* Header */}
-    <div className="bg-cambridge/15 pt-7 pb-6 px-4 border-b border-cambridge/20 text-center">
+    <div className="bg-oxford-blue/80 pt-7 pb-6 px-4 border-b border-cambridge/20 text-center">
       <p className="label-caps text-cambridge-muted mb-2">Est. 1895</p>
       <h1 className="font-serif text-2xl font-normal text-ivory">City University Club</h1>
       <p className="text-ivory/60 text-sm mt-2 max-w-md mx-auto">
@@ -41,7 +41,7 @@ export const Info: React.FC = () => {
 
       {/* About */}
       <section>
-        <p className="label-caps text-cambridge-muted mb-3">About</p>
+        <p className="label-caps text-ivory mb-3">About</p>
         <div className="club-card p-5 text-sm text-ink leading-relaxed space-y-4">
           <p>
             The City University Club (CUC) is a lunch club in the heart of the financial area of London.
@@ -74,7 +74,7 @@ export const Info: React.FC = () => {
 
       {/* Gallery */}
       <section>
-        <p className="label-caps text-cambridge-muted mb-3">Gallery</p>
+        <p className="label-caps text-ivory mb-3">Gallery</p>
         <div className="flex items-center gap-2">
           <button onClick={() => scroll('left')} className="flex-none w-9 h-9 flex items-center justify-center rounded-sm bg-cambridge/15 border border-cambridge/40 text-ivory/70 text-xl hover:bg-cambridge/30 hover:text-ivory hover:border-cambridge transition" aria-label="Scroll left">‹</button>
           <div ref={carouselRef} className="flex gap-2 overflow-x-auto snap-x snap-mandatory pb-2 flex-1" style={{ scrollbarWidth: 'none' }}>
@@ -99,7 +99,7 @@ export const Info: React.FC = () => {
 
       {/* Opening Hours */}
       <section>
-        <p className="label-caps text-cambridge-muted mb-3">Opening Hours</p>
+        <p className="label-caps text-ivory mb-3">Opening Hours</p>
         <div className="club-card p-5 text-sm text-ink space-y-3">
           <div className="flex justify-between border-b border-cambridge/10 pb-3">
             <span className="text-ink-mid">Tuesday – Friday</span>
@@ -114,7 +114,7 @@ export const Info: React.FC = () => {
 
       {/* Contact */}
       <section id="get-in-touch">
-        <p className="label-caps text-cambridge-muted mb-3">Get in Touch</p>
+        <p className="label-caps text-ivory mb-3">Get in Touch</p>
         <div className="club-card p-5 text-sm text-ink space-y-4">
 
           <div className="flex gap-3">
@@ -164,7 +164,7 @@ export const Info: React.FC = () => {
 
       {/* Membership CTA */}
       <section>
-        <p className="label-caps text-cambridge-muted mb-3">Membership</p>
+        <p className="label-caps text-ivory mb-3">Membership</p>
         <div className="club-card p-6 text-center space-y-4">
           <h3 className="font-serif text-oxford-blue text-xl font-normal">Become a Member</h3>
           <p className="text-sm text-ink leading-relaxed max-w-sm mx-auto">
@@ -178,7 +178,7 @@ export const Info: React.FC = () => {
 
       {/* Map */}
       <section>
-        <p className="label-caps text-cambridge-muted mb-3">Location</p>
+        <p className="label-caps text-ivory mb-3">Location</p>
         <div className="rounded-sm overflow-hidden border border-cambridge/20">
           <iframe
             title="City University Club location"
@@ -195,7 +195,7 @@ export const Info: React.FC = () => {
 
       {/* Getting Here */}
       <section>
-        <p className="label-caps text-cambridge-muted mb-3">Getting Here</p>
+        <p className="label-caps text-ivory mb-3">Getting Here</p>
         <div className="club-card p-5 text-sm text-ink leading-relaxed space-y-3">
           <p>The nearest Underground station is <strong>Tower Hill</strong> (Circle &amp; District lines), a 3 minute walk. Exit onto Trinity Square, head north along Muscovy Street, then turn right onto Crutched Friars.</p>
           <p><strong>Aldgate</strong> (Circle &amp; Metropolitan lines) is a 4 minute walk. Head south on Aldgate High Street, turn right onto Fenchurch Street, then left onto Crutched Friars.</p>
@@ -205,7 +205,7 @@ export const Info: React.FC = () => {
 
       {/* Venue Hire */}
       <section>
-        <p className="label-caps text-cambridge-muted mb-3">Venue Hire</p>
+        <p className="label-caps text-ivory mb-3">Venue Hire</p>
         <div className="space-y-4">
 
           <div className="club-card p-5 text-sm text-ink space-y-5">

@@ -156,7 +156,7 @@ export const EventDetail: React.FC = () => {
   return (
     <div className="pb-20">
       {/* Header */}
-      <div className="bg-cambridge/15 pt-7 pb-6 px-4 border-b border-cambridge/20">
+      <div className="bg-oxford-blue/80 pt-7 pb-6 px-4 border-b border-cambridge/20">
         <div className="max-w-2xl mx-auto">
           <Link to="/events" className="label-caps text-cambridge-muted hover:text-cambridge transition mb-4 inline-block">
             ← All Events

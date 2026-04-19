@@ -209,30 +209,14 @@ const ReciprocalClubs: React.FC = () => {
   return (
     <>
     <div className="">
-      <div className="bg-cambridge/15 pt-7 pb-5 border-b border-cambridge/20">
-        <div className="flex items-center justify-center gap-2 text-ivory">
+      <div className="bg-oxford-blue/80 pt-7 pb-5 px-4 border-b border-cambridge/20">
+        <div className="flex items-center justify-center gap-2 text-ivory mb-4">
           <IconClubs />
           <h1 className="font-serif text-2xl font-normal">Reciprocal Clubs</h1>
         </div>
-      </div>
-
-      <div className="max-w-2xl mx-auto px-4 mt-5">
-        {error && (
-          <div className="mb-4 border-l-4 border-red-400/60 bg-red-900/20 px-4 py-3 flex items-center justify-between gap-4">
-            <p className="text-red-300/80 text-sm">Unable to load clubs. Please try again later.</p>
-            {retryFnRef.current && (
-              <button
-                onClick={() => { setError(null); retryFnRef.current?.() }}
-                className="label-caps text-cambridge-light/70 hover:text-cambridge-light transition flex-shrink-0"
-              >
-                Retry
-              </button>
-            )}
-          </div>
-        )}
 
         {token && (
-          <div className="relative flex w-full max-w-sm sm:max-w-md md:max-w-2xl mx-auto border border-cambridge/20 rounded-sm p-1 mb-4">
+          <div className="relative flex w-full max-w-sm sm:max-w-md md:max-w-2xl mx-auto border border-cambridge/20 rounded-sm p-1">
             {(() => {
               const tabs = [
                 { id: 'clubs' as const, label: 'Clubs' },
@@ -263,6 +247,22 @@ const ReciprocalClubs: React.FC = () => {
                 </>
               )
             })()}
+          </div>
+        )}
+      </div>
+
+      <div className="max-w-2xl mx-auto px-4 mt-5">
+        {error && (
+          <div className="mb-4 border-l-4 border-red-400/60 bg-red-900/20 px-4 py-3 flex items-center justify-between gap-4">
+            <p className="text-red-300/80 text-sm">Unable to load clubs. Please try again later.</p>
+            {retryFnRef.current && (
+              <button
+                onClick={() => { setError(null); retryFnRef.current?.() }}
+                className="label-caps text-cambridge-light/70 hover:text-cambridge-light transition flex-shrink-0"
+              >
+                Retry
+              </button>
+            )}
           </div>
         )}
         {activeTab === 'clubs' && <Breadcrumb />}

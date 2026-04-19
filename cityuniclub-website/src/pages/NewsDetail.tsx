@@ -49,7 +49,7 @@ export const NewsDetail: React.FC = () => {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
-      <button onClick={() => navigate('/news')} className="label-caps text-cambridge/70 hover:text-cambridge transition mb-6 block">
+      <button onClick={() => navigate('/news')} className="label-caps text-ivory hover:text-cambridge transition mb-6 block">
         ← Back to News
       </button>
 
