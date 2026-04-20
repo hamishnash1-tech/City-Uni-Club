@@ -19,39 +19,48 @@ SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
 
 # Membership type mapping from CSV to database
 MEMBERSHIP_TYPE_MAP = {
-    "Country": "Full Membership",
-    "country": "Full Membership",
-    "Overseas": "Full Membership",
-    "overseas": "Full Membership",
-    "Overseas/over 70": "Full Membership",
-    "Overseas/ over 70": "Full Membership",
-    "Overseas Spousal": "Full Membership",
-    "Overseas/under 35": "Full Membership",
-    "70 and over": "Full Membership",
-    "70 and over+overseas": "Full Membership",
-    "70 and Over Overseas": "Full Membership",
-    "70 & over overseas": "Full Membership",
-    "Full 32 to 59": "Full Membership",
-    "full 32 to 59": "Full Membership",
-    "Full Membership": "Full Membership",
-    "Under 32": "Junior Membership",
-    "Under 35": "Junior Membership",
-    "under 32": "Junior Membership",
-    "U32": "Junior Membership",
-    "Under32": "Junior Membership",
-    "60 to 64": "Full Membership",
-    "65 to69": "Full Membership",
-    "65 to 69": "Full Membership",
-    "Retired 65 to 69": "Full Membership",
-    "Retired 65 to69": "Full Membership",
-    "Group": "Corporate Membership",
-    "Spousal": "Full Membership",
-    "Old Stoics": "Full Membership",
-    "Honorary": "Senior Membership",
-    "2026 country": "Full Membership",
-    "Changing to Country March": "Full Membership",
-    "Oveerseas": "Full Membership",
-    "Overseas          ": "Full Membership",
+    "Country": "Country",
+    "country": "Country",
+    "2026 country": "Country",
+    "Changing to Country March": "Country",
+    "Overseas": "Overseas",
+    "overseas": "Overseas",
+    "Oveerseas": "Overseas",
+    "Overseas          ": "Overseas",
+    "Overseas/over 70": "70 and over",
+    "Overseas/ over 70": "70 and over",
+    "Overseas/70 and over": "70 and over",
+    "Overseas/ 70 and over": "70 and over",
+    "Overseas/70": "70 and over",
+    "Overseas/70 & over": "70 and over",
+    "70 and over+overseas": "70 and over",
+    "70 and Over Overseas": "70 and over",
+    "70 & over overseas": "70 and over",
+    "Overseas Spousal": "Spousal",
+    "Overseas/Under 35": "Under 35",
+    "Overseas/65 to69": "65 to 69",
+    "Overseas/under 35": "Under 35",
+    "70 and over": "70 and over",
+    "70  and over": "70 and over",
+    "Full 32 to 59": "Full 35 to 59",
+    "full 32 to 59": "Full 35 to 59",
+    "Under 32": "Under 35",
+    "Under 35": "Under 35",
+    "under 32": "Under 35",
+    "U32": "Under 35",
+    "Under32": "Under 35",
+    "Under 32 (overseas)": "Under 35",
+    "Under 32 (Overseas)": "Under 35",
+    "60 to 64": "60 to 64",
+    "65 to69": "65 to 69",
+    "65 to 69": "65 to 69",
+    "Retired 65 to 69": "Retired 65 to 69",
+    "Retired 65 to69": "Retired 65 to 69",
+    "Group": "Group",
+    "group": "Group",
+    "Spousal": "Spousal",
+    "Old Stoics": "Old Stoics",
+    "Honorary": "Honorary",
 }
 
 
@@ -103,7 +112,15 @@ class MemberCSVProcessor:
         """Clean email addresses"""
         if not email:
             return None
-        email = email.strip().rstrip(',')
+        email = email.strip().rstrip(',').rstrip(';').rstrip('>').strip()
+        # Extract email from "Name <email@x.com>" format
+        m = re.search(r'<([^>]+@[^>]+)>', email)
+        if m:
+            email = m.group(1)
+        # Extract bare email if wrapped in other text
+        m = re.search(r'[\w.+-]+@[\w-]+\.[\w.-]+', email)
+        if m:
+            email = m.group(0)
         if "@" not in email or email == "nan":
             return None
         return email
@@ -130,14 +147,14 @@ class MemberCSVProcessor:
     def map_membership_type(self, csv_type: str) -> str:
         """Map CSV membership type to database type"""
         if not csv_type:
-            return "Full Membership"
+            return "Country"
 
         mapped = MEMBERSHIP_TYPE_MAP.get(csv_type.strip())
         if mapped:
             return mapped
 
-        print(f"  WARNING: Unknown membership type '{csv_type}' - using Full Membership")
-        return "Full Membership"
+        print(f"  WARNING: Unknown membership type '{csv_type}' - using Country")
+        return "Country"
 
     def get_next_tba_number(self, max_member_number: int) -> int:
         """Get next available membership number for tba entries"""
@@ -187,11 +204,10 @@ class MemberCSVProcessor:
                 except (ValueError, TypeError):
                     pass
 
-            # Handle tba entries
-            if member_no == "tba":
-                max_member_number += 1
-                member_no = str(max_member_number)
-                print(f"  Row {idx}: Assigned TBA member {firstname} {lastname} number {member_no}")
+            # Skip tba entries
+            if member_no.lower() == "tba":
+                issues.append(f"Row {idx}: Skipped TBA entry {firstname} {lastname}")
+                continue
 
             # Default member_since if not provided
             if not date_joined:
@@ -208,7 +224,7 @@ class MemberCSVProcessor:
                 "phone_number": phone,
                 "membership_type": membership_type,
                 "member_since": date_joined,
-                "member_until": "2026-12-31",  # Default
+                "member_until": "2027-03-31",  # Default
                 "is_active": True,
                 "title": title,
             })

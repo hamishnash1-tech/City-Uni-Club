@@ -7,8 +7,7 @@ struct MembershipCardView: View {
     var member: Member? { authManager.currentMember }
 
     var formattedMemberUntil: String {
-        let nextYear = Calendar.current.component(.year, from: Date()) + 1
-        return "March \(nextYear)"
+        formatMonthYear(member?.memberUntil)
     }
 
     var body: some View {

@@ -24,7 +24,8 @@ data class Member(
     @SerializedName("middle_name") val middleName: String? = null,
     @SerializedName("last_name") val lastName: String = "",
     @SerializedName("membership_number") val membershipNumber: String = "",
-    @SerializedName("membership_type") val membershipType: String = ""
+    @SerializedName("membership_type") val membershipType: String = "",
+    @SerializedName("member_until") val memberUntil: String? = null
 ) {
     val fullName: String get() = listOfNotNull(firstName.ifBlank { null }, middleName?.ifBlank { null }, lastName.ifBlank { null }).joinToString(" ")
 }
