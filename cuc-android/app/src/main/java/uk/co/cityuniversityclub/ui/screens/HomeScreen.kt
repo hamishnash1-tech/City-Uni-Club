@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import uk.co.cityuniversityclub.R
 import uk.co.cityuniversityclub.network.Member
 import uk.co.cityuniversityclub.ui.components.MembershipCard
+import uk.co.cityuniversityclub.util.formatMonthYear
 import uk.co.cityuniversityclub.ui.theme.CambridgeBlue
 import uk.co.cityuniversityclub.ui.theme.OxfordBlue
 
@@ -24,7 +25,7 @@ import uk.co.cityuniversityclub.ui.theme.OxfordBlue
 fun HomeScreen(member: Member) {
     val memberFirstName = member.firstName.ifBlank { "Member" }
     val memberFullName = member.fullName.ifBlank { "Member" }
-    val memberUntil = "March ${java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) + 1}"
+    val memberUntil = formatMonthYear(member.memberUntil)
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(

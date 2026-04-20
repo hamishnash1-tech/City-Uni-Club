@@ -38,11 +38,18 @@ import { FUNCTIONS_URL } from '../services/supabase'
 import { useAuth } from '../context/AuthContext'
 
 const MEMBERSHIP_TYPES = [
-  'Full Membership',
-  'Associate Membership',
-  'Junior Membership',
-  'Senior Membership',
-  'Corporate Membership',
+  'Country',
+  'Overseas',
+  'Full 35 to 59',
+  'Under 35',
+  '60 to 64',
+  '65 to 69',
+  '70 and over',
+  'Retired 65 to 69',
+  'Honorary',
+  'Spousal',
+  'Group',
+  'Old Stoics',
 ]
 
 interface Member {
@@ -65,7 +72,8 @@ const emptyForm = {
   middle_name: '',
   email: '',
   phone_number: '',
-  membership_type: 'Full Membership',
+  membership_number: '',
+  membership_type: 'Country',
   member_since: new Date().toISOString().split('T')[0],
   member_until: '',
   is_active: true,
@@ -87,7 +95,7 @@ export default function MembersPage() {
   const [formError, setFormError] = useState<string | null>(null)
 
   const [editMember, setEditMember] = useState<Member | null>(null)
-  const [editForm, setEditForm] = useState({ first_name: '', middle_name: '', last_name: '', member_since: '', membership_type: '', email: '', phone_number: '', is_active: true })
+  const [editForm, setEditForm] = useState({ first_name: '', middle_name: '', last_name: '', member_since: '', member_until: '', membership_number: '', membership_type: '', email: '', phone_number: '', is_active: true })
   const [editSubmitting, setEditSubmitting] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
 
@@ -133,6 +141,8 @@ export default function MembersPage() {
       middle_name: member.middle_name || '',
       last_name: member.last_name || '',
       member_since: member.member_since ? member.member_since.split('T')[0] : '',
+      member_until: member.member_until ? member.member_until.split('T')[0] : '',
+      membership_number: member.membership_number || '',
       membership_type: member.membership_type || '',
       email: member.email || '',
       phone_number: member.phone_number || '',
@@ -155,6 +165,8 @@ export default function MembersPage() {
           first_name: editForm.first_name || null,
           middle_name: editForm.middle_name || null,
           member_since: editForm.member_since || null,
+          member_until: editForm.member_until || null,
+          membership_number: editForm.membership_number || null,
           membership_type: editForm.membership_type || null,
           email: editForm.email,
           phone_number: editForm.phone_number || null,
@@ -189,6 +201,7 @@ export default function MembersPage() {
           ...form,
           phone_number: form.phone_number || null,
           member_until: form.member_until || null,
+          membership_number: form.membership_number || null,
         }),
       })
       const json = await res.json()
@@ -247,6 +260,7 @@ export default function MembersPage() {
               <TableCell>Email</TableCell>
               <TableCell>Phone</TableCell>
               <TableCell>Member Since</TableCell>
+              <TableCell>Member Until</TableCell>
               <TableCell>Status</TableCell>
               <TableCell></TableCell>
             </TableRow>
@@ -254,13 +268,13 @@ export default function MembersPage() {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={9} align="center" sx={{ py: 4 }}>
+                <TableCell colSpan={10} align="center" sx={{ py: 4 }}>
                   <CircularProgress size={32} />
                 </TableCell>
               </TableRow>
             ) : paginatedMembers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} align="center">
+                <TableCell colSpan={10} align="center">
                   <Typography color="textSecondary" sx={{ py: 4 }}>
                     {searchTerm ? 'No members found matching your search' : 'No members found'}
                   </Typography>
@@ -306,6 +320,11 @@ export default function MembersPage() {
                   <TableCell>
                     <Typography variant="body2" color="textSecondary">
                       {member.member_since ? new Date(member.member_since).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" color="textSecondary">
+                      {member.member_until ? new Date(member.member_until).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
                     </Typography>
                   </TableCell>
                   <TableCell>
@@ -389,7 +408,16 @@ export default function MembersPage() {
                 placeholder="+44 7700 900000"
               />
             </Grid>
-            <Grid size={12}>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Membership Number"
+                value={editForm.membership_number}
+                onChange={e => setEditForm(prev => ({ ...prev, membership_number: e.target.value }))}
+                fullWidth
+                placeholder="e.g. 002017"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 select
                 label="Membership Type"
@@ -402,7 +430,7 @@ export default function MembersPage() {
                 ))}
               </TextField>
             </Grid>
-            <Grid size={12}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 label="Member Since"
                 type="date"
@@ -410,6 +438,17 @@ export default function MembersPage() {
                 onChange={e => setEditForm(prev => ({ ...prev, member_since: e.target.value }))}
                 fullWidth
                 InputLabelProps={{ shrink: true }}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Member Until"
+                type="date"
+                value={editForm.member_until}
+                onChange={e => setEditForm(prev => ({ ...prev, member_until: e.target.value }))}
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                helperText="Leave blank if ongoing"
               />
             </Grid>
             <Grid size={12}>
@@ -491,6 +530,16 @@ export default function MembersPage() {
                 onChange={set('phone_number')}
                 fullWidth
                 placeholder="+44 7700 900000"
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <TextField
+                label="Membership Number"
+                value={form.membership_number}
+                onChange={set('membership_number')}
+                fullWidth
+                placeholder="e.g. 002017"
+                helperText="Leave blank to assign later"
               />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>

@@ -1,0 +1,1 @@
+ALTER TABLE members ALTER COLUMN phone_number TYPE VARCHAR(100);

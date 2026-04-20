@@ -45,7 +45,7 @@ export const Login: React.FC = () => {
   }
 
   return (
-    <div className="bg-navy-gradient flex items-center justify-center p-4 py-12">
+    <div className="flex items-center justify-center p-4 py-12">
       <div className="w-full max-w-md">
         {/* Logo */}
         <div className="text-center mb-12">

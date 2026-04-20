@@ -29,7 +29,7 @@ export const MobileApp: React.FC = () => (
   <div className="pb-20">
 
     {/* Header */}
-    <div className="bg-cambridge/15 pt-7 pb-6 px-4 border-b border-cambridge/20 text-center">
+    <div className="bg-oxford-blue/80 pt-7 pb-6 px-4 border-b border-cambridge/20 text-center">
       <p className="label-caps text-cambridge-light/50 mb-2">Member Mobile App</p>
       <h1 className="font-serif text-2xl font-normal text-ivory">City University Club</h1>
       <p className="text-ivory/60 text-sm mt-2 max-w-md mx-auto">
@@ -63,7 +63,7 @@ export const MobileApp: React.FC = () => (
 
       {/* About */}
       <section>
-        <p className="label-caps text-cambridge-light/50 mb-3">About the App</p>
+        <p className="label-caps text-ivory mb-3">About the App</p>
         <div className="club-card p-5 text-sm text-ink leading-relaxed space-y-3">
           <p>
             The City University Club app gives members convenient access to Club services directly from their iPhone or Android device. Book a table in the dining room, browse and register for upcoming events, view your membership card, and request Letters of Introduction to reciprocal clubs around the world — all from one place.
@@ -76,7 +76,7 @@ export const MobileApp: React.FC = () => (
 
       {/* Features */}
       <section>
-        <p className="label-caps text-cambridge-light/50 mb-5">Features</p>
+        <p className="label-caps text-ivory mb-5">Features</p>
         <div className="space-y-5">
           <Feature
             icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2" strokeWidth={1.5}/><path d="M2 10h20" strokeWidth={1.5}/><path d="M6 15h4" strokeWidth={1.5} strokeLinecap="round"/></svg>}
@@ -108,7 +108,7 @@ export const MobileApp: React.FC = () => (
 
       {/* Support & contact */}
       <section>
-        <p className="label-caps text-cambridge-light/50 mb-3">Support</p>
+        <p className="label-caps text-ivory mb-3">Support</p>
         <div className="club-card p-5 text-sm text-ink leading-relaxed space-y-2">
           <p>For technical support with the app, or any membership enquiry, please contact the Club Secretary.</p>
           <p>

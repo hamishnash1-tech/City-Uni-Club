@@ -108,7 +108,7 @@ export const VenueHire: React.FC = () => {
   return (
     <div className="">
       {/* Header */}
-      <div className="bg-cambridge/15 pt-7 pb-5 px-4 border-b border-cambridge/20">
+      <div className="bg-oxford-blue/80 pt-7 pb-5 px-4 border-b border-cambridge/20">
         <div className="text-center">
           <p className="label-caps text-cambridge-muted mb-2">City University Club</p>
           <h1 className="font-serif text-2xl font-normal text-ivory">Venue Hire</h1>

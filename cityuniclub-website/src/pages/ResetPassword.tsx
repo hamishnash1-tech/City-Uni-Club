@@ -37,7 +37,7 @@ export const ResetPassword: React.FC = () => {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-navy-gradient flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4">
         <div className="w-full max-w-md text-center space-y-4">
           <p className="text-red-300/80 text-sm">Invalid or missing reset link.</p>
           <Link to="/login" className="text-xs text-cambridge/60 hover:text-cambridge-light transition">Back to login</Link>
@@ -47,7 +47,7 @@ export const ResetPassword: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-navy-gradient flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-10">
           <h1 className="font-serif text-3xl font-light text-ivory mb-2 tracking-wide">Set New Password</h1>

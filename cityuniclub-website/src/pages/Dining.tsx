@@ -174,7 +174,7 @@ export const Dining: React.FC = () => {
   return (
     <div className="">
       {/* Header */}
-      <div className="bg-cambridge/15 pt-7 pb-5 px-4 border-b border-cambridge/20">
+      <div className="bg-oxford-blue/80 pt-7 pb-5 px-4 border-b border-cambridge/20">
         <div className="flex items-center justify-center gap-2 mb-4 text-ivory">
           <IconDining />
           <h1 className="font-serif text-2xl font-normal text-ivory">Dining</h1>
@@ -234,7 +234,7 @@ export const Dining: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {activeTab === 'menu' && (
           <div className="flex justify-center mb-6">
-            <div className="relative flex border border-cambridge/20 rounded-sm p-1">
+            <div className="relative flex bg-oxford-blue/80 border border-cambridge/20 rounded-sm p-1">
               {(() => {
                 const menuTabs = [
                   { id: 'breakfast', label: 'Breakfast' },

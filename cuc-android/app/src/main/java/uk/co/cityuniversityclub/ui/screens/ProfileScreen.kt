@@ -16,13 +16,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import uk.co.cityuniversityclub.network.Member
+import uk.co.cityuniversityclub.util.formatMonthYear
 import uk.co.cityuniversityclub.ui.theme.CambridgeBlue
 import uk.co.cityuniversityclub.ui.theme.OxfordBlue
 import uk.co.cityuniversityclub.ui.theme.SecondaryText
 
 @Composable
 fun ProfileScreen(member: Member, onLogout: () -> Unit) {
-    val memberUntil = "March ${java.util.Calendar.getInstance().get(java.util.Calendar.YEAR) + 1}"
+    val memberUntil = formatMonthYear(member.memberUntil)
 
     val initials = member.fullName
         .split(" ")

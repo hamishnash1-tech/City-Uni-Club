@@ -46,7 +46,7 @@ serve(async (req) => {
 
     if (req.method === 'POST') {
       const body = await req.json()
-      const { last_name, first_name, middle_name, email, phone_number, membership_type, member_since, member_until, is_active, password } = body
+      const { last_name, first_name, middle_name, email, phone_number, membership_number, membership_type, member_since, member_until, is_active, password } = body
 
       if (!last_name || !first_name || !email || !membership_type || !member_since || !password) {
         return new Response(JSON.stringify({ error: 'Missing required fields: last_name, first_name, email, membership_type, member_since, password' }), {
@@ -64,6 +64,7 @@ serve(async (req) => {
           middle_name: middle_name || null,
           email,
           phone_number: phone_number || null,
+          membership_number: membership_number || null,
           membership_type,
           member_since,
           member_until: member_until || null,
@@ -81,7 +82,7 @@ serve(async (req) => {
     }
 
     if (req.method === 'PATCH') {
-      const { id, is_active, member_since, membership_type, email, phone_number, last_name, first_name, middle_name } = await req.json()
+      const { id, is_active, member_since, member_until, membership_number, membership_type, email, phone_number, last_name, first_name, middle_name } = await req.json()
       if (!id) {
         return new Response(JSON.stringify({ error: 'Missing id' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400
@@ -90,6 +91,8 @@ serve(async (req) => {
       const update: Record<string, unknown> = {}
       if (is_active !== undefined) update.is_active = is_active
       if (member_since !== undefined) update.member_since = member_since
+      if (member_until !== undefined) update.member_until = member_until || null
+      if (membership_number !== undefined) update.membership_number = membership_number || null
       if (membership_type !== undefined) update.membership_type = membership_type
       if (email !== undefined) update.email = email
       if (phone_number !== undefined) update.phone_number = phone_number

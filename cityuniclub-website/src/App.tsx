@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, type PropsWithChildren } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Routes, Route, Navigate, Link, useLocation } from 'react-router-dom'
 import { RootState } from './store'
@@ -23,6 +23,12 @@ const MobileApp        = React.lazy(() => import('./pages/MobileApp').then(m => 
 const Info             = React.lazy(() => import('./pages/Info').then(m => ({ default: m.Info })))
 const VenueHire        = React.lazy(() => import('./pages/VenueHire').then(m => ({ default: m.VenueHire })))
 import { IconUser } from './icons'
+
+const PageShell: React.FC<PropsWithChildren> = ({ children }) => (
+  <div className="max-w-5xl mx-auto min-h-[calc(100vh-5rem)] backdrop-blur-sm">
+    {children}
+  </div>
+)
 
 const tabs = [
   { id: 'home',    label: 'Home',    path: '/home' },
@@ -333,31 +339,30 @@ const App: React.FC = () => {
           backgroundAttachment: 'fixed',
         }}
       >
-        <div className="fixed inset-0 bg-navy-deep/80 pointer-events-none" style={{ zIndex: 0 }} />
-        <div className="flex-1 relative" style={{ zIndex: 1 }}>
+        <div className="flex-1 relative">
         <React.Suspense fallback={<div className="flex justify-center py-20"><div className="w-6 h-6 border-2 border-cambridge/30 border-t-cambridge rounded-full animate-spin" /></div>}>
           <Routes>
             <Route path="/" element={<Navigate to="/home" replace />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/login" element={<PageShell><Login /></PageShell>} />
+            <Route path="/forgot-password" element={<PageShell><ForgotPassword /></PageShell>} />
+            <Route path="/reset-password" element={<PageShell><ResetPassword /></PageShell>} />
             <Route path="/home" element={<Home />} />
-            <Route path="/dining" element={<Dining />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/events/:slug" element={<EventDetail />} />
-            <Route path="/news" element={<News />} />
-            <Route path="/news/:id" element={<NewsDetail />} />
-            <Route path="/reciprocal-clubs" element={<ReciprocalClubs />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/loi-request" element={<ProtectedRoute><LOIRequest /></ProtectedRoute>} />
-            <Route path="/terms" element={<TermsAndConditions />} />
-            <Route path="/privacy" element={<PrivacyPolicy />} />
-            <Route path="/mobile-app" element={<MobileApp />} />
-            <Route path="/info" element={<Info />} />
+            <Route path="/dining" element={<PageShell><Dining /></PageShell>} />
+            <Route path="/events" element={<PageShell><Events /></PageShell>} />
+            <Route path="/events/:slug" element={<PageShell><EventDetail /></PageShell>} />
+            <Route path="/news" element={<PageShell><News /></PageShell>} />
+            <Route path="/news/:id" element={<PageShell><NewsDetail /></PageShell>} />
+            <Route path="/reciprocal-clubs" element={<PageShell><ReciprocalClubs /></PageShell>} />
+            <Route path="/profile" element={<PageShell><Profile /></PageShell>} />
+            <Route path="/loi-request" element={<PageShell><ProtectedRoute><LOIRequest /></ProtectedRoute></PageShell>} />
+            <Route path="/terms" element={<PageShell><TermsAndConditions /></PageShell>} />
+            <Route path="/privacy" element={<PageShell><PrivacyPolicy /></PageShell>} />
+            <Route path="/mobile-app" element={<PageShell><MobileApp /></PageShell>} />
+            <Route path="/info" element={<PageShell><Info /></PageShell>} />
             <Route path="/about" element={<Navigate to="/info" replace />} />
             <Route path="/contact" element={<Navigate to="/info" replace />} />
-            <Route path="/join" element={<Join />} />
-            <Route path="/venue-hire" element={<VenueHire />} />
+            <Route path="/join" element={<PageShell><Join /></PageShell>} />
+            <Route path="/venue-hire" element={<PageShell><VenueHire /></PageShell>} />
           </Routes>
         </React.Suspense>
         </div>
