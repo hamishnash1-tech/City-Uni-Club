@@ -12,6 +12,7 @@ struct EventsView: View {
     @State private var specialRequests = ""
     @State private var showConfirmation = false
     @State private var isBooking = false
+    @State private var showBookingError = false
     @State private var cancelTarget: Event? = nil
     @State private var isCancelling = false
     @State private var showReservations = false
@@ -125,6 +126,11 @@ struct EventsView: View {
                 }
             }
         }
+        .alert("Booking Failed", isPresented: $showBookingError) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Something went wrong. Please try again.")
+        }
         .alert("Cancel Booking", isPresented: Binding(
             get: { cancelTarget != nil },
             set: { if !$0 { cancelTarget = nil } }
@@ -233,12 +239,13 @@ struct EventsView: View {
                 isBooking = false
                 showBookingSheet = false
                 showConfirmation = true
+                loadEvents()
             }
         } catch {
             await MainActor.run {
                 isBooking = false
                 showBookingSheet = false
-                showError = true
+                showBookingError = true
             }
         }
     }
